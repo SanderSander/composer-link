@@ -1,0 +1,27 @@
+{
+    "name": "sandersander/composer-link",
+    "description": "Link your libraries into your project for development",
+    "type": "composer-plugin",
+    "autoload": {
+        "psr-4": {
+            "ComposerLink\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "SanderSander",
+            "email": "themastersleader@hotmail.com"
+        }
+    ],
+    "require": {
+        "composer-plugin-api": "^2.2",
+        "league/flysystem": "^3.0",
+        "friendsofphp/php-cs-fixer": "^3.7"
+    },
+    "require-dev": {
+        "composer/composer": "^2.0"
+    },
+    "extra": {
+        "class": "ComposerLink\\Plugin"
+    }
+}
