@@ -15,11 +15,11 @@
     ],
     "require": {
         "composer-plugin-api": "^2.2",
-        "league/flysystem": "^3.0",
-        "friendsofphp/php-cs-fixer": "^3.7"
+        "league/flysystem": "^3.0"
     },
     "require-dev": {
-        "composer/composer": "^2.0"
+        "composer/composer": "^2.0",
+        "friendsofphp/php-cs-fixer": "^v3.4.0"
     },
     "extra": {
         "class": "ComposerLink\\Plugin"

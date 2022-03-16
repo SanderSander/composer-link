@@ -19,16 +19,14 @@ class LinkCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');
-        $this->getIO()->write(sprintf('Linking path "%s".', $path));
 
-        $factory = new LinkedPackageFactory();
+        $factory = new LinkedPackageFactory($this->getComposer()->getInstallationManager(), $this->getComposer()->getRepositoryManager()->getLocalRepository());
         $linkedPackage = $factory->fromPath($path);
 
         $this->plugin->getRepository()->store($linkedPackage);
         $this->plugin->getRepository()->persist();
-        ;
 
-        $this->getIO()->write('Package is linked run `composer update` to link the package into the vendor directory');
+        $this->plugin->getLinkedPackagesManager()->linkPackage($linkedPackage);
 
         return 0;
     }

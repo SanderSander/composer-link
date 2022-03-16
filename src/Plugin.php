@@ -5,12 +5,8 @@ namespace ComposerLink;
 use Composer\Composer;
 use Composer\Downloader\DownloadManager;
 use Composer\EventDispatcher\EventSubscriberInterface;
-use Composer\Factory;
 use Composer\Installer\InstallationManager;
 use Composer\IO\IOInterface;
-use Composer\Json\JsonFile;
-use Composer\Package\Loader\ArrayLoader;
-use Composer\Package\Package;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
@@ -31,6 +27,8 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     protected InstallationManager $installationManager;
 
     protected \Composer\Util\Filesystem $filesystem;
+
+    protected LinkedPackagesManager $linkedPackagesManager;
 
     public function __construct(\Composer\Util\Filesystem $filesystem = null)
     {
@@ -54,13 +52,19 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $this->downloadManager = $composer->getDownloadManager();
         $this->installationManager = $composer->getInstallationManager();
 
+        $this->linkedPackagesManager = new LinkedPackagesManager(
+            $this->filesystem,
+            $this->io,
+            $this->downloadManager
+        );
+
         $this->repository = new LinkedPackagesRepository(
-            new Filesystem(new LocalFilesystemAdapter(dirname(Factory::getComposerFile()))),
+            new Filesystem(new LocalFilesystemAdapter($composer->getConfig()->get('vendor-dir'))),
             $io
         );
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ScriptEvents::POST_UPDATE_CMD => [
@@ -69,27 +73,18 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         ];
     }
 
+    public function getLinkedPackagesManager(): LinkedPackagesManager
+    {
+        return $this->linkedPackagesManager;
+    }
+
     public function linkLinkedPackages(): void
     {
         $this->io->write('[ComposerLink] Loading linked packages');
         foreach ($this->repository->all() as $linkedPackage) {
-            // Extract package information
-            $package = $this->createPackageForPath($linkedPackage->getPath());
-            $destination = $this->installationManager->getInstallPath($package);
-
-            // Skip linking if already linked
-            if ($this->filesystem->isSymlinkedDirectory($destination) ||
-                $this->filesystem->isJunction($destination)
-            ) {
-                continue;
+            if (!$this->linkedPackagesManager->isLinked($linkedPackage)) {
+                $this->linkedPackagesManager->linkPackage($linkedPackage);
             }
-
-            $this->filesystem->removeDirectory($destination);
-
-            // Download the managed package from its path with the composer downloader
-            $this->io->debug("[ComposerLink] Creating link to " . $linkedPackage->getPath() . " for package " . $linkedPackage->getName());
-            $pathDownloader = $this->downloadManager->getDownloader('path');
-            $pathDownloader->install($package, $destination);
         }
         $this->io->write('[ComposerLink] Done loading linked packages');
     }
@@ -105,25 +100,5 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     public function getRepository(): LinkedPackagesRepository
     {
         return $this->repository;
-    }
-
-    /**
-     * Creates package from given path
-     */
-    private function createPackageForPath(string $path): Package
-    {
-        $json = (new JsonFile(
-            realpath($path . DIRECTORY_SEPARATOR . 'composer.json')
-        ))->read();
-        $json['version'] = 'dev-master';
-
-        // branch alias won't work, otherwise the ArrayLoader::load won't return an instance of CompletePackage
-        unset($json['extra']['branch-alias']);
-
-        $loader = new ArrayLoader();
-        $package = $loader->load($json);
-        $package->setDistUrl($path);
-
-        return $package;
     }
 }

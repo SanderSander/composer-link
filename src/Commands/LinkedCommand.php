@@ -23,7 +23,7 @@ class LinkedCommand extends Command
         }
 
         foreach ($linkedPackages as $linkedPackage) {
-            $output->writeln($linkedPackage->getPath());
+            $output->writeln(sprintf("%s\t%s", $linkedPackage->getPath(), $linkedPackage->getPackage()));
         }
 
         return 0;

@@ -3,12 +3,12 @@
 namespace ComposerLink\Repositories;
 
 use Composer\IO\IOInterface;
-use ComposerLink\Entities\LinkedPackage;
+use ComposerLink\LinkedPackage;
 use League\Flysystem\Filesystem;
 
 class LinkedPackagesRepository
 {
-    protected const JSON_FILE_NAME = 'composer-link.json';
+    protected const FILE_NAME = 'linked.dat';
 
     protected Filesystem $filesystem;
 
@@ -66,7 +66,7 @@ class LinkedPackagesRepository
     public function persist(): void
     {
         $this->io->debug("[ComposerLink]\tStoring linked repositories data into json file");
-        $this->filesystem->write(self::JSON_FILE_NAME, serialize($this->linkedPackages));
+        $this->filesystem->write(self::FILE_NAME, serialize($this->linkedPackages));
     }
 
     /**
@@ -74,10 +74,10 @@ class LinkedPackagesRepository
      */
     private function loadFromJsonFile(): void
     {
-        if (!$this->filesystem->fileExists(self::JSON_FILE_NAME)) {
+        if (!$this->filesystem->fileExists(self::FILE_NAME)) {
             return;
         }
 
-        $this->linkedPackages = unserialize($this->filesystem->read(self::JSON_FILE_NAME));
+        $this->linkedPackages = unserialize($this->filesystem->read(self::FILE_NAME));
     }
 }
