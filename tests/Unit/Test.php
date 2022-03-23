@@ -4,5 +4,4 @@ namespace Unit;
 
 class Test
 {
-
 }
