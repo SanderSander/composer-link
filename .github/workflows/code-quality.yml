@@ -1,4 +1,4 @@
-name: Code Style
+name: Code Static Analysis
 
 on:
   pull_request:
@@ -31,5 +31,5 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Run quality check
+      - name: Run static analyse
         run: ./vendor/bin/phpstan analyse src tests --memory-limit=2G --level=max --error-format=github
