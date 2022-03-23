@@ -19,7 +19,8 @@
     },
     "require-dev": {
         "composer/composer": "^2.0",
-        "friendsofphp/php-cs-fixer": "^v3.4.0"
+        "friendsofphp/php-cs-fixer": "^v3.4.0",
+        "phpstan/phpstan": "^1.4"
     },
     "extra": {
         "class": "ComposerLink\\Plugin"
