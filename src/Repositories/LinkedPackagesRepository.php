@@ -8,14 +8,14 @@ use League\Flysystem\Filesystem;
 
 class LinkedPackagesRepository
 {
-    protected const FILE_NAME = 'linked.dat';
+    protected const FILE_NAME = 'link.dat';
 
     protected Filesystem $filesystem;
 
     protected IOInterface $io;
 
     /**
-     * @var LinkedPackage[]
+     * @var array<int, LinkedPackage>
      */
     protected array $linkedPackages = [];
 

@@ -15,12 +15,18 @@ class CommandProvider implements ComposerCommandProvider
 
     protected Plugin $plugin;
 
+    /**
+     * @param array<string, mixed> $arguments
+     */
     public function __construct(array $arguments)
     {
         $this->io = $arguments['io'];
         $this->plugin = $arguments['plugin'];
     }
 
+    /**
+     * @return \Composer\Command\BaseCommand[]
+     */
     public function getCommands(): array
     {
         $this->io->debug("[ComposerLink]\tInitializing commands.");

@@ -11,6 +11,7 @@ use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\ScriptEvents;
+use Composer\Util\Filesystem as ComposerFileSystem;
 use ComposerLink\Providers\CommandProvider;
 use ComposerLink\Repositories\LinkedPackagesRepository;
 use League\Flysystem\Filesystem;
@@ -26,13 +27,13 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected InstallationManager $installationManager;
 
-    protected \Composer\Util\Filesystem $filesystem;
+    protected ComposerFileSystem $filesystem;
 
     protected LinkedPackagesManager $linkedPackagesManager;
 
-    public function __construct(\Composer\Util\Filesystem $filesystem = null)
+    public function __construct(ComposerFileSystem $filesystem = null)
     {
-        $this->filesystem = $filesystem ?: new \Composer\Util\Filesystem();
+        $this->filesystem = $filesystem ?: new ComposerFileSystem();
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
@@ -81,18 +82,18 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function linkLinkedPackages(): void
     {
-        $this->io->write('[ComposerLink] Loading linked packages');
+        $this->io?->write('[ComposerLink] Loading linked packages');
         foreach ($this->repository->all() as $linkedPackage) {
             if (!$this->linkedPackagesManager->isLinked($linkedPackage)) {
                 $this->linkedPackagesManager->linkPackage($linkedPackage);
             }
         }
-        $this->io->write('[ComposerLink] Done loading linked packages');
+        $this->io?->write('[ComposerLink] Done loading linked packages');
     }
 
     public function getCapabilities()
     {
-        $this->io->debug("[ComposerLink]\tCapabilities are loaded");
+        $this->io?->debug("[ComposerLink]\tCapabilities are loaded");
         return [
             ComposerCommandProvider::class => CommandProvider::class,
         ];

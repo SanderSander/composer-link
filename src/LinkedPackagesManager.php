@@ -72,6 +72,9 @@ class LinkedPackagesManager
 
         // Install the original package
         $installPromise = $this->downloadManager->install($linkedPackage->getOriginalPackage(), $linkedPackage->getInstallationPath());
+        if (is_null($installPromise)) {
+            throw new \RuntimeException('No installer for package found');
+        }
         $this->loop->wait([$installPromise]);
     }
 }

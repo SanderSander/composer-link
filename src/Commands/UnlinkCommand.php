@@ -2,6 +2,7 @@
 
 namespace ComposerLink\Commands;
 
+use Composer\Composer;
 use ComposerLink\Factories\LinkedPackageFactory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,8 +20,13 @@ class UnlinkCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');
+        /** @var Composer $composer */
+        $composer = $this->getComposer(true);
 
-        $factory = new LinkedPackageFactory($this->getComposer()->getInstallationManager(), $this->getComposer()->getRepositoryManager()->getLocalRepository());
+        $factory = new LinkedPackageFactory(
+            $composer->getInstallationManager(),
+            $composer->getRepositoryManager()->getLocalRepository()
+        );
         $linkedPackage = $factory->fromPath($path);
 
 

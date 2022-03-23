@@ -2,6 +2,7 @@
 
 namespace ComposerLink\Commands;
 
+use Composer\Composer;
 use ComposerLink\Factories\LinkedPackageFactory;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,7 +21,13 @@ class LinkCommand extends Command
     {
         $path = $input->getArgument('path');
 
-        $factory = new LinkedPackageFactory($this->getComposer()->getInstallationManager(), $this->getComposer()->getRepositoryManager()->getLocalRepository());
+        /** @var Composer $composer */
+        $composer = $this->getComposer(true);
+
+        $factory = new LinkedPackageFactory(
+            $composer->getInstallationManager(),
+            $composer->getRepositoryManager()->getLocalRepository()
+        );
         $linkedPackage = $factory->fromPath($path);
 
         $this->plugin->getRepository()->store($linkedPackage);

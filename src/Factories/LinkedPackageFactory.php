@@ -23,9 +23,12 @@ class LinkedPackageFactory
 
     private function loadFromJsonFile(string $path): CompletePackage
     {
-        $json = (new JsonFile(
-            realpath($path . DIRECTORY_SEPARATOR . 'composer.json')
-        ))->read();
+        $realPath = realpath($path . DIRECTORY_SEPARATOR . 'composer.json');
+        if ($realPath === false) {
+            throw new \RuntimeException('Composer.json file not found.');
+        }
+
+        $json = (new JsonFile($realPath))->read();
         $json['version'] = 'dev-master';
 
         // branch alias won't work, otherwise the ArrayLoader::load won't return an instance of CompletePackage
@@ -34,6 +37,10 @@ class LinkedPackageFactory
         $loader = new ArrayLoader();
         $package = $loader->load($json);
         $package->setDistUrl($path);
+
+        if (! $package instanceof CompletePackage) {
+            throw new \RuntimeException('Unsupported package.');
+        }
 
         return $package;
     }
@@ -48,6 +55,11 @@ class LinkedPackageFactory
                 $originalPackage = $package;
             }
         }
+
+        if (is_null($originalPackage)) {
+            throw new \RuntimeException('Original package not found, is it installed?');
+        }
+
         $destination = $this->installationManager->getInstallPath($newPackage);
 
         return new LinkedPackage(
