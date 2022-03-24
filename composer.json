@@ -24,8 +24,5 @@
     },
     "extra": {
         "class": "ComposerLink\\Plugin"
-    },
-    "scripts": {
-        "lint": "./vendor/bin/php-cs-fixer fix"
     }
 }
