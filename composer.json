@@ -1,6 +1,6 @@
 {
     "name": "sandersander/composer-link",
-    "description": "Link your libraries into your project for development",
+    "description": "Adds ability to link local packages for development with composer",
     "type": "composer-plugin",
     "license": "MIT",
     "authors": [
@@ -33,10 +33,5 @@
     },
     "extra": {
         "class": "ComposerLink\\Plugin"
-    },
-    "config": {
-        "allow-plugins": {
-            "phpstan/extension-installer": false
-        }
     }
 }
