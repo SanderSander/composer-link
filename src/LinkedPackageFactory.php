@@ -63,9 +63,11 @@ class LinkedPackageFactory
             }
         }
 
+        /*
         if (is_null($originalPackage)) {
             throw new \RuntimeException('Original package not found, is it installed?');
         }
+        */
 
         $destination = $this->installationManager->getInstallPath($newPackage);
 
