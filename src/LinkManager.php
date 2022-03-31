@@ -62,10 +62,14 @@ class LinkManager
     public function linkPackage(LinkedPackage $linkedPackage): void
     {
         if (!is_null($linkedPackage->getOriginalPackage())) {
-            $this->installationManager->uninstall(
+            $uninstallPromise = $this->installationManager->uninstall(
                 $this->installedRepository,
                 new UninstallOperation($linkedPackage->getOriginalPackage())
             );
+
+            if (!is_null($uninstallPromise)) {
+                $this->loop->wait([$uninstallPromise]);
+            }
         }
 
         $this->installationManager->install(
@@ -86,10 +90,14 @@ class LinkManager
         $this->installedRepository->addPackage($linkedPackage->getPackage());
 
         // Uninstall the linked package
-        $this->installationManager->uninstall(
+        $uninstallPromise = $this->installationManager->uninstall(
             $this->installedRepository,
             new UninstallOperation($linkedPackage->getPackage())
         );
+
+        if (!is_null($uninstallPromise)) {
+            $this->loop->wait([$uninstallPromise]);
+        }
 
         // Reinstall the linked package
         if (!is_null($linkedPackage->getOriginalPackage())) {
@@ -107,10 +115,14 @@ class LinkManager
             );
             $this->loop->wait([$downloadPromise]);
 
-            $this->installationManager->install(
+            $installPromise = $this->installationManager->install(
                 $this->installedRepository,
                 new InstallOperation($linkedPackage->getOriginalPackage())
             );
+
+            if (!is_null($installPromise)) {
+                $this->loop->wait([$installPromise]);
+            }
         }
     }
 }
