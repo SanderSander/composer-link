@@ -17,7 +17,6 @@ use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\Downloader\DownloadManager;
 use Composer\Installer\InstallationManager;
-use Composer\IO\IOInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Loop;
@@ -25,8 +24,6 @@ use Composer\Util\Loop;
 class LinkManager
 {
     protected Filesystem $filesystem;
-
-    protected IOInterface $io;
 
     protected DownloadManager $downloadManager;
 
@@ -38,14 +35,12 @@ class LinkManager
 
     public function __construct(
         Filesystem $filesystem,
-        IOInterface $io,
         DownloadManager $downloadManager,
         Loop $loop,
         InstallationManager $installationManager,
         InstalledRepositoryInterface  $installedRepository
     ) {
         $this->filesystem = $filesystem;
-        $this->io = $io;
         $this->downloadManager = $downloadManager;
         $this->loop = $loop;
         $this->installationManager = $installationManager;
@@ -66,8 +61,6 @@ class LinkManager
      */
     public function linkPackage(LinkedPackage $linkedPackage): void
     {
-        $this->io->debug("[ComposerLink] Creating link to " . $linkedPackage->getPath() . " for package " . $linkedPackage->getPackage());
-
         if (!is_null($linkedPackage->getOriginalPackage())) {
             $this->installationManager->uninstall(
                 $this->installedRepository,
@@ -86,10 +79,19 @@ class LinkManager
      */
     public function unlinkPackage(LinkedPackage $linkedPackage): void
     {
-        $pathDownloader = $this->downloadManager->getDownloader('path');
-        $pathDownloader->remove($linkedPackage->getPackage(), $linkedPackage->getInstallationPath());
-        $pathDownloader->cleanup('uninstall', $linkedPackage->getPackage(), $linkedPackage->getInstallationPath());
+        // Update the repository to the current situation
+        if (!is_null($linkedPackage->getOriginalPackage())) {
+            $this->installedRepository->removePackage($linkedPackage->getOriginalPackage());
+        }
+        $this->installedRepository->addPackage($linkedPackage->getPackage());
 
+        // Uninstall the linked package
+        $this->installationManager->uninstall(
+            $this->installedRepository,
+            new UninstallOperation($linkedPackage->getPackage())
+        );
+
+        // Reinstall the linked package
         if (!is_null($linkedPackage->getOriginalPackage())) {
             // Prepare (Not sure if really needed)
             $this->downloadManager->prepare(
@@ -99,20 +101,16 @@ class LinkManager
             );
 
             // Download the original package
-            $this->io->debug("[ComposerLink] Installing original package " . $linkedPackage->getOriginalPackage());
             $downloadPromise = $this->downloadManager->download(
                 $linkedPackage->getOriginalPackage(),
                 $linkedPackage->getInstallationPath()
             );
             $this->loop->wait([$downloadPromise]);
 
-            // Install the original package
-            $installPromise = $this->downloadManager->install(
-                $linkedPackage->getOriginalPackage(),
-                $linkedPackage->getInstallationPath()
+            $this->installationManager->install(
+                $this->installedRepository,
+                new InstallOperation($linkedPackage->getOriginalPackage())
             );
-
-            $this->loop->wait([$installPromise]);
         }
     }
 }

@@ -72,7 +72,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
         $this->linkedPackagesManager = new LinkManager(
             $this->filesystem,
-            $this->io,
             $this->downloadManager,
             $composer->getLoop(),
             $composer->getInstallationManager(),
