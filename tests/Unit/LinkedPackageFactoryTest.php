@@ -42,11 +42,9 @@ class LinkedPackageFactoryTest extends TestCase
         $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Original package not found, is it installed?');
-
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
-        $factory->fromPath('tests/mock');
+        $package = $factory->fromPath('tests/mock');
+        $this->assertNull($package->getOriginalPackage());
     }
 
     public function test_no_composer_file(): void

@@ -101,6 +101,7 @@ class LinkManagerTest extends TestCase
 
         $package = $this->createMock(CompletePackage::class);
         $this->package->method('getPackage')->willReturn($package);
+        $this->package->method('getOriginalPackage')->willReturn($package);
 
         $pathDownloader = $this->createMock(DownloaderInterface::class);
         $pathDownloader->expects($this->once())
@@ -114,6 +115,36 @@ class LinkManagerTest extends TestCase
 
         $this->downloadManager
             ->expects($this->once())
+            ->method('install');
+
+        $manager->unlinkPackage($this->package);
+    }
+
+    public function test_unlink_without_original_package(): void
+    {
+        $manager = new LinkManager(
+            $this->filesystem,
+            $this->io,
+            $this->downloadManager,
+            $this->loop
+        );
+
+        $package = $this->createMock(CompletePackage::class);
+        $this->package->method('getPackage')->willReturn($package);
+        $this->package->method('getOriginalPackage')->willReturn(null);
+
+        $pathDownloader = $this->createMock(DownloaderInterface::class);
+        $pathDownloader->expects($this->once())
+            ->method('remove')
+            ->with($package, $this->package->getInstallationPath());
+
+        $this->downloadManager
+            ->method('getDownloader')
+            ->with('path')
+            ->willReturn($pathDownloader);
+
+        $this->downloadManager
+            ->expects($this->never())
             ->method('install');
 
         $manager->unlinkPackage($this->package);

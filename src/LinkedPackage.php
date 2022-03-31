@@ -22,14 +22,14 @@ class LinkedPackage
 
     protected CompletePackage $package;
 
-    protected PackageInterface $originalPackage;
+    protected ?PackageInterface $originalPackage;
 
     protected string $installationPath;
 
     public function __construct(
         string $path,
         CompletePackage $package,
-        PackageInterface $originalPackage,
+        ?PackageInterface $originalPackage,
         string $installationPath
     ) {
         $this->path = $path;
@@ -53,7 +53,7 @@ class LinkedPackage
         return $this->package;
     }
 
-    public function getOriginalPackage(): PackageInterface
+    public function getOriginalPackage(): ?PackageInterface
     {
         return $this->originalPackage;
     }
