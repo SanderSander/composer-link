@@ -72,9 +72,10 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
         $this->linkedPackagesManager = new LinkManager(
             $this->filesystem,
-            $this->io,
             $this->downloadManager,
-            $composer->getLoop()
+            $composer->getLoop(),
+            $composer->getInstallationManager(),
+            $composer->getRepositoryManager()->getLocalRepository()
         );
 
         // TODO use factory pattern
