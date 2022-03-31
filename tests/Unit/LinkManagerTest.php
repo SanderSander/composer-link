@@ -13,10 +13,15 @@
 
 namespace Tests\Unit;
 
+use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\Downloader\DownloaderInterface;
 use Composer\Downloader\DownloadManager;
+use Composer\Installer\InstallationManager;
 use Composer\IO\IOInterface;
 use Composer\Package\CompletePackage;
+use Composer\Package\PackageInterface;
+use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Loop;
 use ComposerLink\LinkedPackage;
@@ -28,77 +33,103 @@ class LinkManagerTest extends TestCase
 {
     /** @var Filesystem&MockObject  */
     protected Filesystem $filesystem;
+
     /** @var IOInterface&MockObject  */
     protected IOInterface $io;
+
     /** @var DownloadManager&MockObject  */
     protected DownloadManager $downloadManager;
+
     /** @var Loop&MockObject  */
     protected Loop $loop;
+
     /** @var LinkedPackage&MockObject  */
     protected LinkedPackage $package;
+
+    /** @var InstallationManager|MockObject  */
+    protected InstallationManager $installationManager;
+
+    /** @var InstalledRepositoryInterface|MockObject  */
+    protected InstalledRepositoryInterface $installedRepository;
+
+    protected LinkManager $linkManager;
 
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->filesystem = $this->createMock(Filesystem::class);
         $this->io = $this->createMock(IOInterface::class);
         $this->downloadManager = $this->createMock(DownloadManager::class);
         $this->loop = $this->createMock(Loop::class);
         $this->package = $this->createMock(LinkedPackage::class);
+        $this->installationManager = $this->createMock(InstallationManager::class);
+        $this->installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+
+        $this->linkManager = new LinkManager(
+            $this->filesystem,
+            $this->io,
+            $this->downloadManager,
+            $this->loop,
+            $this->installationManager,
+            $this->installedRepository
+        );
     }
 
     public function test_is_linked(): void
     {
-        $manager = new LinkManager(
-            $this->filesystem,
-            $this->io,
-            $this->downloadManager,
-            $this->loop
-        );
-
         $this->filesystem->method('isSymlinkedDirectory')
             ->willReturnOnConsecutiveCalls(false, true, false);
         // Short circuit, so we only expect 2 calls
         $this->filesystem->method('isJunction')
             ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->assertFalse($manager->isLinked($this->package));
-        $this->assertTrue($manager->isLinked($this->package));
-        $this->assertTrue($manager->isLinked($this->package));
+        $this->assertFalse($this->linkManager->isLinked($this->package));
+        $this->assertTrue($this->linkManager->isLinked($this->package));
+        $this->assertTrue($this->linkManager->isLinked($this->package));
     }
 
-    public function test_link(): void
+    public function test_link_without_original_package(): void
     {
-        $manager = new LinkManager(
-            $this->filesystem,
-            $this->io,
-            $this->downloadManager,
-            $this->loop
-        );
-
         $package = $this->createMock(CompletePackage::class);
         $this->package->method('getPackage')->willReturn($package);
 
-        $pathDownloader = $this->createMock(DownloaderInterface::class);
-        $pathDownloader->expects($this->once())
-            ->method('install')
-            ->with($package, $this->package->getInstallationPath());
-        $this->downloadManager->method('getDownloader')
-            ->with('path')
-            ->willReturn($pathDownloader);
+        $this->installationManager
+            ->expects($this->never())
+            ->method('uninstall');
 
-        $manager->linkPackage($this->package);
+        $this->installationManager
+            ->expects($this->once())
+            ->method('install')
+            ->with($this->installedRepository, new InstallOperation($this->package->getPackage()));
+
+        $this->linkManager->linkPackage($this->package);
+    }
+
+    public function test_link_with_original_package(): void
+    {
+        $package = $this->createMock(CompletePackage::class);
+        $this->package->method('getPackage')->willReturn($package);
+
+        $original = $this->createMock(PackageInterface::class);
+        $this->package->method('getOriginalPackage')
+            ->willReturn($original);
+
+        $this->installationManager
+            ->expects($this->once())
+            ->method('uninstall')
+            ->with($this->installedRepository, new UninstallOperation($original));
+
+        $this->installationManager
+            ->expects($this->once())
+            ->method('install')
+            ->with($this->installedRepository, new InstallOperation($this->package->getPackage()));
+
+        $this->linkManager->linkPackage($this->package);
     }
 
     public function test_unlink(): void
     {
-        $manager = new LinkManager(
-            $this->filesystem,
-            $this->io,
-            $this->downloadManager,
-            $this->loop
-        );
-
         $package = $this->createMock(CompletePackage::class);
         $this->package->method('getPackage')->willReturn($package);
         $this->package->method('getOriginalPackage')->willReturn($package);
@@ -113,22 +144,15 @@ class LinkManagerTest extends TestCase
             ->with('path')
             ->willReturn($pathDownloader);
 
-        $this->downloadManager
+        $this->installationManager
             ->expects($this->once())
             ->method('install');
 
-        $manager->unlinkPackage($this->package);
+        $this->linkManager->unlinkPackage($this->package);
     }
 
     public function test_unlink_without_original_package(): void
     {
-        $manager = new LinkManager(
-            $this->filesystem,
-            $this->io,
-            $this->downloadManager,
-            $this->loop
-        );
-
         $package = $this->createMock(CompletePackage::class);
         $this->package->method('getPackage')->willReturn($package);
         $this->package->method('getOriginalPackage')->willReturn(null);
@@ -147,6 +171,6 @@ class LinkManagerTest extends TestCase
             ->expects($this->never())
             ->method('install');
 
-        $manager->unlinkPackage($this->package);
+        $this->linkManager->unlinkPackage($this->package);
     }
 }

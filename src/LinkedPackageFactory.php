@@ -48,6 +48,8 @@ class LinkedPackageFactory
         /** @var CompletePackage $package */
         $package = $loader->load($json);
         $package->setDistUrl($path);
+        $package->setInstallationSource('dist');
+        $package->setDistType('path');
 
         return $package;
     }
@@ -63,14 +65,7 @@ class LinkedPackageFactory
             }
         }
 
-        /*
-        if (is_null($originalPackage)) {
-            throw new \RuntimeException('Original package not found, is it installed?');
-        }
-        */
-
         $destination = $this->installationManager->getInstallPath($newPackage);
-
         return new LinkedPackage(
             $path,
             $newPackage,
