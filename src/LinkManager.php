@@ -91,7 +91,6 @@ class LinkManager
         $pathDownloader->cleanup('uninstall', $linkedPackage->getPackage(), $linkedPackage->getInstallationPath());
 
         if (!is_null($linkedPackage->getOriginalPackage())) {
-            $this->installationManager->install($this->installedRepository, new InstallOperation($linkedPackage->getOriginalPackage()));
             // Prepare (Not sure if really needed)
             $this->downloadManager->prepare(
                 $linkedPackage->getOriginalPackage()->getType(),
