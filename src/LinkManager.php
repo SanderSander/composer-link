@@ -17,6 +17,7 @@ use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\Downloader\DownloadManager;
 use Composer\Installer\InstallationManager;
+use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Loop;
@@ -62,16 +63,10 @@ class LinkManager
     public function linkPackage(LinkedPackage $linkedPackage): void
     {
         if (!is_null($linkedPackage->getOriginalPackage())) {
-            $this->installationManager->uninstall(
-                $this->installedRepository,
-                new UninstallOperation($linkedPackage->getOriginalPackage())
-            );
+            $this->uninstall($linkedPackage->getOriginalPackage());
         }
 
-        $this->installationManager->install(
-            $this->installedRepository,
-            new InstallOperation($linkedPackage->getPackage())
-        );
+        $this->install($linkedPackage->getPackage());
     }
 
     /**
@@ -86,10 +81,7 @@ class LinkManager
         $this->installedRepository->addPackage($linkedPackage->getPackage());
 
         // Uninstall the linked package
-        $this->installationManager->uninstall(
-            $this->installedRepository,
-            new UninstallOperation($linkedPackage->getPackage())
-        );
+        $this->uninstall($linkedPackage->getPackage());
 
         // Reinstall the linked package
         if (!is_null($linkedPackage->getOriginalPackage())) {
@@ -107,10 +99,31 @@ class LinkManager
             );
             $this->loop->wait([$downloadPromise]);
 
-            $this->installationManager->install(
-                $this->installedRepository,
-                new InstallOperation($linkedPackage->getOriginalPackage())
-            );
+            $this->install($linkedPackage->getOriginalPackage());
+        }
+    }
+
+    protected function uninstall(PackageInterface $package): void
+    {
+        $promise = $this->installationManager->uninstall(
+            $this->installedRepository,
+            new UninstallOperation($package)
+        );
+
+        if (!is_null($promise)) {
+            $this->loop->wait([$promise]);
+        }
+    }
+
+    protected function install(PackageInterface $package): void
+    {
+        $promise = $this->installationManager->install(
+            $this->installedRepository,
+            new InstallOperation($package)
+        );
+
+        if (!is_null($promise)) {
+            $this->loop->wait([$promise]);
         }
     }
 }
