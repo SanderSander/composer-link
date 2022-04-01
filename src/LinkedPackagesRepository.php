@@ -39,8 +39,14 @@ class LinkedPackagesRepository
 
     public function store(LinkedPackage $linkedPackage): void
     {
-        $this->io->debug("[ComposerLink]\tStoring linked repository into memory");
-        $this->linkedPackages[] = $linkedPackage;
+        $index = $this->findIndex($linkedPackage);
+
+        if (is_null($index)) {
+            $this->linkedPackages[] = $linkedPackage;
+            return;
+        }
+
+        $this->linkedPackages[$index] = $linkedPackage;
     }
 
     /**
@@ -48,14 +54,19 @@ class LinkedPackagesRepository
      */
     public function all(): array
     {
-        return $this->linkedPackages;
+        $all = [];
+        foreach ($this->linkedPackages as $package) {
+            $all[] = clone $package;
+        }
+
+        return $all;
     }
 
     public function findByPath(string $path): ?LinkedPackage
     {
         foreach ($this->linkedPackages as $linkedPackage) {
             if ($linkedPackage->getPath() === $path) {
-                return $linkedPackage;
+                return clone $linkedPackage;
             }
         }
 
@@ -66,7 +77,7 @@ class LinkedPackagesRepository
     {
         foreach ($this->linkedPackages as $linkedPackage) {
             if ($linkedPackage->getName() === $name) {
-                return $linkedPackage;
+                return clone $linkedPackage;
             }
         }
 
@@ -75,9 +86,9 @@ class LinkedPackagesRepository
 
     public function remove(LinkedPackage $linkedPackage): void
     {
-        $index = array_search($linkedPackage, $this->linkedPackages, true);
+        $index = $this->findIndex($linkedPackage);
 
-        if ($index === false) {
+        if (is_null($index)) {
             throw new \RuntimeException('Linked package not found');
         }
 
@@ -102,5 +113,16 @@ class LinkedPackagesRepository
 
         // TODO use json
         $this->linkedPackages = unserialize($this->filesystem->read(self::FILE_NAME));
+    }
+
+    private function findIndex(LinkedPackage $package): ?int
+    {
+        foreach ($this->linkedPackages as $index => $linkedPackage) {
+            if ($linkedPackage->getName() === $package->getName()) {
+                return $index;
+            }
+        }
+
+        return null;
     }
 }

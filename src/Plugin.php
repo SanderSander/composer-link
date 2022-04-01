@@ -14,13 +14,13 @@
 namespace ComposerLink;
 
 use Composer\Composer;
-use Composer\Downloader\DownloadManager;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\InstallationManager;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
+use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
 use League\Flysystem\Filesystem;
@@ -32,8 +32,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected LinkedPackagesRepository $repository;
 
-    protected DownloadManager $downloadManager;
-
     protected InstallationManager $installationManager;
 
     protected ComposerFileSystem $filesystem;
@@ -41,6 +39,8 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     protected LinkManager $linkedPackagesManager;
 
     protected LinkedPackageFactory $packageFactory;
+
+    protected RepositoryManager $repositoryManager;
 
     public function __construct(ComposerFileSystem $filesystem = null)
     {
@@ -62,20 +62,19 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->io = $io;
-        $this->downloadManager = $composer->getDownloadManager();
         $this->installationManager = $composer->getInstallationManager();
+        $this->repositoryManager = $composer->getRepositoryManager();
 
         $this->packageFactory = new LinkedPackageFactory(
             $this->installationManager,
-            $composer->getRepositoryManager()->getLocalRepository()
+            $this->repositoryManager->getLocalRepository()
         );
 
         $this->linkedPackagesManager = new LinkManager(
             $this->filesystem,
-            $this->downloadManager,
             $composer->getLoop(),
             $composer->getInstallationManager(),
-            $composer->getRepositoryManager()->getLocalRepository()
+            $this->repositoryManager->getLocalRepository()
         );
 
         // TODO use factory pattern
@@ -103,9 +102,21 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         foreach ($this->repository->all() as $linkedPackage) {
             if (!$this->linkedPackagesManager->isLinked($linkedPackage)) {
+                // Package is updated, so we need to link the newer original package
+                $oldOriginalPackage = $linkedPackage->getOriginalPackage();
+                if (!is_null($oldOriginalPackage)) {
+                    $newOriginalPackage = $this->repositoryManager
+                        ->getLocalRepository()
+                        ->findPackage($oldOriginalPackage->getName(), '*');
+                    $linkedPackage->setOriginalPackage($newOriginalPackage);
+                    $this->repository->store($linkedPackage);
+                }
+
                 $this->linkedPackagesManager->linkPackage($linkedPackage);
             }
         }
+
+        $this->repository->persist();
     }
 
     public function getCapabilities(): array

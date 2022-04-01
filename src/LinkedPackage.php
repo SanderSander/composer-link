@@ -62,4 +62,9 @@ class LinkedPackage
     {
         return $this->installationPath;
     }
+
+    public function setOriginalPackage(?PackageInterface $package): void
+    {
+        $this->originalPackage = $package;
+    }
 }
