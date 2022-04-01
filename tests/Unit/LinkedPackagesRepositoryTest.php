@@ -34,7 +34,8 @@ class LinkedPackagesRepositoryTest extends TestCase
 
         $repository->store($package);
         $this->assertCount(1, $repository->all());
-        $this->assertSame($package, $repository->all()[0]);
+        $this->assertEquals($package, $repository->all()[0]);
+        $this->assertNotSame($package, $repository->findByName('test/package'));
 
         $fileSystem->expects($this->once())
             ->method('write')
@@ -55,7 +56,8 @@ class LinkedPackagesRepositoryTest extends TestCase
         );
 
         $repository->store($package);
-        $this->assertSame($package, $repository->findByPath('/test-path'));
+        $this->assertEquals($package, $repository->findByPath('/test-path'));
+        $this->assertNotSame($package, $repository->findByName('test/package'));
         $this->assertNull($repository->findByPath('/test-path-other'));
     }
 
@@ -72,7 +74,8 @@ class LinkedPackagesRepositoryTest extends TestCase
         );
 
         $repository->store($package);
-        $this->assertSame($package, $repository->findByName('test/package'));
+        $this->assertEquals($package, $repository->findByName('test/package'));
+        $this->assertNotSame($package, $repository->findByName('test/package'));
         $this->assertNull($repository->findByName('test/package-other'));
     }
 
