@@ -15,9 +15,9 @@ namespace Tests\Unit\Commands;
 
 use ComposerLink\Commands\UnlinkCommand;
 use ComposerLink\LinkedPackage;
-use ComposerLink\LinkedPackagesRepository;
 use ComposerLink\LinkManager;
 use ComposerLink\Plugin;
+use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -35,8 +35,8 @@ class UnlinkCommandTest extends TestCase
     /** @var LinkManager&MockObject  */
     protected LinkManager $linkManager;
 
-    /** @var LinkedPackagesRepository&MockObject  */
-    protected LinkedPackagesRepository $repository;
+    /** @var \ComposerLink\Repository\Repository&MockObject  */
+    protected Repository $repository;
 
     /** @var LinkedPackage&MockObject  */
     protected LinkedPackage $package;
@@ -51,7 +51,7 @@ class UnlinkCommandTest extends TestCase
         $this->plugin = $this->createMock(Plugin::class);
         $this->output = $this->createMock(OutputInterface::class);
         $this->linkManager = $this->createMock(LinkManager::class);
-        $this->repository = $this->createMock(LinkedPackagesRepository::class);
+        $this->repository = $this->createMock(Repository::class);
         $this->package = $this->createMock(LinkedPackage::class);
 
         $this->plugin->method('getRepository')->willReturn($this->repository);

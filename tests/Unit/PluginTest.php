@@ -25,14 +25,14 @@ use Composer\Script\ScriptEvents;
 use Composer\Util\Loop;
 use ComposerLink\CommandProvider;
 use ComposerLink\LinkedPackageFactory;
-use ComposerLink\LinkedPackagesRepository;
 use ComposerLink\LinkManager;
 use ComposerLink\Plugin;
+use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\TestCase;
 
 class PluginTest extends TestCase
 {
-    protected LinkedPackagesRepository $packagesRepository;
+    protected Repository $packagesRepository;
 
     public function test_if_plugin_can_be_utilized(): void
     {
@@ -47,7 +47,7 @@ class PluginTest extends TestCase
 
         $this->assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
         $this->assertContains(CommandProvider::class, $capabilities);
-        $this->assertInstanceOf(LinkedPackagesRepository::class, $plugin->getRepository());
+        $this->assertInstanceOf(Repository::class, $plugin->getRepository());
         $this->assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
         $this->assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
         $this->assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
@@ -70,7 +70,7 @@ class PluginTest extends TestCase
 
         $this->assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
         $this->assertContains(CommandProvider::class, $capabilities);
-        $this->assertInstanceOf(LinkedPackagesRepository::class, $plugin->getRepository());
+        $this->assertInstanceOf(Repository::class, $plugin->getRepository());
         $this->assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
         $this->assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
         $this->assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
@@ -88,7 +88,7 @@ class PluginTest extends TestCase
         $localRepository = $this->createMock(InstalledRepositoryInterface::class);
         $repositoryManager->method('getLocalRepository')->willReturn($localRepository);
 
-        $config->method('get')->with('vendor-dir')->willReturn('./../vendor');
+        $config->method('get')->with('vendor-dir')->willReturn('./vendor');
 
         $composer = $this->createMock(Composer::class);
         $composer->method('getDownloadManager')->willReturn($downloader);

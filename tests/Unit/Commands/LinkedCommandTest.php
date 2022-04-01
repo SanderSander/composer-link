@@ -15,8 +15,8 @@ namespace Tests\Unit\Commands;
 
 use ComposerLink\Commands\LinkedCommand;
 use ComposerLink\LinkedPackage;
-use ComposerLink\LinkedPackagesRepository;
 use ComposerLink\Plugin;
+use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -55,7 +55,7 @@ class LinkedCommandTest extends TestCase
 
     public function test_linked_packages(): void
     {
-        $repository = $this->createMock(LinkedPackagesRepository::class);
+        $repository = $this->createMock(Repository::class);
         $repository->method('all')->willReturn([
             $this->getMockedLinkedPackage('test-1'),
             $this->getMockedLinkedPackage('test-2'),
