@@ -14,7 +14,6 @@
 namespace ComposerLink;
 
 use Composer\Composer;
-use Composer\Downloader\DownloadManager;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\InstallationManager;
 use Composer\IO\IOInterface;
@@ -31,8 +30,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     protected ?IOInterface $io;
 
     protected LinkedPackagesRepository $repository;
-
-    protected DownloadManager $downloadManager;
 
     protected InstallationManager $installationManager;
 
@@ -62,7 +59,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->io = $io;
-        $this->downloadManager = $composer->getDownloadManager();
         $this->installationManager = $composer->getInstallationManager();
 
         $this->packageFactory = new LinkedPackageFactory(
@@ -72,7 +68,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
         $this->linkedPackagesManager = new LinkManager(
             $this->filesystem,
-            $this->downloadManager,
             $composer->getLoop(),
             $composer->getInstallationManager(),
             $composer->getRepositoryManager()->getLocalRepository()

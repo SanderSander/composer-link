@@ -13,20 +13,16 @@
 
 namespace ComposerLink;
 
-use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UninstallOperation;
-use Composer\Downloader\DownloadManager;
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Loop;
+use React\Promise\PromiseInterface;
 
 class LinkManager
 {
     protected Filesystem $filesystem;
-
-    protected DownloadManager $downloadManager;
 
     protected Loop $loop;
 
@@ -36,13 +32,11 @@ class LinkManager
 
     public function __construct(
         Filesystem $filesystem,
-        DownloadManager $downloadManager,
         Loop $loop,
         InstallationManager $installationManager,
         InstalledRepositoryInterface  $installedRepository
     ) {
         $this->filesystem = $filesystem;
-        $this->downloadManager = $downloadManager;
         $this->loop = $loop;
         $this->installationManager = $installationManager;
         $this->installedRepository = $installedRepository;
@@ -65,7 +59,6 @@ class LinkManager
         if (!is_null($linkedPackage->getOriginalPackage())) {
             $this->uninstall($linkedPackage->getOriginalPackage());
         }
-
         $this->install($linkedPackage->getPackage());
     }
 
@@ -80,48 +73,43 @@ class LinkManager
         }
         $this->installedRepository->addPackage($linkedPackage->getPackage());
 
-        // Uninstall the linked package
         $this->uninstall($linkedPackage->getPackage());
-
-        // Reinstall the linked package
         if (!is_null($linkedPackage->getOriginalPackage())) {
-            // Prepare (Not sure if really needed)
-            $this->downloadManager->prepare(
-                $linkedPackage->getOriginalPackage()->getType(),
-                $linkedPackage->getOriginalPackage(),
-                $linkedPackage->getInstallationPath()
-            );
-
-            // Download the original package
-            $downloadPromise = $this->downloadManager->download(
-                $linkedPackage->getOriginalPackage(),
-                $linkedPackage->getInstallationPath()
-            );
-            $this->loop->wait([$downloadPromise]);
-
             $this->install($linkedPackage->getOriginalPackage());
         }
     }
 
     protected function uninstall(PackageInterface $package): void
     {
-        $promise = $this->installationManager->uninstall(
-            $this->installedRepository,
-            new UninstallOperation($package)
-        );
-
-        if (!is_null($promise)) {
-            $this->loop->wait([$promise]);
-        }
+        $installer = $this->installationManager->getInstaller($package->getType());
+        $this->wait($installer->uninstall($this->installedRepository, $package));
     }
 
+    /**
+     * Downloads and installs the given package
+     * https://github.com/composer/composer/blob/2.0.0/src/Composer/Util/SyncHelper.php
+     */
     protected function install(PackageInterface $package): void
     {
-        $promise = $this->installationManager->install(
-            $this->installedRepository,
-            new InstallOperation($package)
-        );
+        $installer = $this->installationManager->getInstaller($package->getType());
 
+        try {
+            $this->wait($installer->download($package));
+            $this->wait($installer->prepare('install', $package));
+            $this->wait($installer->install($this->installedRepository, $package));
+        } catch (\Exception $exception) {
+            $this->wait($installer->cleanup('install', $package));
+            throw $exception;
+        }
+
+        $this->wait($installer->cleanup('install', $package));
+    }
+
+    /**
+     * Waits for promise to be finished
+     */
+    protected function wait(?PromiseInterface $promise): void
+    {
         if (!is_null($promise)) {
             $this->loop->wait([$promise]);
         }
