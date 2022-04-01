@@ -19,6 +19,7 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 abstract class TestCase extends PHPUnitTestCase
 {
+    /** @SuppressWarnings(PHPMD.BooleanArgumentFlag) */
     protected function mockPackage(string $name = 'package', bool $withOriginalPackage = true): LinkedPackage
     {
         $package = $this->createMock(LinkedPackage::class);
