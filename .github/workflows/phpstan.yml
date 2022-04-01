@@ -3,7 +3,7 @@ name: Code Static Analysis
 on: [push, pull_request, create]
 
 jobs:
-  static-analysis:
+  phpstan:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

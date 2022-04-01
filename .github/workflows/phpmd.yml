@@ -1,0 +1,23 @@
+name: Code Static Analysis
+
+on: [push, pull_request, create]
+
+jobs:
+  phpmd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Validate composer.json
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run phpmd
+        run: ./vendor/bin/phpmd ./src,./tests github cleancode,codesize,controversial,design,naming,unusedcode
