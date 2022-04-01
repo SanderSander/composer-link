@@ -20,4 +20,4 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run phpmd
-        run: ./vendor/bin/phpmd ./src,./tests github cleancode,codesize,controversial,design,naming,unusedcode
+        run: ./vendor/bin/phpmd ./src,./tests github ruleset.md

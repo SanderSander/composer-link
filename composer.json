@@ -37,6 +37,6 @@
         "class": "ComposerLink\\Plugin"
     },
     "scripts": {
-        "phpmd": "./vendor/bin/phpmd ./src,./tests ansi cleancode, codesize, controversial, design, naming, unusedcode"
+        "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml"
     }
 }

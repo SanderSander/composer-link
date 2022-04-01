@@ -27,6 +27,9 @@ class LinkCommand extends Command
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');
@@ -37,7 +40,8 @@ class LinkCommand extends Command
             throw new RuntimeException(sprintf('Package in path "%s" already linked', $path));
         }
 
-        if ($currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName())) {
+        $currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName());
+        if (!is_null($currentLinked)) {
             throw new RuntimeException(sprintf(
                 'Package "%s" already linked from path "%s"',
                 $linkedPackage->getName(),
