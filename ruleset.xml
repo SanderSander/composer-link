@@ -17,6 +17,13 @@
             <property name="allow-underscore-test" value="true" />
         </properties>
     </rule>
-    <rule ref="rulesets/naming.xml" />
+    <rule ref="rulesets/naming.xml">
+        <exclude name="ShortVariable" />
+    </rule>
+    <rule ref="rulesets/naming.xml/ShortVariable">
+        <properties>
+            <property name="exceptions" value="io" />
+        </properties>
+    </rule>
     <rule ref="rulesets/unusedcode.xml" />
 </ruleset>
