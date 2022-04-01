@@ -38,5 +38,8 @@ class LinkedPackageTest extends TestCase
         $this->assertSame($package, $linkedPackage->getPackage());
         $this->assertSame($originalPackage, $linkedPackage->getOriginalPackage());
         $this->assertSame('test/package', $linkedPackage->getName());
+        $newOriginalPackage = $this->createMock(PackageInterface::class);
+        $linkedPackage->setOriginalPackage($newOriginalPackage);
+        $this->assertSame($newOriginalPackage, $linkedPackage->getOriginalPackage());
     }
 }

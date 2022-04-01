@@ -163,4 +163,52 @@ class LinkManagerTest extends TestCase
 
         $this->linkManager->unlinkPackage($this->package);
     }
+
+    public function test_is_cleaned_up_after_uninstall_failure(): void
+    {
+        $package = $this->createMock(CompletePackage::class);
+        $this->package->method('getPackage')->willReturn($package);
+
+        $this->installer
+            ->expects($this->once())
+            ->method('uninstall')
+            ->willThrowException(new \RuntimeException());
+
+        $this->installer
+            ->expects($this->once())
+            ->method('cleanup')
+            ->with('uninstall', $package);
+
+        $this->installer
+            ->expects($this->never())
+            ->method('install');
+
+        $this->expectException(\RuntimeException::class);
+        $this->linkManager->unlinkPackage($this->package);
+    }
+
+
+    public function test_is_cleaned_up_after_install_failure(): void
+    {
+        $package = $this->createMock(CompletePackage::class);
+        $this->package->method('getPackage')->willReturn($package);
+
+        $this->installer
+            ->expects($this->never())
+            ->method('uninstall');
+
+        $this->installer
+            ->expects($this->once())
+            ->method('install')
+            ->with($this->installedRepository, $this->package->getPackage())
+            ->willThrowException(new \RuntimeException());
+
+        $this->installer
+            ->expects($this->once())
+            ->method('cleanup')
+            ->with('install', $package);
+
+        $this->expectException(\RuntimeException::class);
+        $this->linkManager->linkPackage($this->package);
+    }
 }

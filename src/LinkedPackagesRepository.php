@@ -42,11 +42,11 @@ class LinkedPackagesRepository
         $index = $this->findIndex($linkedPackage);
 
         if (is_null($index)) {
-            $this->linkedPackages[] = $linkedPackage;
+            $this->linkedPackages[] = clone $linkedPackage;
             return;
         }
 
-        $this->linkedPackages[$index] = $linkedPackage;
+        $this->linkedPackages[$index] = clone $linkedPackage;
     }
 
     /**
