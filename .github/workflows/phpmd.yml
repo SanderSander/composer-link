@@ -20,4 +20,4 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run phpmd
-        run: ./vendor/bin/phpmd ./src,./tests github ruleset.md
+        run: ./vendor/bin/phpmd ./src,./tests github ruleset.xml
