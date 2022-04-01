@@ -18,6 +18,7 @@ use Composer\Json\JsonFile;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\InstalledRepositoryInterface;
+use RuntimeException;
 
 class LinkedPackageFactory
 {
@@ -35,7 +36,7 @@ class LinkedPackageFactory
     {
         $realPath = realpath($path . DIRECTORY_SEPARATOR . 'composer.json');
         if ($realPath === false) {
-            throw new \RuntimeException('No composer.json file found in given path.');
+            throw new RuntimeException('No composer.json file found in given path.');
         }
 
         $json = (new JsonFile($realPath))->read();

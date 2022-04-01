@@ -18,6 +18,7 @@ use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Loop;
+use Exception;
 use React\Promise\PromiseInterface;
 
 class LinkManager
@@ -84,7 +85,7 @@ class LinkManager
         $installer = $this->installationManager->getInstaller($package->getType());
         try {
             $this->wait($installer->uninstall($this->installedRepository, $package));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->wait($installer->cleanup('uninstall', $package));
             throw $exception;
         }
@@ -104,7 +105,7 @@ class LinkManager
             $this->wait($installer->download($package));
             $this->wait($installer->prepare('install', $package));
             $this->wait($installer->install($this->installedRepository, $package));
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->wait($installer->cleanup('install', $package));
             throw $exception;
         }

@@ -24,6 +24,9 @@ class LinkedCommand extends Command
         $this->setDescription('List all linked packages');
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $linkedPackages = $this->plugin->getRepository()->all();

@@ -24,6 +24,7 @@ use ComposerLink\LinkedPackage;
 use ComposerLink\LinkManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use function React\Promise\resolve;
 
 class LinkManagerTest extends TestCase
@@ -172,7 +173,7 @@ class LinkManagerTest extends TestCase
         $this->installer
             ->expects($this->once())
             ->method('uninstall')
-            ->willThrowException(new \RuntimeException());
+            ->willThrowException(new RuntimeException());
 
         $this->installer
             ->expects($this->once())
@@ -183,7 +184,7 @@ class LinkManagerTest extends TestCase
             ->expects($this->never())
             ->method('install');
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->linkManager->unlinkPackage($this->package);
     }
 
@@ -201,14 +202,14 @@ class LinkManagerTest extends TestCase
             ->expects($this->once())
             ->method('install')
             ->with($this->installedRepository, $this->package->getPackage())
-            ->willThrowException(new \RuntimeException());
+            ->willThrowException(new RuntimeException());
 
         $this->installer
             ->expects($this->once())
             ->method('cleanup')
             ->with('install', $package);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->linkManager->linkPackage($this->package);
     }
 }

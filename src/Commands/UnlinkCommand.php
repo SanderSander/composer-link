@@ -26,6 +26,9 @@ class UnlinkCommand extends Command
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');

@@ -30,9 +30,13 @@
         "friendsofphp/php-cs-fixer": "^v3.4.0",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan-phpunit": "^1.1"
+        "phpstan/phpstan-phpunit": "^1.1",
+        "phpmd/phpmd": "^2.12"
     },
     "extra": {
         "class": "ComposerLink\\Plugin"
+    },
+    "scripts": {
+        "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml"
     }
 }

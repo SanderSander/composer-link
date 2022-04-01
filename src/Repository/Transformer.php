@@ -57,6 +57,7 @@ class Transformer
      */
     public function export(LinkedPackage $package): array
     {
+        $data = [];
         $data['path'] = $package->getPath();
         $data['installationPath'] = $package->getInstallationPath();
         $data['package'] = $this->composerDumper->dump($package->getPackage());

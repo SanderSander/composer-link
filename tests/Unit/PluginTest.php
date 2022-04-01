@@ -34,6 +34,7 @@ class PluginTest extends TestCase
 {
     protected Repository $packagesRepository;
 
+    /** @SuppressWarnings(PHPMD.StaticAccess) */
     public function test_if_plugin_can_be_utilized(): void
     {
         $io =$this->createMock(IOInterface::class);
@@ -65,15 +66,9 @@ class PluginTest extends TestCase
         $plugin = new Plugin();
         $plugin->activate($composer, $io);
 
-        $capabilities = $plugin->getCapabilities();
-        $events = Plugin::getSubscribedEvents();
-
-        $this->assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
-        $this->assertContains(CommandProvider::class, $capabilities);
         $this->assertInstanceOf(Repository::class, $plugin->getRepository());
         $this->assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
         $this->assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
-        $this->assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
 
         $plugin->linkLinkedPackages();
     }

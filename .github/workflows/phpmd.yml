@@ -1,9 +1,13 @@
 name: Code Static Analysis
 
-on: [push, pull_request, create]
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
 
 jobs:
-  static-analysis:
+  phpmd:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,5 +23,5 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run static analyse
-        run: ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github
+      - name: Run phpmd
+        run: ./vendor/bin/phpmd ./src,./tests github ruleset.xml

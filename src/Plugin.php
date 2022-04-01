@@ -38,7 +38,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected ComposerFileSystem $filesystem;
 
-    protected LinkManager $linkedPackagesManager;
+    protected LinkManager $linkManager;
 
     protected LinkedPackageFactory $packageFactory;
 
@@ -49,17 +49,26 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $this->filesystem = $filesystem ?: new ComposerFileSystem();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function deactivate(Composer $composer, IOInterface $io)
     {
         $io->debug("[ComposerLink]\tPlugin is deactivated");
     }
 
+    /**
+     * @inheritdoc
+     */
     public function uninstall(Composer $composer, IOInterface $io)
     {
         // TODO remove repository file and restore all packages
         $io->debug("[ComposerLink]\tPlugin uninstalling");
     }
 
+    /**
+     * @inheritdoc
+     */
     public function activate(Composer $composer, IOInterface $io)
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
@@ -72,7 +81,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             $this->repositoryManager->getLocalRepository()
         );
 
-        $this->linkedPackagesManager = new LinkManager(
+        $this->linkManager = new LinkManager(
             $this->filesystem,
             $composer->getLoop(),
             $composer->getInstallationManager(),
@@ -98,13 +107,13 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function getLinkManager(): LinkManager
     {
-        return $this->linkedPackagesManager;
+        return $this->linkManager;
     }
 
     public function linkLinkedPackages(): void
     {
         foreach ($this->repository->all() as $linkedPackage) {
-            if (!$this->linkedPackagesManager->isLinked($linkedPackage)) {
+            if (!$this->linkManager->isLinked($linkedPackage)) {
                 // Package is updated, so we need to link the newer original package
                 $oldOriginalPackage = $linkedPackage->getOriginalPackage();
                 if (!is_null($oldOriginalPackage)) {
@@ -115,7 +124,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
                     $this->repository->store($linkedPackage);
                 }
 
-                $this->linkedPackagesManager->linkPackage($linkedPackage);
+                $this->linkManager->linkPackage($linkedPackage);
             }
         }
 

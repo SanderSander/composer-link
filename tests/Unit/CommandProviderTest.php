@@ -25,6 +25,7 @@ class CommandProviderTest extends TestCase
 {
     public function test_command_provider(): void
     {
+        $arguments = [];
         $arguments['io'] = $this->createStub(IOInterface::class);
         $arguments['plugin'] = $this->createStub(Plugin::class);
 

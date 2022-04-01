@@ -1,4 +1,4 @@
-name: Code Style
+name: Code Static Analysis
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - opened
 
 jobs:
-  code-style:
+  phpstan:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,5 +23,5 @@ jobs:
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Run style check
-        run: ./vendor/bin/php-cs-fixer fix --dry-run
+      - name: Run static analyse
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G --error-format=github
