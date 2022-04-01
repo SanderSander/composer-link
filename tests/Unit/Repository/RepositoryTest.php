@@ -18,7 +18,7 @@ use ComposerLink\LinkedPackage;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\Transformer;
 use League\Flysystem\FilesystemOperator;
-use PHPUnit\Framework\TestCase;
+use Tests\Unit\TestCase;
 
 class RepositoryTest extends TestCase
 {
@@ -38,15 +38,6 @@ class RepositoryTest extends TestCase
         $this->io = $this->createStub(IOInterface::class);
         $this->fileSystem = $this->createMock(FilesystemOperator::class);
         $this->transformer = $this->createMock(Transformer::class);
-    }
-
-    protected function mockPackage(string $name = 'package'): LinkedPackage
-    {
-        $package = $this->createMock(LinkedPackage::class);
-        $package->method('getName')->willReturn('test/' . $name);
-        $package->method('getPath')->willReturn('../test-path-' . $name);
-
-        return $package;
     }
 
     protected function getRepository(): Repository
