@@ -23,6 +23,8 @@ use Composer\Plugin\PluginInterface;
 use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
+use ComposerLink\Repository\Repository;
+use ComposerLink\Repository\Transformer;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 
@@ -30,7 +32,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
     protected ?IOInterface $io;
 
-    protected LinkedPackagesRepository $repository;
+    protected Repository $repository;
 
     protected InstallationManager $installationManager;
 
@@ -78,9 +80,10 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         );
 
         // TODO use factory pattern
-        $this->repository = new LinkedPackagesRepository(
+        $this->repository = new Repository(
             new Filesystem(new LocalFilesystemAdapter($composer->getConfig()->get('vendor-dir'))),
-            $io
+            $io,
+            new Transformer()
         );
     }
 
@@ -126,7 +129,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         ];
     }
 
-    public function getRepository(): LinkedPackagesRepository
+    public function getRepository(): Repository
     {
         return $this->repository;
     }

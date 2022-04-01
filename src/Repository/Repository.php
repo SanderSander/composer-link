@@ -11,28 +11,33 @@
  * @link https://github.com/SanderSander/composer-link
  */
 
-namespace ComposerLink;
+namespace ComposerLink\Repository;
 
 use Composer\IO\IOInterface;
+use ComposerLink\LinkedPackage;
 use League\Flysystem\FilesystemOperator;
 
-class LinkedPackagesRepository
+class Repository
 {
-    protected const FILE_NAME = 'link.dat';
+    protected const FILE_NAME = 'linked-packages.json';
 
+    /** @deprecated We should get rid of all dependencies */
     protected FilesystemOperator $filesystem;
 
     protected IOInterface $io;
+
+    protected Transformer $transformer;
 
     /**
      * @var array<int, LinkedPackage>
      */
     protected array $linkedPackages = [];
 
-    public function __construct(FilesystemOperator $filesystem, IOInterface $io)
+    public function __construct(FilesystemOperator $filesystem, IOInterface $io, Transformer $transformer)
     {
         $this->filesystem = $filesystem;
         $this->io = $io;
+        $this->transformer = $transformer;
 
         $this->loadFromJsonFile();
     }
@@ -98,8 +103,17 @@ class LinkedPackagesRepository
     public function persist(): void
     {
         $this->io->debug("[ComposerLink]\tStoring linked repositories data into json file");
-        // TODO use json
-        $this->filesystem->write(self::FILE_NAME, serialize($this->linkedPackages));
+
+        $data = [
+            'packages' => []
+        ];
+        foreach ($this->linkedPackages as $package) {
+            $data['packages'][] = $this->transformer->export($package);
+        }
+
+        /** @var string $json */
+        $json = json_encode($data);
+        $this->filesystem->write(self::FILE_NAME, $json);
     }
 
     /**
@@ -110,9 +124,11 @@ class LinkedPackagesRepository
         if (!$this->filesystem->fileExists(self::FILE_NAME)) {
             return;
         }
+        $data = json_decode($this->filesystem->read(self::FILE_NAME), true);
 
-        // TODO use json
-        $this->linkedPackages = unserialize($this->filesystem->read(self::FILE_NAME));
+        foreach ($data['packages'] as $package) {
+            $this->linkedPackages[] = $this->transformer->load($package);
+        }
     }
 
     private function findIndex(LinkedPackage $package): ?int

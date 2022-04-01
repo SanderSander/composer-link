@@ -21,6 +21,7 @@
     },
     "require": {
         "php": ">=7.4",
+        "ext-json": "*",
         "composer-plugin-api": "^2.2",
         "league/flysystem": "^2.0|^3.0"
     },
