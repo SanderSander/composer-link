@@ -1,6 +1,10 @@
 name: PHPUnit
 
 on:
+  push:
+    branches:
+      - master
+      - v*
   pull_request:
     types:
       - synchronize
