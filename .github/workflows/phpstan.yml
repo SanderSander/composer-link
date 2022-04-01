@@ -1,6 +1,10 @@
 name: Code Static Analysis
 
-on: [push, pull_request, create]
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
 
 jobs:
   phpstan:
