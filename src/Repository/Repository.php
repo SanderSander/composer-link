@@ -16,6 +16,7 @@ namespace ComposerLink\Repository;
 use Composer\IO\IOInterface;
 use ComposerLink\LinkedPackage;
 use League\Flysystem\FilesystemOperator;
+use RuntimeException;
 
 class Repository
 {
@@ -94,7 +95,7 @@ class Repository
         $index = $this->findIndex($linkedPackage);
 
         if (is_null($index)) {
-            throw new \RuntimeException('Linked package not found');
+            throw new RuntimeException('Linked package not found');
         }
 
         array_splice($this->linkedPackages, $index, 1);

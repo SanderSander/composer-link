@@ -13,6 +13,7 @@
 
 namespace ComposerLink\Commands;
 
+use RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,11 +34,11 @@ class LinkCommand extends Command
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path);
 
         if (!is_null($this->plugin->getRepository()->findByPath($path))) {
-            throw new \RuntimeException(sprintf('Package in path "%s" already linked', $path));
+            throw new RuntimeException(sprintf('Package in path "%s" already linked', $path));
         }
 
         if ($currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName())) {
-            throw new \RuntimeException(sprintf(
+            throw new RuntimeException(sprintf(
                 'Package "%s" already linked from path "%s"',
                 $linkedPackage->getName(),
                 $currentLinked->getPath()
