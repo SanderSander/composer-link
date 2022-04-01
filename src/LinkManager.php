@@ -82,7 +82,14 @@ class LinkManager
     protected function uninstall(PackageInterface $package): void
     {
         $installer = $this->installationManager->getInstaller($package->getType());
-        $this->wait($installer->uninstall($this->installedRepository, $package));
+        try {
+            $this->wait($installer->uninstall($this->installedRepository, $package));
+        } catch (\Exception $exception) {
+            $this->wait($installer->cleanup('uninstall', $package));
+            throw $exception;
+        }
+
+        $this->wait($installer->cleanup('uninstall', $package));
     }
 
     /**

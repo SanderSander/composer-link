@@ -13,7 +13,6 @@
 
 namespace Tests\Unit\Commands;
 
-use Composer\Package\CompletePackage;
 use ComposerLink\Commands\LinkedCommand;
 use ComposerLink\LinkedPackage;
 use ComposerLink\LinkedPackagesRepository;
@@ -67,8 +66,8 @@ class LinkedCommandTest extends TestCase
         $output->expects($this->exactly(2))
             ->method('writeln')
             ->with($this->logicalOr(
-                $this->equalTo('../package/test-1	package/test-1'),
-                $this->equalTo('../package/test-2	package/test-2')
+                $this->equalTo("package/test-1\t../package/test-1"),
+                $this->equalTo("package/test-2\t../package/test-2")
             ));
 
         $input = new StringInput('linked');
@@ -77,11 +76,9 @@ class LinkedCommandTest extends TestCase
 
     private function getMockedLinkedPackage(string $name): LinkedPackage
     {
-        $completePackage = $this->createMock(CompletePackage::class);
-        $completePackage->method('getName')->willReturn('package/' . $name);
         $package = $this->createMock(LinkedPackage::class);
+        $package->method('getName')->willReturn('package/' . $name);
         $package->method('getPath')->willReturn('../package/' . $name);
-        $package->method('getPackage')->willReturn($completePackage);
 
         return $package;
     }

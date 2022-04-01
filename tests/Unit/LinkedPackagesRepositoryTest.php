@@ -39,8 +39,36 @@ class LinkedPackagesRepositoryTest extends TestCase
 
         $fileSystem->expects($this->once())
             ->method('write')
-            ->with('link.dat', serialize([$package]));
+            ->with('link.dat', $this->callback(function (string $data) use ($package) {
+                $data = unserialize($data);
+                $this->assertCount(1, $data);
+                $this->assertEquals($package, $data[0]);
+                return true;
+            }));
+
         $repository->persist();
+    }
+
+    public function test_if_package_is_updated_when_stored(): void
+    {
+        $io = $this->createStub(IOInterface::class);
+        $package1 = $this->createStub(LinkedPackage::class);
+        $package2 = $this->createStub(LinkedPackage::class);
+        $fileSystem = $this->createMock(FilesystemOperator::class);
+
+        $repository = new LinkedPackagesRepository(
+            $fileSystem,
+            $io
+        );
+
+        $package1->method('getName')->willReturn('test/package');
+        $package2->method('getName')->willReturn('test/package');
+
+        $repository->store($package1);
+        $repository->store($package2);
+
+        $this->assertCount(1, $repository->all());
+        $this->assertEquals($package2, $repository->findByName('test/package'));
     }
 
     public function test_find_by_path(): void

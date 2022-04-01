@@ -32,8 +32,19 @@ class LinkedCommand extends Command
             return 0;
         }
 
+        $longest = 0;
         foreach ($linkedPackages as $linkedPackage) {
-            $output->writeln(sprintf("%s\t%s", $linkedPackage->getPath(), $linkedPackage->getPackage()->getName()));
+            if (strlen($linkedPackage->getName()) > $longest) {
+                $longest = strlen($linkedPackage->getName());
+            }
+        }
+
+        foreach ($linkedPackages as $linkedPackage) {
+            $output->writeln(sprintf(
+                "%s\t%s",
+                str_pad($linkedPackage->getName(), $longest),
+                $linkedPackage->getPath()
+            ));
         }
 
         return 0;
