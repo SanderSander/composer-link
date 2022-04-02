@@ -36,6 +36,11 @@ class LinkCommand extends Command
     {
         $path = $input->getArgument('path');
 
+        // When run in global we should transform path to absolute path
+        // TODO fail the some way as fromPath() when realpath === false
+        if ($this->isGlobal() && ! $this->isAbsolutePath($path)) {
+            $path = realpath($this->getApplication()->getInitialWorkingDirectory() . DIRECTORY_SEPARATOR . $path);
+        }
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path);
 
         if (!is_null($this->plugin->getRepository()->findByPath($path))) {
