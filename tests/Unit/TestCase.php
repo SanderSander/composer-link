@@ -22,6 +22,7 @@ abstract class TestCase extends PHPUnitTestCase
 {
     protected string $rootDir;
 
+    /** @SuppressWarnings(PHPMD.StaticAccess) */
     protected function setUp(): void
     {
         parent::setUp();
