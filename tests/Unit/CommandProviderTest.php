@@ -32,9 +32,9 @@ class CommandProviderTest extends TestCase
         $provider = new CommandProvider($arguments);
         $commands = $provider->getCommands();
 
-        $this->assertCount(3, $commands);
-        $this->assertInstanceOf(LinkCommand::class, $commands[0]);
-        $this->assertInstanceOf(UnlinkCommand::class, $commands[1]);
-        $this->assertInstanceOf(LinkedCommand::class, $commands[2]);
+        static::assertCount(3, $commands);
+        static::assertInstanceOf(LinkCommand::class, $commands[0]);
+        static::assertInstanceOf(UnlinkCommand::class, $commands[1]);
+        static::assertInstanceOf(LinkedCommand::class, $commands[2]);
     }
 }

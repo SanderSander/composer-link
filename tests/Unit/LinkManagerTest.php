@@ -78,9 +78,9 @@ class LinkManagerTest extends TestCase
         $this->filesystem->method('isJunction')
             ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->assertFalse($this->linkManager->isLinked($this->package));
-        $this->assertTrue($this->linkManager->isLinked($this->package));
-        $this->assertTrue($this->linkManager->isLinked($this->package));
+        static::assertFalse($this->linkManager->isLinked($this->package));
+        static::assertTrue($this->linkManager->isLinked($this->package));
+        static::assertTrue($this->linkManager->isLinked($this->package));
     }
 
     public function test_link_without_original_package(): void
@@ -89,11 +89,11 @@ class LinkManagerTest extends TestCase
         $this->package->method('getPackage')->willReturn($package);
 
         $this->installer
-            ->expects($this->never())
+            ->expects(static::never())
             ->method('uninstall');
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('install')
             ->with($this->installedRepository, $this->package->getPackage())
             ->willReturn(resolve(null));
@@ -111,13 +111,13 @@ class LinkManagerTest extends TestCase
             ->willReturn($original);
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('uninstall')
             ->with($this->installedRepository, $original)
             ->willReturn(resolve(null));
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('install')
             ->with($this->installedRepository, $this->package->getPackage())
             ->willReturn(resolve(null));
@@ -133,13 +133,13 @@ class LinkManagerTest extends TestCase
         $this->package->method('getOriginalPackage')->willReturn($original);
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('uninstall')
             ->with($this->installedRepository, $package)
             ->willReturn(resolve(null));
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('install')
             ->with($this->installedRepository, $original)
             ->willReturn(resolve(null));
@@ -153,13 +153,13 @@ class LinkManagerTest extends TestCase
         $this->package->method('getPackage')->willReturn($package);
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('uninstall')
             ->with($this->installedRepository, $package)
             ->willReturn(resolve(null));
 
         $this->installer
-            ->expects($this->never())
+            ->expects(static::never())
             ->method('install');
 
         $this->linkManager->unlinkPackage($this->package);
@@ -171,17 +171,17 @@ class LinkManagerTest extends TestCase
         $this->package->method('getPackage')->willReturn($package);
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('uninstall')
             ->willThrowException(new RuntimeException());
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('cleanup')
             ->with('uninstall', $package);
 
         $this->installer
-            ->expects($this->never())
+            ->expects(static::never())
             ->method('install');
 
         $this->expectException(RuntimeException::class);
@@ -195,17 +195,17 @@ class LinkManagerTest extends TestCase
         $this->package->method('getPackage')->willReturn($package);
 
         $this->installer
-            ->expects($this->never())
+            ->expects(static::never())
             ->method('uninstall');
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('install')
             ->with($this->installedRepository, $this->package->getPackage())
             ->willThrowException(new RuntimeException());
 
         $this->installer
-            ->expects($this->once())
+            ->expects(static::once())
             ->method('cleanup')
             ->with('install', $package);
 

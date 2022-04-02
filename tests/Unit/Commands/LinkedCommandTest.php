@@ -45,12 +45,12 @@ class LinkedCommandTest extends TestCase
     public function test_no_linked_packages(): void
     {
         $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->once())
+        $output->expects(static::once())
             ->method('writeln')
             ->with('No packages are linked');
 
         $input = new StringInput('linked');
-        $this->assertSame(0, $this->application->run($input, $output));
+        static::assertSame(0, $this->application->run($input, $output));
     }
 
     public function test_linked_packages(): void
@@ -63,15 +63,15 @@ class LinkedCommandTest extends TestCase
         $this->plugin->method('getRepository')->willReturn($repository);
 
         $output = $this->createMock(OutputInterface::class);
-        $output->expects($this->exactly(2))
+        $output->expects(static::exactly(2))
             ->method('writeln')
-            ->with($this->logicalOr(
-                $this->equalTo("package/test-1\t../package/test-1"),
-                $this->equalTo("package/test-2\t../package/test-2")
+            ->with(static::logicalOr(
+                static::equalTo("package/test-1\t../package/test-1"),
+                static::equalTo("package/test-2\t../package/test-2")
             ));
 
         $input = new StringInput('linked');
-        $this->assertSame(0, $this->application->run($input, $output));
+        static::assertSame(0, $this->application->run($input, $output));
     }
 
     private function getMockedLinkedPackage(string $name): LinkedPackage

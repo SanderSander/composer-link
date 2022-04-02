@@ -71,21 +71,21 @@ class LinkCommandTest extends TestCase
 
     public function test_link_command(): void
     {
-        $this->packageFactory->expects($this->once())
+        $this->packageFactory->expects(static::once())
             ->method('fromPath')
             ->with('/test-path');
 
-        $this->repository->expects($this->once())->method('store');
-        $this->repository->expects($this->once())->method('persist');
-        $this->linkManager->expects($this->once())->method('linkPackage');
+        $this->repository->expects(static::once())->method('store');
+        $this->repository->expects(static::once())->method('persist');
+        $this->linkManager->expects(static::once())->method('linkPackage');
 
         $input = new StringInput('link /test-path');
-        $this->assertSame(0, $this->application->run($input, $this->output));
+        static::assertSame(0, $this->application->run($input, $this->output));
     }
 
     public function test_existing_path(): void
     {
-        $this->repository->expects($this->once())->method('findByPath')
+        $this->repository->expects(static::once())->method('findByPath')
             ->with('/test-path')
             ->willReturn($this->createMock(LinkedPackage::class));
 
@@ -93,7 +93,7 @@ class LinkCommandTest extends TestCase
         $this->expectExceptionMessage('Package in path "/test-path" already linked');
 
         $input = new StringInput('link /test-path');
-        $this->assertSame(1, $this->application->run($input, $this->output));
+        static::assertSame(1, $this->application->run($input, $this->output));
     }
 
     public function test_existing_package_name(): void
@@ -101,22 +101,22 @@ class LinkCommandTest extends TestCase
         $this->package->method('getName')->willReturn('test/package');
         $this->package->method('getPath')->willReturn('/test-path');
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(static::once())
             ->method('findByName')
             ->willReturn($this->package);
 
-        $this->packageFactory->expects($this->once())
+        $this->packageFactory->expects(static::once())
             ->method('fromPath')
             ->with('/test-path')
             ->willReturn($this->package);
 
         $command = new LinkCommand($this->plugin);
-        $this->assertSame('link', $command->getName());
+        static::assertSame('link', $command->getName());
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Package "test/package" already linked from path "/test-path"');
 
         $input = new StringInput('link /test-path');
-        $this->assertSame(1, $this->application->run($input, $this->output));
+        static::assertSame(1, $this->application->run($input, $this->output));
     }
 }

@@ -24,8 +24,6 @@ use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Loop;
 use ComposerLink\CommandProvider;
-use ComposerLink\LinkedPackageFactory;
-use ComposerLink\LinkManager;
 use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\TestCase;
@@ -46,31 +44,12 @@ class PluginTest extends TestCase
         $capabilities = $plugin->getCapabilities();
         $events = Plugin::getSubscribedEvents();
 
-        $this->assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
-        $this->assertContains(CommandProvider::class, $capabilities);
-        $this->assertInstanceOf(Repository::class, $plugin->getRepository());
-        $this->assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
-        $this->assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
-        $this->assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
+        static::assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
+        static::assertContains(CommandProvider::class, $capabilities);
+        static::assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
 
         $plugin->deactivate($composer, $io);
         $plugin->uninstall($composer, $io);
-    }
-
-
-    public function test_linking_linked_packages(): void
-    {
-        $io =$this->createMock(IOInterface::class);
-        $composer = $this->mockComposer();
-
-        $plugin = new Plugin();
-        $plugin->activate($composer, $io);
-
-        $this->assertInstanceOf(Repository::class, $plugin->getRepository());
-        $this->assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
-        $this->assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
-
-        $plugin->linkLinkedPackages();
     }
 
     private function mockComposer(): Composer

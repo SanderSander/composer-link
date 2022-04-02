@@ -31,7 +31,9 @@
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
         "phpstan/phpstan-phpunit": "^1.1",
-        "phpmd/phpmd": "^2.12"
+        "phpmd/phpmd": "^2.12",
+        "phpstan/phpstan-strict-rules": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0"
     },
     "extra": {
         "class": "ComposerLink\\Plugin"

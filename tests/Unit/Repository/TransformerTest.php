@@ -14,7 +14,6 @@
 namespace Tests\Unit\Repository;
 
 use Composer\Package\PackageInterface;
-use ComposerLink\LinkedPackage;
 use ComposerLink\Repository\Transformer;
 use Tests\Unit\TestCase;
 
@@ -39,12 +38,10 @@ class TransformerTest extends TestCase
             ]
         );
 
-        $this->assertInstanceOf(LinkedPackage::class, $package);
-        $this->assertInstanceOf(PackageInterface::class, $package->getPackage());
-        $this->assertInstanceOf(PackageInterface::class, $package->getOriginalPackage());
-        $this->assertEquals('test/package', $package->getName());
-        $this->assertEquals('../path', $package->getPath());
-        $this->assertEquals('install-path/', $package->getInstallationPath());
+        static::assertInstanceOf(PackageInterface::class, $package->getOriginalPackage());
+        static::assertEquals('test/package', $package->getName());
+        static::assertEquals('../path', $package->getPath());
+        static::assertEquals('install-path/', $package->getInstallationPath());
 
         $package = $transformer->load(
             [
@@ -57,7 +54,7 @@ class TransformerTest extends TestCase
                 ]
             ]
         );
-        $this->assertNull($package->getOriginalPackage());
+        static::assertNull($package->getOriginalPackage());
     }
 
     public function test_export(): void
@@ -65,7 +62,7 @@ class TransformerTest extends TestCase
         $transformer = new Transformer();
 
         $data = $transformer->export($this->mockPackage());
-        $this->assertEquals([
+        static::assertEquals([
             'path' => '../test-path-package',
             'installationPath' => '../install-path-package',
             'package' => [
@@ -83,7 +80,7 @@ class TransformerTest extends TestCase
         ], $data);
 
         $data = $transformer->export($this->mockPackage('package', false));
-        $this->assertEquals([
+        static::assertEquals([
             'path' => '../test-path-package',
             'installationPath' => '../install-path-package',
             'package' => [
