@@ -14,7 +14,6 @@
 namespace Tests\Unit\Repository;
 
 use Composer\Package\PackageInterface;
-use ComposerLink\LinkedPackage;
 use ComposerLink\Repository\Transformer;
 use Tests\Unit\TestCase;
 
@@ -39,8 +38,6 @@ class TransformerTest extends TestCase
             ]
         );
 
-        static::assertInstanceOf(LinkedPackage::class, $package);
-        static::assertInstanceOf(PackageInterface::class, $package->getPackage());
         static::assertInstanceOf(PackageInterface::class, $package->getOriginalPackage());
         static::assertEquals('test/package', $package->getName());
         static::assertEquals('../path', $package->getPath());

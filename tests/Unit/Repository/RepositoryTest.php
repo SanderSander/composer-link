@@ -14,7 +14,6 @@
 namespace Tests\Unit\Repository;
 
 use Composer\IO\IOInterface;
-use ComposerLink\LinkedPackage;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\Transformer;
 use League\Flysystem\FilesystemOperator;
@@ -64,8 +63,8 @@ class RepositoryTest extends TestCase
             ->method('write')
             ->with('linked-packages.json', static::callback(function (string $json) {
                 $data = json_decode($json, true);
-                $this->assertCount(1, $data['packages']);
-                $this->assertSame(['test' => 'exists'], $data['packages'][0]);
+                self::assertCount(1, $data['packages']);
+                self::assertSame(['test' => 'exists'], $data['packages'][0]);
                 return true;
             }));
 
@@ -142,7 +141,5 @@ class RepositoryTest extends TestCase
         $this->transformer->method('load')->willReturn($package);
 
         static::assertCount(1, $repository->all());
-        $resolved = $repository->all()[0];
-        static::assertInstanceOf(LinkedPackage::class, $resolved);
     }
 }

@@ -61,7 +61,7 @@ class Transformer
         $data['path'] = $package->getPath();
         $data['installationPath'] = $package->getInstallationPath();
         $data['package'] = $this->composerDumper->dump($package->getPackage());
-        if ($package->getOriginalPackage()) {
+        if (! is_null($package->getOriginalPackage())) {
             $data['originalPackage'] = $this->composerDumper->dump($package->getOriginalPackage());
         }
 
