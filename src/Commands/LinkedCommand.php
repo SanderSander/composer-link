@@ -31,6 +31,8 @@ class LinkedCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        var_dump(getcwd() === $this->getComposer()->getConfig()->get('home'));
+
         $linkedPackages = $this->plugin->getRepository()->all();
         if (count($linkedPackages) === 0) {
             $output->writeln('No packages are linked');

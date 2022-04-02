@@ -28,4 +28,9 @@ abstract class Command extends BaseCommand
 
         $this->plugin = $plugin;
     }
+
+    protected function isGlobal(): bool
+    {
+        return getcwd() === $this->getComposer()->getConfig()->get('home');
+    }
 }
