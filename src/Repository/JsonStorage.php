@@ -37,11 +37,8 @@ class JsonStorage implements StorageInterface
             throw new RuntimeException('Cannot read data, no data stored.');
         }
 
+        /** @var string $data */
         $data = file_get_contents($this->file);
-        if ($data === false) {
-            throw new RuntimeException('Cannot read data file.');
-        }
-
         return json_decode($data, true);
     }
 

@@ -26,7 +26,6 @@ use Composer\Util\Loop;
 use ComposerLink\CommandProvider;
 use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
-use PHPUnit\Framework\TestCase;
 
 class PluginTest extends TestCase
 {
@@ -62,7 +61,7 @@ class PluginTest extends TestCase
         $localRepository = $this->createMock(InstalledRepositoryInterface::class);
         $repositoryManager->method('getLocalRepository')->willReturn($localRepository);
 
-        $config->method('get')->with('vendor-dir')->willReturn('.');
+        $config->method('get')->with('vendor-dir')->willReturn($this->rootDir);
 
         $composer = $this->createMock(Composer::class);
         $composer->method('getDownloadManager')->willReturn($downloader);
