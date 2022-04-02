@@ -87,7 +87,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             $this->repositoryManager->getLocalRepository()
         );
 
-        // TODO use factory pattern
         $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR  . 'linked-packages.json';
         $this->repository = new Repository(
             new JsonStorage($storageFile),
