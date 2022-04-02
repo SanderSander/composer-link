@@ -65,20 +65,20 @@ class UnlinkCommandTest extends TestCase
 
     public function test_link_command_for_existing_package(): void
     {
-        $this->repository->expects($this->once())->method('findByPath')->willReturn($this->package);
-        $this->repository->expects($this->once())->method('remove')->with($this->package);
-        $this->repository->expects($this->once())->method('persist');
-        $this->linkManager->expects($this->once())->method('unlinkPackage')->with($this->package);
+        $this->repository->expects(static::once())->method('findByPath')->willReturn($this->package);
+        $this->repository->expects(static::once())->method('remove')->with($this->package);
+        $this->repository->expects(static::once())->method('persist');
+        $this->linkManager->expects(static::once())->method('unlinkPackage')->with($this->package);
 
         $input = new StringInput('unlink /test-path');
-        $this->assertSame(0, $this->application->run($input, $this->output));
+        static::assertSame(0, $this->application->run($input, $this->output));
     }
 
     public function test_link_command_for_non_existing_package(): void
     {
-        $this->repository->expects($this->once())->method('findByPath')->willReturn(null);
+        $this->repository->expects(static::once())->method('findByPath')->willReturn(null);
 
         $input = new StringInput('unlink /test-path');
-        $this->assertSame(1, $this->application->run($input, $this->output));
+        static::assertSame(1, $this->application->run($input, $this->output));
     }
 }

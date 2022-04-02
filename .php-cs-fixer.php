@@ -24,6 +24,7 @@ return $config
         'strict_param' => true,
         'declare_strict_types' => true,
         'no_unused_imports' => true,
+        'php_unit_test_case_static_method_calls' => true,
         'single_blank_line_at_eof' => true,
         'array_syntax' => ['syntax' => 'short'],
         'ordered_imports' => ['imports_order' => ['class', 'function', 'const'], 'sort_algorithm' => 'alpha'],

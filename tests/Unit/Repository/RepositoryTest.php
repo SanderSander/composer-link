@@ -55,14 +55,14 @@ class RepositoryTest extends TestCase
         $repository = $this->getRepository();
 
         $repository->store($package);
-        $this->assertCount(1, $repository->all());
-        $this->assertEquals($package, $repository->all()[0]);
-        $this->assertNotSame($package, $repository->findByName('test/package'));
+        static::assertCount(1, $repository->all());
+        static::assertEquals($package, $repository->all()[0]);
+        static::assertNotSame($package, $repository->findByName('test/package'));
         $this->transformer->method('export')->willReturn(['test' => 'exists']);
 
-        $this->fileSystem->expects($this->once())
+        $this->fileSystem->expects(static::once())
             ->method('write')
-            ->with('linked-packages.json', $this->callback(function (string $json) {
+            ->with('linked-packages.json', static::callback(function (string $json) {
                 $data = json_decode($json, true);
                 $this->assertCount(1, $data['packages']);
                 $this->assertSame(['test' => 'exists'], $data['packages'][0]);
@@ -81,8 +81,8 @@ class RepositoryTest extends TestCase
         $repository->store($package1);
         $repository->store($package2);
 
-        $this->assertCount(1, $repository->all());
-        $this->assertEquals($package2, $repository->findByName('test/package'));
+        static::assertCount(1, $repository->all());
+        static::assertEquals($package2, $repository->findByName('test/package'));
     }
 
     public function test_find_by_path(): void
@@ -91,9 +91,9 @@ class RepositoryTest extends TestCase
         $repository = $this->getRepository();
 
         $repository->store($package);
-        $this->assertEquals($package, $repository->findByPath('../test-path-package'));
-        $this->assertNotSame($package, $repository->findByName('test/package'));
-        $this->assertNull($repository->findByPath('/test-path-other'));
+        static::assertEquals($package, $repository->findByPath('../test-path-package'));
+        static::assertNotSame($package, $repository->findByName('test/package'));
+        static::assertNull($repository->findByPath('/test-path-other'));
     }
 
     public function test_find_by_name(): void
@@ -102,9 +102,9 @@ class RepositoryTest extends TestCase
         $repository = $this->getRepository();
 
         $repository->store($package);
-        $this->assertEquals($package, $repository->findByName('test/package'));
-        $this->assertNotSame($package, $repository->findByName('test/package'));
-        $this->assertNull($repository->findByName('test/package-other'));
+        static::assertEquals($package, $repository->findByName('test/package'));
+        static::assertNotSame($package, $repository->findByName('test/package'));
+        static::assertNull($repository->findByName('test/package-other'));
     }
 
     public function test_package_is_removed(): void
@@ -115,9 +115,9 @@ class RepositoryTest extends TestCase
         $repository->store($package);
         $repository->remove($package);
 
-        $this->assertCount(0, $repository->all());
+        static::assertCount(0, $repository->all());
 
-        $this->fileSystem->expects($this->once())
+        $this->fileSystem->expects(static::once())
             ->method('write')
             ->with('linked-packages.json', json_encode(['packages' => []]));
         $repository->persist();
@@ -141,8 +141,8 @@ class RepositoryTest extends TestCase
 
         $this->transformer->method('load')->willReturn($package);
 
-        $this->assertCount(1, $repository->all());
+        static::assertCount(1, $repository->all());
         $resolved = $repository->all()[0];
-        $this->assertInstanceOf(LinkedPackage::class, $resolved);
+        static::assertInstanceOf(LinkedPackage::class, $resolved);
     }
 }

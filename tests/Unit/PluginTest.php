@@ -46,12 +46,12 @@ class PluginTest extends TestCase
         $capabilities = $plugin->getCapabilities();
         $events = Plugin::getSubscribedEvents();
 
-        $this->assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
-        $this->assertContains(CommandProvider::class, $capabilities);
-        $this->assertInstanceOf(Repository::class, $plugin->getRepository());
-        $this->assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
-        $this->assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
-        $this->assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
+        static::assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
+        static::assertContains(CommandProvider::class, $capabilities);
+        static::assertInstanceOf(Repository::class, $plugin->getRepository());
+        static::assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
+        static::assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
+        static::assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
 
         $plugin->deactivate($composer, $io);
         $plugin->uninstall($composer, $io);
@@ -66,9 +66,9 @@ class PluginTest extends TestCase
         $plugin = new Plugin();
         $plugin->activate($composer, $io);
 
-        $this->assertInstanceOf(Repository::class, $plugin->getRepository());
-        $this->assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
-        $this->assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
+        static::assertInstanceOf(Repository::class, $plugin->getRepository());
+        static::assertInstanceOf(LinkManager::class, $plugin->getLinkManager());
+        static::assertInstanceOf(LinkedPackageFactory::class, $plugin->getPackageFactory());
 
         $plugin->linkLinkedPackages();
     }

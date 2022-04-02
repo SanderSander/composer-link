@@ -33,13 +33,13 @@ class LinkedPackageTest extends TestCase
             '/test-install-path'
         );
 
-        $this->assertSame('/test-install-path', $linkedPackage->getInstallationPath());
-        $this->assertSame('/test-path', $linkedPackage->getPath());
-        $this->assertSame($package, $linkedPackage->getPackage());
-        $this->assertSame($originalPackage, $linkedPackage->getOriginalPackage());
-        $this->assertSame('test/package', $linkedPackage->getName());
+        static::assertSame('/test-install-path', $linkedPackage->getInstallationPath());
+        static::assertSame('/test-path', $linkedPackage->getPath());
+        static::assertSame($package, $linkedPackage->getPackage());
+        static::assertSame($originalPackage, $linkedPackage->getOriginalPackage());
+        static::assertSame('test/package', $linkedPackage->getName());
         $newOriginalPackage = $this->createMock(PackageInterface::class);
         $linkedPackage->setOriginalPackage($newOriginalPackage);
-        $this->assertSame($newOriginalPackage, $linkedPackage->getOriginalPackage());
+        static::assertSame($newOriginalPackage, $linkedPackage->getOriginalPackage());
     }
 }

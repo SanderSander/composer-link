@@ -33,7 +33,7 @@ class LinkedPackageFactoryTest extends TestCase
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
         $result = $factory->fromPath('tests/mock');
 
-        $this->assertInstanceOf(LinkedPackage::class, $result);
+        static::assertInstanceOf(LinkedPackage::class, $result);
     }
 
     public function test_no_original_package(): void
@@ -44,7 +44,7 @@ class LinkedPackageFactoryTest extends TestCase
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
         $package = $factory->fromPath('tests/mock');
-        $this->assertNull($package->getOriginalPackage());
+        static::assertNull($package->getOriginalPackage());
     }
 
     public function test_no_composer_file(): void
