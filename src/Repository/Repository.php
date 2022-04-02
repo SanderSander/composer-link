@@ -15,32 +15,28 @@ namespace ComposerLink\Repository;
 
 use Composer\IO\IOInterface;
 use ComposerLink\LinkedPackage;
-use League\Flysystem\FilesystemOperator;
 use RuntimeException;
 
 class Repository
 {
-    protected const FILE_NAME = 'linked-packages.json';
-
-    /** @deprecated We should get rid of all dependencies */
-    protected FilesystemOperator $filesystem;
-
     protected IOInterface $io;
 
     protected Transformer $transformer;
+
+    protected StorageInterface $storage;
 
     /**
      * @var array<int, LinkedPackage>
      */
     protected array $linkedPackages = [];
 
-    public function __construct(FilesystemOperator $filesystem, IOInterface $io, Transformer $transformer)
+    public function __construct(StorageInterface $storage, IOInterface $io, Transformer $transformer)
     {
-        $this->filesystem = $filesystem;
         $this->io = $io;
         $this->transformer = $transformer;
+        $this->storage = $storage;
 
-        $this->loadFromJsonFile();
+        $this->load();
     }
 
     public function store(LinkedPackage $linkedPackage): void
@@ -112,20 +108,16 @@ class Repository
             $data['packages'][] = $this->transformer->export($package);
         }
 
-        /** @var string $json */
-        $json = json_encode($data);
-        $this->filesystem->write(self::FILE_NAME, $json);
+        $this->storage->write($data);
     }
 
-    /**
-     * Load all linked packages from the json file into memory
-     */
-    private function loadFromJsonFile(): void
+    private function load(): void
     {
-        if (!$this->filesystem->fileExists(self::FILE_NAME)) {
+        if (!$this->storage->hasData()) {
             return;
         }
-        $data = json_decode($this->filesystem->read(self::FILE_NAME), true);
+
+        $data = $this->storage->read();
 
         foreach ($data['packages'] as $package) {
             $this->linkedPackages[] = $this->transformer->load($package);

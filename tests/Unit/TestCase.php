@@ -15,10 +15,21 @@ namespace Tests\Unit;
 
 use Composer\Package\PackageInterface;
 use ComposerLink\LinkedPackage;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 abstract class TestCase extends PHPUnitTestCase
 {
+    protected string $rootDir;
+
+    /** @SuppressWarnings(PHPMD.StaticAccess) */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        vfsStream::setup();
+        $this->rootDir = vfsStream::url('root' . DIRECTORY_SEPARATOR);
+    }
+
     /** @SuppressWarnings(PHPMD.BooleanArgumentFlag) */
     protected function mockPackage(string $name = 'package', bool $withOriginalPackage = true): LinkedPackage
     {
