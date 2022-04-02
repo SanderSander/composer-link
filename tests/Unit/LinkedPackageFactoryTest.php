@@ -16,7 +16,6 @@ namespace Tests\Unit;
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
-use ComposerLink\LinkedPackage;
 use ComposerLink\LinkedPackageFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -33,7 +32,8 @@ class LinkedPackageFactoryTest extends TestCase
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
         $result = $factory->fromPath('tests/mock');
 
-        static::assertInstanceOf(LinkedPackage::class, $result);
+        static::assertSame('test/package', $result->getName());
+        static::assertSame($originalPackage, $result->getOriginalPackage());
     }
 
     public function test_no_original_package(): void
