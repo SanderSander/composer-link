@@ -15,8 +15,9 @@ namespace Tests\Unit\Repository;
 
 use Composer\IO\IOInterface;
 use ComposerLink\Repository\Repository;
+use ComposerLink\Repository\StorageInterface;
 use ComposerLink\Repository\Transformer;
-use League\Flysystem\FilesystemOperator;
+use RuntimeException;
 use Tests\Unit\TestCase;
 
 class RepositoryTest extends TestCase
@@ -24,8 +25,8 @@ class RepositoryTest extends TestCase
     /** @var IOInterface&\PHPUnit\Framework\MockObject\Stub */
     protected IOInterface $io;
 
-    /** @var FilesystemOperator&\PHPUnit\Framework\MockObject\MockObject */
-    protected FilesystemOperator $fileSystem;
+    /** @var StorageInterface&\PHPUnit\Framework\MockObject\MockObject */
+    protected StorageInterface $storage;
 
     /** @var Transformer&\PHPUnit\Framework\MockObject\MockObject */
     protected Transformer $transformer;
@@ -35,14 +36,14 @@ class RepositoryTest extends TestCase
         parent::setUp();
 
         $this->io = $this->createStub(IOInterface::class);
-        $this->fileSystem = $this->createMock(FilesystemOperator::class);
+        $this->storage = $this->createMock(StorageInterface::class);
         $this->transformer = $this->createMock(Transformer::class);
     }
 
     protected function getRepository(): Repository
     {
         return new Repository(
-            $this->fileSystem,
+            $this->storage,
             $this->io,
             $this->transformer
         );
@@ -59,10 +60,9 @@ class RepositoryTest extends TestCase
         static::assertNotSame($package, $repository->findByName('test/package'));
         $this->transformer->method('export')->willReturn(['test' => 'exists']);
 
-        $this->fileSystem->expects(static::once())
+        $this->storage->expects(static::once())
             ->method('write')
-            ->with('linked-packages.json', static::callback(function (string $json) {
-                $data = json_decode($json, true);
+            ->with(static::callback(function (array $data) {
                 self::assertCount(1, $data['packages']);
                 self::assertSame(['test' => 'exists'], $data['packages'][0]);
                 return true;
@@ -116,9 +116,9 @@ class RepositoryTest extends TestCase
 
         static::assertCount(0, $repository->all());
 
-        $this->fileSystem->expects(static::once())
+        $this->storage->expects(static::once())
             ->method('write')
-            ->with('linked-packages.json', json_encode(['packages' => []]));
+            ->with(['packages' => []]);
         $repository->persist();
     }
 
@@ -126,16 +126,16 @@ class RepositoryTest extends TestCase
     {
         $package = $this->mockPackage();
         $repository = $this->getRepository();
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $repository->remove($package);
     }
 
     public function test_if_data_can_be_loaded_from_file(): void
     {
         $package = $this->mockPackage();
-        $this->fileSystem->method('fileExists')->willReturn(true);
-        $this->fileSystem->method('read')
-            ->willReturn(json_encode(['packages' => [[]]]));
+        $this->storage->method('hasData')->willReturn(true);
+        $this->storage->method('read')
+            ->willReturn(['packages' => [[]]]);
         $repository = $this->getRepository();
 
         $this->transformer->method('load')->willReturn($package);

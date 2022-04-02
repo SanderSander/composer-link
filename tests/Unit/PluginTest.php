@@ -62,7 +62,7 @@ class PluginTest extends TestCase
         $localRepository = $this->createMock(InstalledRepositoryInterface::class);
         $repositoryManager->method('getLocalRepository')->willReturn($localRepository);
 
-        $config->method('get')->with('vendor-dir')->willReturn('./vendor');
+        $config->method('get')->with('vendor-dir')->willReturn('.');
 
         $composer = $this->createMock(Composer::class);
         $composer->method('getDownloadManager')->willReturn($downloader);

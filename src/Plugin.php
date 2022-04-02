@@ -23,10 +23,9 @@ use Composer\Plugin\PluginInterface;
 use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
+use ComposerLink\Repository\JsonStorage;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\Transformer;
-use League\Flysystem\Filesystem;
-use League\Flysystem\Local\LocalFilesystemAdapter;
 
 class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
@@ -89,8 +88,9 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         );
 
         // TODO use factory pattern
+        $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR  . 'linked-packages.json';
         $this->repository = new Repository(
-            new Filesystem(new LocalFilesystemAdapter($composer->getConfig()->get('vendor-dir'))),
+            new JsonStorage($storageFile),
             $io,
             new Transformer()
         );
