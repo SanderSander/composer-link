@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -28,7 +30,7 @@ class LinkCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -42,11 +44,7 @@ class LinkCommand extends Command
 
         $currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName());
         if (!is_null($currentLinked)) {
-            throw new RuntimeException(sprintf(
-                'Package "%s" already linked from path "%s"',
-                $linkedPackage->getName(),
-                $currentLinked->getPath()
-            ));
+            throw new RuntimeException(sprintf('Package "%s" already linked from path "%s"', $linkedPackage->getName(), $currentLinked->getPath()));
         }
 
         $this->plugin->getRepository()->store($linkedPackage);

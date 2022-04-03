@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -34,7 +36,7 @@ class PluginTest extends TestCase
     /** @SuppressWarnings(PHPMD.StaticAccess) */
     public function test_if_plugin_can_be_utilized(): void
     {
-        $io =$this->createMock(IOInterface::class);
+        $io = $this->createMock(IOInterface::class);
         $composer = $this->mockComposer();
 
         $plugin = new Plugin();

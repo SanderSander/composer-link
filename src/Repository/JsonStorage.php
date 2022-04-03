@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -39,6 +41,7 @@ class JsonStorage implements StorageInterface
 
         /** @var string $data */
         $data = file_get_contents($this->file);
+
         return json_decode($data, true);
     }
 

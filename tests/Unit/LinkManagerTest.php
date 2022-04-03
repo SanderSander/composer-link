@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -29,22 +31,22 @@ use function React\Promise\resolve;
 
 class LinkManagerTest extends TestCase
 {
-    /** @var Filesystem&MockObject  */
+    /** @var Filesystem&MockObject */
     protected Filesystem $filesystem;
 
-    /** @var InstallerInterface&MockObject  */
+    /** @var InstallerInterface&MockObject */
     protected InstallerInterface $installer;
 
-    /** @var Loop&MockObject  */
+    /** @var Loop&MockObject */
     protected Loop $loop;
 
-    /** @var LinkedPackage&MockObject  */
+    /** @var LinkedPackage&MockObject */
     protected LinkedPackage $package;
 
-    /** @var InstallationManager|MockObject  */
+    /** @var InstallationManager|MockObject */
     protected InstallationManager $installationManager;
 
-    /** @var InstalledRepositoryInterface|MockObject  */
+    /** @var InstalledRepositoryInterface|MockObject */
     protected InstalledRepositoryInterface $installedRepository;
 
     protected LinkManager $linkManager;
@@ -187,7 +189,6 @@ class LinkManagerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->linkManager->unlinkPackage($this->package);
     }
-
 
     public function test_is_cleaned_up_after_install_failure(): void
     {

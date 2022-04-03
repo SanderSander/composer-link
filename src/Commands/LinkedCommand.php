@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -25,13 +27,14 @@ class LinkedCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $linkedPackages = $this->plugin->getRepository()->all();
-        if (count($linkedPackages) === 0) {
+        if (0 === count($linkedPackages)) {
             $output->writeln('No packages are linked');
+
             return 0;
         }
 

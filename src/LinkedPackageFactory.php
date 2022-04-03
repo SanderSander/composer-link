@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -35,7 +37,7 @@ class LinkedPackageFactory
     private function loadFromJsonFile(string $path): CompletePackage
     {
         $realPath = realpath($path . DIRECTORY_SEPARATOR . 'composer.json');
-        if ($realPath === false) {
+        if (false === $realPath) {
             throw new RuntimeException('No composer.json file found in given path.');
         }
 
@@ -67,6 +69,7 @@ class LinkedPackageFactory
         }
 
         $destination = $this->installationManager->getInstallPath($newPackage);
+
         return new LinkedPackage(
             $path,
             $newPackage,

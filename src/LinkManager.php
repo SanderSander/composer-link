@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -35,7 +37,7 @@ class LinkManager
         Filesystem $filesystem,
         Loop $loop,
         InstallationManager $installationManager,
-        InstalledRepositoryInterface  $installedRepository
+        InstalledRepositoryInterface $installedRepository
     ) {
         $this->filesystem = $filesystem;
         $this->loop = $loop;
@@ -44,7 +46,7 @@ class LinkManager
     }
 
     /**
-     * Checks if the given package is linked
+     * Checks if the given package is linked.
      */
     public function isLinked(LinkedPackage $linkedPackage): bool
     {
@@ -53,7 +55,7 @@ class LinkManager
     }
 
     /**
-     * Links the package into the vendor directory
+     * Links the package into the vendor directory.
      */
     public function linkPackage(LinkedPackage $linkedPackage): void
     {
@@ -64,7 +66,7 @@ class LinkManager
     }
 
     /**
-     * Unlinks the package from the vendor directory
+     * Unlinks the package from the vendor directory.
      */
     public function unlinkPackage(LinkedPackage $linkedPackage): void
     {
@@ -95,7 +97,7 @@ class LinkManager
 
     /**
      * Downloads and installs the given package
-     * https://github.com/composer/composer/blob/2.0.0/src/Composer/Util/SyncHelper.php
+     * https://github.com/composer/composer/blob/2.0.0/src/Composer/Util/SyncHelper.php.
      */
     protected function install(PackageInterface $package): void
     {
@@ -114,7 +116,7 @@ class LinkManager
     }
 
     /**
-     * Waits for promise to be finished
+     * Waits for promise to be finished.
      */
     protected function wait(?PromiseInterface $promise): void
     {

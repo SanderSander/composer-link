@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -26,22 +28,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UnlinkCommandTest extends TestCase
 {
-    /** @var Plugin&MockObject  */
+    /** @var Plugin&MockObject */
     protected Plugin $plugin;
 
-    /** @var OutputInterface&MockObject  */
+    /** @var OutputInterface&MockObject */
     protected OutputInterface $output;
 
-    /** @var LinkManager&MockObject  */
+    /** @var LinkManager&MockObject */
     protected LinkManager $linkManager;
 
-    /** @var \ComposerLink\Repository\Repository&MockObject  */
+    /** @var \ComposerLink\Repository\Repository&MockObject */
     protected Repository $repository;
 
-    /** @var LinkedPackage&MockObject  */
+    /** @var LinkedPackage&MockObject */
     protected LinkedPackage $package;
 
-    /** @var Application */
     protected Application $application;
 
     protected function setUp(): void
