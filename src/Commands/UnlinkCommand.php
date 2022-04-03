@@ -39,7 +39,7 @@ class UnlinkCommand extends Command
         $repository = $this->plugin->getRepository();
         $linkedPackage = $repository->findByPath($linkedPackage->getPath());
 
-        if (null === $linkedPackage) {
+        if ($linkedPackage === null) {
             $this->getIO()->warning(sprintf('No linked package found in path "%s"', $path));
 
             return 1;

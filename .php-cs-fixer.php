@@ -46,4 +46,5 @@ return $config
         'header_comment' => ['header' => $header],
         'php_unit_method_casing' => ['case' => 'snake_case'],
         'concat_space' => ['spacing' => 'one'],
+        'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
     ])->setFinder($finder);

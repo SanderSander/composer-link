@@ -32,7 +32,7 @@ class LinkedCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $linkedPackages = $this->plugin->getRepository()->all();
-        if (0 === count($linkedPackages)) {
+        if (count($linkedPackages) === 0) {
             $output->writeln('No packages are linked');
 
             return 0;
