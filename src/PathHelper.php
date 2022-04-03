@@ -15,7 +15,7 @@ namespace ComposerLink;
 
 use RuntimeException;
 
-class Path
+class PathHelper
 {
     protected string $path;
 
