@@ -21,6 +21,7 @@ return $config
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR2' => true,
+        '@Symfony' => true,
         'strict_param' => true,
         'declare_strict_types' => true,
         'no_unused_imports' => true,
@@ -28,5 +29,7 @@ return $config
         'single_blank_line_at_eof' => true,
         'array_syntax' => ['syntax' => 'short'],
         'ordered_imports' => ['imports_order' => ['class', 'function', 'const'], 'sort_algorithm' => 'alpha'],
-        'header_comment' => ['header' => $header]
+        'header_comment' => ['header' => $header],
+        'php_unit_method_casing' => ['case' => 'snake_case'],
+        'concat_space' => ['spacing' => 'one']
     ])->setFinder($finder);
