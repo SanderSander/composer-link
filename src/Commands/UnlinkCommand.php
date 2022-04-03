@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
+use ComposerLink\Path;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,10 +37,13 @@ class UnlinkCommand extends Command
         $path = $input->getArgument('path');
 
         // When run in global we should transform path to absolute path
-        // TODO fail the some way as fromPath() when realpath === false
-        if ($this->isGlobal() && ! $this->isAbsolutePath($path)) {
-            $path = realpath($this->getApplication()->getInitialWorkingDirectory() . DIRECTORY_SEPARATOR . $path);
+        if ($this->plugin->isGlobal()) {
+            $transform = new Path($path);
+            /** @var string $working */
+            $working = $this->getApplication()->getInitialWorkingDirectory();
+            $path = $transform->getAbsolutePath($working);
         }
+
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path);
 
         $repository = $this->plugin->getRepository();

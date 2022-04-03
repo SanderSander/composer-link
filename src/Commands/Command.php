@@ -28,22 +28,4 @@ abstract class Command extends BaseCommand
 
         $this->plugin = $plugin;
     }
-
-    protected function isGlobal(): bool
-    {
-        return getcwd() === $this->getComposer()->getConfig()->get('home');
-    }
-
-    public function isAbsolutePath(string $file): bool
-    {
-        return '' !== $file && (
-            strspn($file, '/\\', 0, 1)
-                || (
-                    strlen($file) > 3 && ctype_alpha($file[0])
-                    && ':' === $file[1]
-                    && strspn($file, '/\\', 2, 1)
-                )
-                || null !== parse_url($file, \PHP_URL_SCHEME)
-        );
-    }
 }
