@@ -19,18 +19,20 @@ use Composer\IO\IOInterface;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\StorageInterface;
 use ComposerLink\Repository\Transformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use RuntimeException;
 use Tests\Unit\TestCase;
 
 class RepositoryTest extends TestCase
 {
-    /** @var IOInterface&\PHPUnit\Framework\MockObject\Stub */
+    /** @var IOInterface&Stub */
     protected IOInterface $io;
 
-    /** @var StorageInterface&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var StorageInterface&MockObject */
     protected StorageInterface $storage;
 
-    /** @var Transformer&\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Transformer&MockObject */
     protected Transformer $transformer;
 
     public function setUp(): void

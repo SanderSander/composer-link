@@ -37,7 +37,7 @@ class UnlinkCommandTest extends TestCase
     /** @var LinkManager&MockObject */
     protected LinkManager $linkManager;
 
-    /** @var \ComposerLink\Repository\Repository&MockObject */
+    /** @var Repository&MockObject  */
     protected Repository $repository;
 
     /** @var LinkedPackage&MockObject */
