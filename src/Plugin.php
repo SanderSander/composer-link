@@ -153,7 +153,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     }
 
     /**
-     * Check if this plugin is running from global or local project
+     * Check if this plugin is running from global or local project.
      */
     public function isGlobal(): bool
     {
