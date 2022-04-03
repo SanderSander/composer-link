@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -27,7 +29,7 @@ class UnlinkCommand extends Command
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -39,6 +41,7 @@ class UnlinkCommand extends Command
 
         if ($linkedPackage === null) {
             $this->getIO()->warning(sprintf('No linked package found in path "%s"', $path));
+
             return 1;
         }
 

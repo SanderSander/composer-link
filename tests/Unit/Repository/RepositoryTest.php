@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -65,6 +67,7 @@ class RepositoryTest extends TestCase
             ->with(static::callback(function (array $data) {
                 self::assertCount(1, $data['packages']);
                 self::assertSame(['test' => 'exists'], $data['packages'][0]);
+
                 return true;
             }));
 

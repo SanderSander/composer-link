@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -49,7 +51,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function deactivate(Composer $composer, IOInterface $io)
     {
@@ -57,7 +59,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function uninstall(Composer $composer, IOInterface $io)
     {
@@ -66,7 +68,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function activate(Composer $composer, IOInterface $io)
     {
@@ -87,7 +89,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             $this->repositoryManager->getLocalRepository()
         );
 
-        $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR  . 'linked-packages.json';
+        $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
         $this->repository = new Repository(
             new JsonStorage($storageFile),
             $io,
@@ -99,7 +101,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         return [
             ScriptEvents::POST_UPDATE_CMD => [
-                ['linkLinkedPackages']
+                ['linkLinkedPackages'],
             ],
         ];
     }

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -31,7 +33,7 @@ class Transformer
     }
 
     /**
-     * Load a Linked package from array data
+     * Load a Linked package from array data.
      *
      * @param non-empty-array<string, mixed> $data
      */
@@ -51,9 +53,9 @@ class Transformer
     }
 
     /**
-     * Export LinkedPackage to array data
+     * Export LinkedPackage to array data.
      *
-     * @return  non-empty-array<string, mixed>
+     * @return non-empty-array<string, mixed>
      */
     public function export(LinkedPackage $package): array
     {
@@ -61,7 +63,7 @@ class Transformer
         $data['path'] = $package->getPath();
         $data['installationPath'] = $package->getInstallationPath();
         $data['package'] = $this->composerDumper->dump($package->getPackage());
-        if (! is_null($package->getOriginalPackage())) {
+        if (!is_null($package->getOriginalPackage())) {
             $data['originalPackage'] = $this->composerDumper->dump($package->getOriginalPackage());
         }
 

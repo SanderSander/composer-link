@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -45,6 +47,7 @@ class Repository
 
         if (is_null($index)) {
             $this->linkedPackages[] = clone $linkedPackage;
+
             return;
         }
 
@@ -102,7 +105,7 @@ class Repository
         $this->io->debug("[ComposerLink]\tStoring linked repositories data into json file");
 
         $data = [
-            'packages' => []
+            'packages' => [],
         ];
         foreach ($this->linkedPackages as $package) {
             $data['packages'][] = $this->transformer->export($package);

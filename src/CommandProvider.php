@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -44,7 +46,7 @@ class CommandProvider implements ComposerCommandProvider
         return [
             new LinkCommand($this->plugin),
             new UnlinkCommand($this->plugin),
-            new LinkedCommand($this->plugin)
+            new LinkedCommand($this->plugin),
         ];
     }
 }

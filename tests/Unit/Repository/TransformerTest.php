@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -29,12 +31,12 @@ class TransformerTest extends TestCase
                 'installationPath' => 'install-path/',
                 'package' => [
                     'name' => 'test/package',
-                    'version' => 'dev-master'
+                    'version' => 'dev-master',
                 ],
                 'originalPackage' => [
                     'name' => 'test/package',
-                    'version' => 'dev-master'
-                ]
+                    'version' => 'dev-master',
+                ],
             ]
         );
 
@@ -50,8 +52,8 @@ class TransformerTest extends TestCase
                 'installationPath' => 'install-path/',
                 'package' => [
                     'name' => 'test/package',
-                    'version' => 'dev-master'
-                ]
+                    'version' => 'dev-master',
+                ],
             ]
         );
         static::assertNull($package->getOriginalPackage());
@@ -88,7 +90,7 @@ class TransformerTest extends TestCase
                 'version' => '',
                 'version_normalized' => '',
                 'type' => '',
-            ]
+            ],
         ], $data);
     }
 }

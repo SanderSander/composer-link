@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * This file is part of the composer-link plugin.
@@ -27,7 +29,7 @@ class LinkedCommandTest extends TestCase
 {
     protected Application $application;
 
-    /** @var Plugin&MockObject  */
+    /** @var Plugin&MockObject */
     protected Plugin $plugin;
 
     protected function setUp(): void
