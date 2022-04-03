@@ -47,4 +47,5 @@ return $config
         'php_unit_method_casing' => ['case' => 'snake_case'],
         'concat_space' => ['spacing' => 'one'],
         'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
+        'single_line_throw' => false,
     ])->setFinder($finder);
