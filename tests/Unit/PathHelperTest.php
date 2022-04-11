@@ -47,7 +47,7 @@ class PathHelperTest extends TestCase
     {
         return [
             ['tests'],
-            ['tests/Unit/TestCase.php'],
+            ['tests' . DIRECTORY_SEPARATOR . 'Unit' . DIRECTORY_SEPARATOR . 'TestCase.php'],
         ];
     }
 }
