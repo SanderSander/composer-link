@@ -20,6 +20,7 @@ use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use ComposerLink\LinkedPackageFactory;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class LinkedPackageFactoryTest extends TestCase
 {
@@ -55,7 +56,7 @@ class LinkedPackageFactoryTest extends TestCase
         $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
 
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No composer.json file found in given path.');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);

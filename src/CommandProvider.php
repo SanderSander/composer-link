@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
+use Composer\Command\BaseCommand;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use ComposerLink\Commands\LinkCommand;
@@ -37,7 +38,7 @@ class CommandProvider implements ComposerCommandProvider
     }
 
     /**
-     * @return \Composer\Command\BaseCommand[]
+     * @return BaseCommand[]
      */
     public function getCommands(): array
     {

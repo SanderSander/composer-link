@@ -39,6 +39,9 @@
         "class": "ComposerLink\\Plugin"
     },
     "scripts": {
-        "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml"
+        "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml",
+        "test": "./vendor/bin/phpunit",
+        "phpstan": "./vendor/bin/phpstan",
+        "lint": "./vendor/bin/php-cs-fixer fix"
     }
 }

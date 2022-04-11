@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
+use ComposerLink\PathHelper;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,6 +36,14 @@ class LinkCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $path = $input->getArgument('path');
+
+        // When run in global we should transform path to absolute path
+        if ($this->plugin->isGlobal()) {
+            $transform = new PathHelper($path);
+            /** @var string $working */
+            $working = $this->getApplication()->getInitialWorkingDirectory();
+            $path = $transform->getAbsolutePath($working);
+        }
 
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path);
 

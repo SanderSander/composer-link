@@ -22,21 +22,29 @@ composer require --dev sandersander/composer-link
 
 ## Usage
 
-The following three commands are made available by this plugin `link`, `unlink` and `linked`
+The following three commands are made available by this plugin `link`, `unlink` and `linked`.
+When the plugin is installed globally you can prefix the commands with `global` as example `composer global linked` 
+and install global packages.
 
-To link a package you can use the `link` commands:
+To link a package you can use the `link` commands, you can also link a global package.
+When linked to a global package absolute paths are used, when using a relative path composer-link resolves
+it to the absolute path.
+
 ```
 composer link ../path/to/package
+composer global link ../path/to/package
 ```
 
 To unlink the package you can use the `unlink` command
 ```
 composer unlink ../path/to/package
+composer global link ../path/to/package
 ```
 
 To see all linked packages in your project you can use the `linked` command
 ```
 composer linked
+composer global linked
 ```
 
 ## Contributing

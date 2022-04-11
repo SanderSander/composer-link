@@ -45,6 +45,8 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected RepositoryManager $repositoryManager;
 
+    protected Composer $composer;
+
     public function __construct(ComposerFileSystem $filesystem = null)
     {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
@@ -76,6 +78,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $this->io = $io;
         $this->installationManager = $composer->getInstallationManager();
         $this->repositoryManager = $composer->getRepositoryManager();
+        $this->composer = $composer;
 
         $this->packageFactory = new LinkedPackageFactory(
             $this->installationManager,
@@ -147,5 +150,13 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     public function getPackageFactory(): LinkedPackageFactory
     {
         return $this->packageFactory;
+    }
+
+    /**
+     * Check if this plugin is running from global or local project.
+     */
+    public function isGlobal(): bool
+    {
+        return getcwd() === $this->composer->getConfig()->get('home');
     }
 }
