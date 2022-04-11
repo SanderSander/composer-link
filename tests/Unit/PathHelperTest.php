@@ -37,7 +37,7 @@ class PathHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $helper = new PathHelper('some-path-non-existing-path');
-        $helper->getAbsolutePath('/');
+        $helper->getAbsolutePath(DIRECTORY_SEPARATOR);
     }
 
     /**
