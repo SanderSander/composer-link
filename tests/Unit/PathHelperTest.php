@@ -37,7 +37,8 @@ class PathHelperTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $helper = new PathHelper('some-path-non-existing-path');
-        $helper->getAbsolutePath(DIRECTORY_SEPARATOR);
+        $root = PHP_OS_FAMILY === 'Windows' ? 'C:\\' : '/';
+        $helper->getAbsolutePath($root);
     }
 
     /**
