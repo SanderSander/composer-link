@@ -27,7 +27,8 @@ When the plugin is installed globally you can prefix the commands with `global` 
 and install global packages.
 
 To link a package you can use the `link` commands, you can also link a global package.
-When linked to a global package full paths are used. 
+When linked to a global package absolute paths are used, when using a relative path composer-link resolves
+it to the absolute path.
 
 ```
 composer link ../path/to/package
