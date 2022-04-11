@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
-use RuntimeException;
+use InvalidArgumentException;
 
 class PathHelper
 {
@@ -28,16 +28,13 @@ class PathHelper
         $this->path = $path;
     }
 
-    protected function isAbsolutePath(): bool
-    {
-        return $this->path[0] === '/' || ($this->path[1] === ':' && ctype_alpha($this->path[0]));
-    }
-
     public function getAbsolutePath(string $workingDirectory): string
     {
         $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $this->path);
         if ($real === false) {
-            throw new RuntimeException('Cannot resolve absolute path.');
+            throw new InvalidArgumentException(
+                sprintf('Cannot resolve absolute path to %s.', $this->path)
+            );
         }
 
         return $real;

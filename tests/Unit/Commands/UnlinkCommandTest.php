@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Commands;
 
+use Composer\Console\Application;
 use ComposerLink\Commands\UnlinkCommand;
 use ComposerLink\LinkedPackage;
 use ComposerLink\LinkManager;
@@ -22,7 +23,6 @@ use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -72,6 +72,18 @@ class UnlinkCommandTest extends TestCase
         $this->linkManager->expects(static::once())->method('unlinkPackage')->with($this->package);
 
         $input = new StringInput('unlink /test-path');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_link_command_for_existing_package_global(): void
+    {
+        $this->plugin->method('isGlobal')->willReturn(true);
+        $this->repository->expects(static::once())->method('findByPath')->willReturn($this->package);
+        $this->repository->expects(static::once())->method('remove')->with($this->package);
+        $this->repository->expects(static::once())->method('persist');
+        $this->linkManager->expects(static::once())->method('unlinkPackage')->with($this->package);
+
+        $input = new StringInput('unlink tests');
         static::assertSame(0, $this->application->run($input, $this->output));
     }
 
