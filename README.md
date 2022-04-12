@@ -1,6 +1,8 @@
 # composer-link
 ![phpunit](https://github.com/SanderSander/composer-link/actions/workflows/unit-tests.yml/badge.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/SanderSander/composer-link/badge.svg?branch=master)](https://coveralls.io/github/SanderSander/composer-link?branch=master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/3815e6abf2ec0e1d4ac8/maintainability)](https://codeclimate.com/github/SanderSander/composer-link/maintainability)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/SanderSander/composer-link/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/SanderSander/composer-link/?branch=master)
 
 Adds ability to link local packages in composer for development. 
 
