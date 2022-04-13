@@ -18,13 +18,10 @@ namespace Tests\Integration;
 use Composer\Console\Application;
 use Composer\Util\Filesystem;
 use PHPUnit\Framework\TestCase as BaseCase;
-use Symfony\Component\Console\Tester\ApplicationTester;
 
 abstract class TestCase extends BaseCase
 {
     protected Application $application;
-
-    protected ApplicationTester $tester;
 
     private string $workingDirectory;
 
@@ -46,10 +43,10 @@ abstract class TestCase extends BaseCase
 
         mkdir($this->workingDirectory);
         chdir($this->workingDirectory);
+        file_put_contents('composer.json', '{}');
         $this->application = new Application();
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(false);
-        $this->tester = new ApplicationTester($this->application);
     }
 
     public function tearDown(): void
