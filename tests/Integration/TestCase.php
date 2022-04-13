@@ -16,7 +16,10 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Composer\Console\Application;
+use Composer\Util\Filesystem;
 use PHPUnit\Framework\TestCase as BaseCase;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 abstract class TestCase extends BaseCase
@@ -32,8 +35,9 @@ abstract class TestCase extends BaseCase
         parent::setUp();
         $this->workingDirectory = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'temp';
 
+        $filesystem = new Filesystem();
         if (is_dir($this->workingDirectory)) {
-            rmdir($this->workingDirectory);
+            $filesystem->removeDirectory($this->workingDirectory);
         }
 
         mkdir($this->workingDirectory);
@@ -47,8 +51,9 @@ abstract class TestCase extends BaseCase
     public function tearDown(): void
     {
         parent::tearDown();
+        $filesystem = new Filesystem();
         if (is_dir($this->workingDirectory)) {
-            rmdir($this->workingDirectory);
+            $filesystem->removeDirectory($this->workingDirectory);
         }
     }
 }
