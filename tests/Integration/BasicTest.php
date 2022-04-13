@@ -24,7 +24,6 @@ class BasicTest extends TestCase
     {
         $output = new BufferedOutput();
         $this->application->run(new StringInput('--version'), $output);
-
         static::assertStringContainsString('Composer version 2.3', $output->fetch());
     }
 }
