@@ -26,4 +26,11 @@ class BasicTest extends TestCase
         $this->application->run(new StringInput('--version'), $output);
         static::assertStringContainsString('Composer version 2.3', $output->fetch());
     }
+
+    public function test_second_package_can_be_linked(): void
+    {
+        $output = new BufferedOutput();
+        $this->application->run(new StringInput('--version'), $output);
+        static::assertStringContainsString('Composer version 2.3', $output->fetch());
+    }
 }
