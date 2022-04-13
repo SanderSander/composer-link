@@ -1,4 +1,4 @@
-name: PHPUnit
+name: PHPUnit Integration
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - opened
 
 jobs:
-  unit-tests:
+  integration-tests:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       fail-fast: false
