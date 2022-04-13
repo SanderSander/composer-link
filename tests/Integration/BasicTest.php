@@ -20,17 +20,22 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class BasicTest extends TestCase
 {
-    public function test_package_can_be_linked(): void
+    public function test_package_can_be_linked_and_unlinked(): void
     {
         $output = new BufferedOutput();
-        $this->application->run(new StringInput('--version'), $output);
-        static::assertStringContainsString('Composer version 2.3', $output->fetch());
-    }
+        $this->application->run(new StringInput('linked --no-interaction'), $output);
+        static::assertStringContainsString('No packages are linked', $output->fetch());
 
-    public function test_second_package_can_be_linked(): void
-    {
-        $output = new BufferedOutput();
-        $this->application->run(new StringInput('--version'), $output);
-        static::assertStringContainsString('Composer version 2.3', $output->fetch());
+        $this->application->run(new StringInput('link ../mock/package-1 --no-interaction'), $output);
+        static::assertStringContainsString('Installing test/package-1 (dev-master): Symlinking from ../mock/package-1', $output->fetch());
+
+        $this->application->run(new StringInput('linked --no-interaction'), $output);
+        static::assertStringContainsString('test/package-1	../mock/package-1', $output->fetch());
+
+        $this->application->run(new StringInput('unlink ../mock/package-1 --no-interaction'), $output);
+        static::assertStringContainsString('Removing test/package-1 (dev-master)', $output->fetch());
+
+        $this->application->run(new StringInput('linked --no-interaction'), $output);
+        static::assertStringContainsString('No packages are linked', $output->fetch());
     }
 }
