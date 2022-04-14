@@ -42,7 +42,7 @@ class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $composer = $this->mockComposer();
 
-        $plugin = new Plugin(null, null);
+        $plugin = new Plugin();
         $plugin->activate($composer, $io);
 
         $capabilities = $plugin->getCapabilities();
