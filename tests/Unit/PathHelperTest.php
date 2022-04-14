@@ -45,8 +45,10 @@ class PathHelperTest extends TestCase
 
     public function test_paths_considered_equal_without_trailing_separator(): void
     {
-        $helper1 = new PathHelper('/some/path');
-        $helper2 = new PathHelper('/some/path/');
+        $path = PHP_OS_FAMILY === 'Windows' ? 'C:\\some\\path' : '/some/path';
+
+        $helper1 = new PathHelper($path);
+        $helper2 = new PathHelper($path . DIRECTORY_SEPARATOR);
 
         static::assertSame($helper1->getNormalizedPath(), $helper2->getNormalizedPath());
     }
