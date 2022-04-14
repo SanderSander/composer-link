@@ -53,8 +53,32 @@ class PluginTest extends TestCase
         static::assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
         static::assertFalse($plugin->isGlobal());
 
+        $plugin->getPackageFactory();
+        $plugin->getLinkManager();
+        $plugin->getRepository();
         $plugin->deactivate($composer, $io);
         $plugin->uninstall($composer, $io);
+    }
+
+    public function test_plugin_throws_exception_package_factory(): void
+    {
+        self::expectException(RuntimeException::class);
+        $plugin = new Plugin();
+        $plugin->getPackageFactory();
+    }
+
+    public function test_plugin_throws_exception_link_manager(): void
+    {
+        self::expectException(RuntimeException::class);
+        $plugin = new Plugin();
+        $plugin->getLinkManager();
+    }
+
+    public function test_plugin_throws_exception_repository(): void
+    {
+        self::expectException(RuntimeException::class);
+        $plugin = new Plugin();
+        $plugin->getRepository();
     }
 
     public function test_plugin_link_linked_packages(): void

@@ -35,15 +35,15 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
     protected ?IOInterface $io;
 
-    protected Repository $repository;
+    protected ?Repository $repository = null;
 
     protected InstallationManager $installationManager;
 
     protected ComposerFileSystem $filesystem;
 
-    protected LinkManager $linkManager;
+    protected ?LinkManager $linkManager = null;
 
-    protected LinkedPackageFactory $packageFactory;
+    protected ?LinkedPackageFactory $packageFactory = null;
 
     protected RepositoryManager $repositoryManager;
 
@@ -132,6 +132,10 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function getLinkManager(): LinkManager
     {
+        if (is_null($this->linkManager)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
         return $this->linkManager;
     }
 
@@ -152,11 +156,19 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function getRepository(): Repository
     {
+        if (is_null($this->repository)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
         return $this->repository;
     }
 
     public function getPackageFactory(): LinkedPackageFactory
     {
+        if (is_null($this->packageFactory)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
         return $this->packageFactory;
     }
 
