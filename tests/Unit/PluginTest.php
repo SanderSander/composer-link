@@ -32,6 +32,9 @@ use ComposerLink\Plugin;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
 
+/**
+ *  @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class PluginTest extends TestCase
 {
     /**
