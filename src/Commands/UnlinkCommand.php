@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace ComposerLink\Commands;
 
 use ComposerLink\PathHelper;
+use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,25 +35,24 @@ class UnlinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $path = $input->getArgument('path');
+        $helper = new PathHelper($input->getArgument('path'));
 
         // When run in global we should transform path to absolute path
         if ($this->plugin->isGlobal()) {
-            $transform = new PathHelper($path);
             /** @var string $working */
             $working = $this->getApplication()->getInitialWorkingDirectory();
-            $path = $transform->getAbsolutePath($working);
+            $helper = $helper->toAbsolutePath($working);
         }
 
-        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path);
+        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
 
         $repository = $this->plugin->getRepository();
         $linkedPackage = $repository->findByPath($linkedPackage->getPath());
 
         if ($linkedPackage === null) {
-            $this->getIO()->warning(sprintf('No linked package found in path "%s"', $path));
-
-            return 1;
+            throw new InvalidArgumentException(
+                sprintf('No linked package found in path "%s"', $helper->getNormalizedPath())
+            );
         }
 
         $this->plugin->getLinkManager()->unlinkPackage($linkedPackage);

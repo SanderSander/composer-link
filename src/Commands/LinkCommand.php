@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace ComposerLink\Commands;
 
 use ComposerLink\PathHelper;
-use RuntimeException;
+use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,25 +35,26 @@ class LinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $path = $input->getArgument('path');
+        $helper = new PathHelper($input->getArgument('path'));
 
         // When run in global we should transform path to absolute path
         if ($this->plugin->isGlobal()) {
-            $transform = new PathHelper($path);
             /** @var string $working */
             $working = $this->getApplication()->getInitialWorkingDirectory();
-            $path = $transform->getAbsolutePath($working);
+            $helper = $helper->toAbsolutePath($working);
         }
 
-        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path);
+        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
 
-        if (!is_null($this->plugin->getRepository()->findByPath($path))) {
-            throw new RuntimeException(sprintf('Package in path "%s" already linked', $path));
+        if (!is_null($this->plugin->getRepository()->findByPath($helper->getNormalizedPath()))) {
+            throw new InvalidArgumentException(
+                sprintf('Package in path "%s" already linked', $helper->getNormalizedPath())
+            );
         }
 
         $currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName());
         if (!is_null($currentLinked)) {
-            throw new RuntimeException(
+            throw new InvalidArgumentException(
                 sprintf(
                     'Package "%s" already linked from path "%s"',
                     $linkedPackage->getName(),
