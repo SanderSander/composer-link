@@ -16,9 +16,13 @@ declare(strict_types=1);
 namespace ComposerLink\Actions;
 
 use Composer\Repository\RepositoryManager;
+use ComposerLink\LinkedPackage;
 use ComposerLink\LinkManager;
 use ComposerLink\Repository\Repository;
 
+/**
+ * Links all packages that aren't linked, and updates the state of the linked package with the orignal package.
+ */
 class LinkPackages
 {
     protected RepositoryManager $repositoryManager;
@@ -39,22 +43,30 @@ class LinkPackages
 
     public function execute(): void
     {
-        foreach ($this->repository->all() as $linkedPackage) {
-            if (!$this->linkManager->isLinked($linkedPackage)) {
-                // Package is updated, so we need to link the newer original package
-                $oldOriginalPackage = $linkedPackage->getOriginalPackage();
-                if (!is_null($oldOriginalPackage)) {
-                    $newOriginalPackage = $this->repositoryManager
-                        ->getLocalRepository()
-                        ->findPackage($oldOriginalPackage->getName(), '*');
-                    $linkedPackage->setOriginalPackage($newOriginalPackage);
-                    $this->repository->store($linkedPackage);
-                }
-
-                $this->linkManager->linkPackage($linkedPackage);
+        foreach ($this->repository->all() as $package) {
+            if (!$this->linkManager->isLinked($package)) {
+                $this->linkAndUpdate($package);
             }
         }
 
         $this->repository->persist();
+    }
+
+    /**
+     * It can happen, when a package is updated that we need to update the state of the linked package.
+     * We do this here, before we link the package back in.
+     */
+    private function linkAndUpdate(LinkedPackage $package): void
+    {
+        $oldOriginalPackage = $package->getOriginalPackage();
+        if (!is_null($oldOriginalPackage)) {
+            $newOriginalPackage = $this->repositoryManager
+                ->getLocalRepository()
+                ->findPackage($oldOriginalPackage->getName(), '*');
+            $package->setOriginalPackage($newOriginalPackage);
+            $this->repository->store($package);
+        }
+
+        $this->linkManager->linkPackage($package);
     }
 }
