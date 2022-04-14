@@ -25,6 +25,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
+use ComposerLink\Actions\LinkPackages;
 use ComposerLink\Repository\JsonStorage;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\Transformer;
@@ -116,23 +117,13 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function linkLinkedPackages(): void
     {
-        foreach ($this->repository->all() as $linkedPackage) {
-            if (!$this->linkManager->isLinked($linkedPackage)) {
-                // Package is updated, so we need to link the newer original package
-                $oldOriginalPackage = $linkedPackage->getOriginalPackage();
-                if (!is_null($oldOriginalPackage)) {
-                    $newOriginalPackage = $this->repositoryManager
-                        ->getLocalRepository()
-                        ->findPackage($oldOriginalPackage->getName(), '*');
-                    $linkedPackage->setOriginalPackage($newOriginalPackage);
-                    $this->repository->store($linkedPackage);
-                }
+        $linkPackages = new LinkPackages(
+            $this->linkManager,
+            $this->repository,
+            $this->repositoryManager
+        );
 
-                $this->linkManager->linkPackage($linkedPackage);
-            }
-        }
-
-        $this->repository->persist();
+        $linkPackages->execute();
     }
 
     public function getCapabilities(): array
