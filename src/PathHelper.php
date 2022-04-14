@@ -28,7 +28,7 @@ class PathHelper
         $this->path = $path;
     }
 
-    public function getAbsolutePath(string $workingDirectory): string
+    public function toAbsolutePath(string $workingDirectory): PathHelper
     {
         $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $this->path);
         if ($real === false) {
@@ -37,6 +37,15 @@ class PathHelper
             );
         }
 
-        return $real;
+        return new PathHelper($real);
+    }
+
+    public function getNormalizedPath(): string
+    {
+        if (substr($this->path, -1) === DIRECTORY_SEPARATOR) {
+            return substr($this->path, 0, -1);
+        }
+
+        return $this->path;
     }
 }
