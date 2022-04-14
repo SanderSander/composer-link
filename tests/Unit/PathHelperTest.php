@@ -46,7 +46,7 @@ class PathHelperTest extends TestCase
     public function test_paths_considered_equal_without_trailing_separator(): void
     {
         $helper1 = new PathHelper('/some/path');
-        $helper2 = new PathHelper('/some/path');
+        $helper2 = new PathHelper('/some/path/');
 
         static::assertSame($helper1->getNormalizedPath(), $helper2->getNormalizedPath());
     }
