@@ -42,6 +42,11 @@ class LinkedPackageFactory
         }
 
         $json = (new JsonFile($realPath))->read();
+
+        if (!is_array($json)) {
+            throw new RuntimeException(sprintf('Unable to read composer.json in %s', $path));
+        }
+
         $json['version'] = 'dev-master';
 
         // branch alias won't work, otherwise the ArrayLoader::load won't return an instance of CompletePackage
