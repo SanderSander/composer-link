@@ -19,7 +19,6 @@ use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use ComposerLink\LinkedPackageFactory;
-use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class LinkedPackageFactoryTest extends TestCase
@@ -31,9 +30,10 @@ class LinkedPackageFactoryTest extends TestCase
         $originalPackage = $this->createMock(PackageInterface::class);
         $originalPackage->method('getName')->willReturn('test/package');
         $installedRepository->method('getCanonicalPackages')->willReturn([$originalPackage]);
+        file_put_contents($this->rootDir . 'composer.json', '{"name": "test/package"}');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
-        $result = $factory->fromPath('tests/mock');
+        $result = $factory->fromPath($this->rootDir);
 
         static::assertSame('test/package', $result->getName());
         static::assertSame($originalPackage, $result->getOriginalPackage());
@@ -44,10 +44,25 @@ class LinkedPackageFactoryTest extends TestCase
         $installationManager = $this->createMock(InstallationManager::class);
         $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
+        file_put_contents($this->rootDir . 'composer.json', '{"name": "test/package"}');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
-        $package = $factory->fromPath('tests/mock');
+        $package = $factory->fromPath($this->rootDir);
         static::assertNull($package->getOriginalPackage());
+    }
+
+    public function test_invalid_package(): void
+    {
+        $installationManager = $this->createMock(InstallationManager::class);
+        $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $installedRepository->method('getCanonicalPackages')->willReturn([]);
+        file_put_contents($this->rootDir . 'composer.json', 'null');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to read composer.json in vfs://root/');
+
+        $factory = new LinkedPackageFactory($installationManager, $installedRepository);
+        $factory->fromPath($this->rootDir);
     }
 
     public function test_no_composer_file(): void

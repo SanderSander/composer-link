@@ -25,31 +25,36 @@ use Composer\Plugin\PluginInterface;
 use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
+use ComposerLink\Actions\LinkPackages;
 use ComposerLink\Repository\JsonStorage;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\Transformer;
+use RuntimeException;
 
 class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
     protected ?IOInterface $io;
 
-    protected Repository $repository;
+    protected ?Repository $repository = null;
 
     protected InstallationManager $installationManager;
 
     protected ComposerFileSystem $filesystem;
 
-    protected LinkManager $linkManager;
+    protected ?LinkManager $linkManager = null;
 
-    protected LinkedPackageFactory $packageFactory;
+    protected ?LinkedPackageFactory $packageFactory = null;
 
     protected RepositoryManager $repositoryManager;
 
     protected Composer $composer;
 
-    public function __construct(ComposerFileSystem $filesystem = null)
+    protected ?LinkPackages $linkPackages;
+
+    public function __construct(ComposerFileSystem $filesystem = null, LinkPackages $linkPackages = null)
     {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
+        $this->linkPackages = $linkPackages;
     }
 
     /**
@@ -80,6 +85,21 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $this->repositoryManager = $composer->getRepositoryManager();
         $this->composer = $composer;
 
+        $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
+        $this->repository = new Repository(
+            new JsonStorage($storageFile),
+            $io,
+            new Transformer()
+        );
+
+        $this->initializeProperties();
+    }
+
+    /**
+     * We can't do this in the constructor, would be nice to use some sort of container for this.
+     */
+    protected function initializeProperties(): void
+    {
         $this->packageFactory = new LinkedPackageFactory(
             $this->installationManager,
             $this->repositoryManager->getLocalRepository()
@@ -87,17 +107,18 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
         $this->linkManager = new LinkManager(
             $this->filesystem,
-            $composer->getLoop(),
-            $composer->getInstallationManager(),
+            $this->composer->getLoop(),
+            $this->composer->getInstallationManager(),
             $this->repositoryManager->getLocalRepository()
         );
 
-        $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
-        $this->repository = new Repository(
-            new JsonStorage($storageFile),
-            $io,
-            new Transformer()
-        );
+        if (is_null($this->linkPackages)) {
+            $this->linkPackages = new LinkPackages(
+                $this->getLinkManager(),
+                $this->getRepository(),
+                $this->repositoryManager
+            );
+        }
     }
 
     public static function getSubscribedEvents(): array
@@ -111,28 +132,19 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function getLinkManager(): LinkManager
     {
+        if (is_null($this->linkManager)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
         return $this->linkManager;
     }
 
     public function linkLinkedPackages(): void
     {
-        foreach ($this->repository->all() as $linkedPackage) {
-            if (!$this->linkManager->isLinked($linkedPackage)) {
-                // Package is updated, so we need to link the newer original package
-                $oldOriginalPackage = $linkedPackage->getOriginalPackage();
-                if (!is_null($oldOriginalPackage)) {
-                    $newOriginalPackage = $this->repositoryManager
-                        ->getLocalRepository()
-                        ->findPackage($oldOriginalPackage->getName(), '*');
-                    $linkedPackage->setOriginalPackage($newOriginalPackage);
-                    $this->repository->store($linkedPackage);
-                }
-
-                $this->linkManager->linkPackage($linkedPackage);
-            }
+        if (is_null($this->linkPackages)) {
+            throw new RuntimeException('Plugin not activated');
         }
-
-        $this->repository->persist();
+        $this->linkPackages->execute();
     }
 
     public function getCapabilities(): array
@@ -144,11 +156,19 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function getRepository(): Repository
     {
+        if (is_null($this->repository)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
         return $this->repository;
     }
 
     public function getPackageFactory(): LinkedPackageFactory
     {
+        if (is_null($this->packageFactory)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
         return $this->packageFactory;
     }
 

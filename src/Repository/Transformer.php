@@ -35,7 +35,7 @@ class Transformer
     /**
      * Load a Linked package from array data.
      *
-     * @param non-empty-array<string, mixed> $data
+     * @param array<string, mixed> $data
      */
     public function load(array $data): LinkedPackage
     {
@@ -55,7 +55,7 @@ class Transformer
     /**
      * Export LinkedPackage to array data.
      *
-     * @return non-empty-array<string, mixed>
+     * @return array<string, mixed>
      */
     public function export(LinkedPackage $package): array
     {
