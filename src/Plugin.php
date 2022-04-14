@@ -29,6 +29,7 @@ use ComposerLink\Actions\LinkPackages;
 use ComposerLink\Repository\JsonStorage;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\Transformer;
+use RuntimeException;
 
 class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
@@ -48,9 +49,12 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected Composer $composer;
 
-    public function __construct(ComposerFileSystem $filesystem = null)
+    protected ?LinkPackages $linkPackages;
+
+    public function __construct(ComposerFileSystem $filesystem = null, LinkPackages $linkPackages = null)
     {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
+        $this->linkPackages = $linkPackages;
     }
 
     /**
@@ -93,6 +97,14 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             $this->repositoryManager->getLocalRepository()
         );
 
+        if (!is_null($this->linkPackages)) {
+            $this->linkPackages = new LinkPackages(
+                $this->linkManager,
+                $this->repository,
+                $this->repositoryManager
+            );
+        }
+
         $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
         $this->repository = new Repository(
             new JsonStorage($storageFile),
@@ -117,13 +129,10 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function linkLinkedPackages(): void
     {
-        $linkPackages = new LinkPackages(
-            $this->linkManager,
-            $this->repository,
-            $this->repositoryManager
-        );
-
-        $linkPackages->execute();
+        if (is_null($this->linkPackages)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+        $this->linkPackages->execute();
     }
 
     public function getCapabilities(): array

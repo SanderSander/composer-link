@@ -24,10 +24,13 @@ use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
+use Composer\Util\Filesystem;
 use Composer\Util\Loop;
+use ComposerLink\Actions\LinkPackages;
 use ComposerLink\CommandProvider;
 use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
+use RuntimeException;
 
 class PluginTest extends TestCase
 {
@@ -39,7 +42,7 @@ class PluginTest extends TestCase
         $io = $this->createMock(IOInterface::class);
         $composer = $this->mockComposer();
 
-        $plugin = new Plugin();
+        $plugin = new Plugin(null, null);
         $plugin->activate($composer, $io);
 
         $capabilities = $plugin->getCapabilities();
@@ -48,9 +51,22 @@ class PluginTest extends TestCase
         static::assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
         static::assertContains(CommandProvider::class, $capabilities);
         static::assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
+        static::assertFalse($plugin->isGlobal());
 
         $plugin->deactivate($composer, $io);
         $plugin->uninstall($composer, $io);
+    }
+
+    public function test_plugin_link_linked_packages(): void
+    {
+        $linkPackages = $this->createMock(LinkPackages::class);
+        $linkPackages->expects(static::once())->method('execute');
+        $plugin = new Plugin($this->createMock(Filesystem::class), $linkPackages);
+        $plugin->linkLinkedPackages();
+
+        static::expectException(RuntimeException::class);
+        $plugin = new Plugin($this->createMock(Filesystem::class));
+        $plugin->linkLinkedPackages();
     }
 
     private function mockComposer(): Composer
@@ -63,7 +79,9 @@ class PluginTest extends TestCase
         $localRepository = $this->createMock(InstalledRepositoryInterface::class);
         $repositoryManager->method('getLocalRepository')->willReturn($localRepository);
 
-        $config->method('get')->with('vendor-dir')->willReturn($this->rootDir);
+        $config->method('get')
+            ->withConsecutive(['vendor-dir'], ['home'])
+            ->willReturnOnConsecutiveCalls($this->rootDir, $this->rootDir);
 
         $composer = $this->createMock(Composer::class);
         $composer->method('getDownloadManager')->willReturn($downloader);
