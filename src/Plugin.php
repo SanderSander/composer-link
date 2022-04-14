@@ -17,27 +17,20 @@ namespace ComposerLink;
 
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
-use Composer\Installer\InstallationManager;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
-use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
 use ComposerLink\Actions\LinkPackages;
-use ComposerLink\Repository\JsonStorage;
 use ComposerLink\Repository\Repository;
-use ComposerLink\Repository\Transformer;
+use ComposerLink\Repository\RepositoryFactory;
 use RuntimeException;
 
 class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
-    protected ?IOInterface $io;
-
     protected ?Repository $repository = null;
-
-    protected InstallationManager $installationManager;
 
     protected ComposerFileSystem $filesystem;
 
@@ -45,16 +38,20 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected ?LinkedPackageFactory $packageFactory = null;
 
-    protected RepositoryManager $repositoryManager;
-
     protected Composer $composer;
 
     protected ?LinkPackages $linkPackages;
 
-    public function __construct(ComposerFileSystem $filesystem = null, LinkPackages $linkPackages = null)
-    {
+    private ?RepositoryFactory $repositoryFactory;
+
+    public function __construct(
+        ComposerFileSystem $filesystem = null,
+        LinkPackages $linkPackages = null,
+        RepositoryFactory $repositoryFactory = null
+    ) {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
         $this->linkPackages = $linkPackages;
+        $this->repositoryFactory = $repositoryFactory;
     }
 
     /**
@@ -80,43 +77,49 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     public function activate(Composer $composer, IOInterface $io)
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
-        $this->io = $io;
-        $this->installationManager = $composer->getInstallationManager();
-        $this->repositoryManager = $composer->getRepositoryManager();
         $this->composer = $composer;
 
-        $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
-        $this->repository = new Repository(
-            new JsonStorage($storageFile),
-            $io,
-            new Transformer()
-        );
-
-        $this->initializeProperties();
+        $this->initializeRepository();
+        $this->initializeLinkedPackageFactory();
+        $this->initializeLinkManager();
+        $this->initializeLinkPackages();
     }
 
-    /**
-     * We can't do this in the constructor, would be nice to use some sort of container for this.
-     */
-    protected function initializeProperties(): void
+    protected function initializeRepository(): void
+    {
+        $storageFile = $this->composer->getConfig()
+                ->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
+        if (is_null($this->repositoryFactory)) {
+            $this->repositoryFactory = new RepositoryFactory();
+        }
+        $this->repository = $this->repositoryFactory->create($storageFile);
+    }
+
+    protected function initializeLinkedPackageFactory(): void
     {
         $this->packageFactory = new LinkedPackageFactory(
-            $this->installationManager,
-            $this->repositoryManager->getLocalRepository()
+            $this->composer->getInstallationManager(),
+            $this->composer->getRepositoryManager()->getLocalRepository()
         );
+    }
 
+    protected function initializeLinkManager(): void
+    {
         $this->linkManager = new LinkManager(
             $this->filesystem,
             $this->composer->getLoop(),
             $this->composer->getInstallationManager(),
-            $this->repositoryManager->getLocalRepository()
+            $this->composer->getRepositoryManager()->getLocalRepository()
         );
+    }
 
+    protected function initializeLinkPackages(): void
+    {
         if (is_null($this->linkPackages)) {
             $this->linkPackages = new LinkPackages(
                 $this->getLinkManager(),
                 $this->getRepository(),
-                $this->repositoryManager
+                $this->composer->getRepositoryManager()
             );
         }
     }

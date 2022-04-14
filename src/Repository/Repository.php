@@ -15,14 +15,11 @@ declare(strict_types=1);
 
 namespace ComposerLink\Repository;
 
-use Composer\IO\IOInterface;
 use ComposerLink\LinkedPackage;
 use RuntimeException;
 
 class Repository
 {
-    protected IOInterface $io;
-
     protected Transformer $transformer;
 
     protected StorageInterface $storage;
@@ -32,9 +29,8 @@ class Repository
      */
     protected array $linkedPackages = [];
 
-    public function __construct(StorageInterface $storage, IOInterface $io, Transformer $transformer)
+    public function __construct(StorageInterface $storage, Transformer $transformer)
     {
-        $this->io = $io;
         $this->transformer = $transformer;
         $this->storage = $storage;
 
@@ -102,8 +98,6 @@ class Repository
 
     public function persist(): void
     {
-        $this->io->debug("[ComposerLink]\tStoring linked repositories data into json file");
-
         $data = [
             'packages' => [],
         ];

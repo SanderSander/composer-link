@@ -15,20 +15,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Repository;
 
-use Composer\IO\IOInterface;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\StorageInterface;
 use ComposerLink\Repository\Transformer;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use RuntimeException;
 use Tests\Unit\TestCase;
 
 class RepositoryTest extends TestCase
 {
-    /** @var IOInterface&Stub */
-    protected IOInterface $io;
-
     /** @var StorageInterface&MockObject */
     protected StorageInterface $storage;
 
@@ -39,7 +34,6 @@ class RepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->io = $this->createStub(IOInterface::class);
         $this->storage = $this->createMock(StorageInterface::class);
         $this->transformer = $this->createMock(Transformer::class);
     }
@@ -48,7 +42,6 @@ class RepositoryTest extends TestCase
     {
         return new Repository(
             $this->storage,
-            $this->io,
             $this->transformer
         );
     }
