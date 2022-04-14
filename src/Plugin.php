@@ -85,14 +85,14 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $this->repositoryManager = $composer->getRepositoryManager();
         $this->composer = $composer;
 
-        $this->initializeProperties();
-
         $storageFile = $composer->getConfig()->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
         $this->repository = new Repository(
             new JsonStorage($storageFile),
             $io,
             new Transformer()
         );
+
+        $this->initializeProperties();
     }
 
     /**
@@ -112,10 +112,10 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             $this->repositoryManager->getLocalRepository()
         );
 
-        if (!is_null($this->linkPackages)) {
+        if (is_null($this->linkPackages)) {
             $this->linkPackages = new LinkPackages(
-                $this->linkManager,
-                $this->repository,
+                $this->getLinkManager(),
+                $this->getRepository(),
                 $this->repositoryManager
             );
         }
