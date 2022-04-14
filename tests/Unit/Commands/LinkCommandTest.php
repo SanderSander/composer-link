@@ -22,9 +22,9 @@ use ComposerLink\LinkedPackageFactory;
 use ComposerLink\LinkManager;
 use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -107,7 +107,7 @@ class LinkCommandTest extends TestCase
             ->with('/test-path')
             ->willReturn($this->createMock(LinkedPackage::class));
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Package in path "/test-path" already linked');
 
         $input = new StringInput('link /test-path');
@@ -131,7 +131,7 @@ class LinkCommandTest extends TestCase
         $command = new LinkCommand($this->plugin);
         static::assertSame('link', $command->getName());
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Package "test/package" already linked from path "/test-path"');
 
         $input = new StringInput('link /test-path');

@@ -25,11 +25,13 @@ class PathHelperTest extends TestCase
      */
     public function test_get_absolute_path(string $pah): void
     {
-        $root = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..');
+        $testPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
+        $root = realpath($testPath);
         $helper = new PathHelper($pah);
         static::assertEquals(
             $root . DIRECTORY_SEPARATOR . $pah,
-            $helper->getAbsolutePath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..')
+            $helper->toAbsolutePath($testPath)
+                ->getNormalizedPath()
         );
     }
 
@@ -38,7 +40,17 @@ class PathHelperTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $helper = new PathHelper('some-path-non-existing-path');
         $root = PHP_OS_FAMILY === 'Windows' ? 'C:\\' : '/';
-        $helper->getAbsolutePath($root);
+        $helper->toAbsolutePath($root);
+    }
+
+    public function test_paths_considered_equal_without_trailing_separator(): void
+    {
+        $path = PHP_OS_FAMILY === 'Windows' ? 'C:\\some\\path' : '/some/path';
+
+        $helper1 = new PathHelper($path);
+        $helper2 = new PathHelper($path . DIRECTORY_SEPARATOR);
+
+        static::assertSame($helper1->getNormalizedPath(), $helper2->getNormalizedPath());
     }
 
     /**

@@ -21,6 +21,7 @@ use ComposerLink\LinkedPackage;
 use ComposerLink\LinkManager;
 use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
@@ -90,8 +91,9 @@ class UnlinkCommandTest extends TestCase
     public function test_link_command_for_non_existing_package(): void
     {
         $this->repository->expects(static::once())->method('findByPath')->willReturn(null);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No linked package found in path "/test-path"');
 
-        $input = new StringInput('unlink /test-path');
-        static::assertSame(1, $this->application->run($input, $this->output));
+        $this->application->run(new StringInput('unlink /test-path'), $this->output);
     }
 }
