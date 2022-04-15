@@ -80,8 +80,6 @@ class LinkManager
             var_dump($leftOvers);
         }
 
-
-
         $this->install($linkedPackage->getPackage());
 
         $this->io->warning('----------------------');
@@ -92,7 +90,7 @@ class LinkManager
         foreach ($pool->getPackages() as $package) {
             $request->lockPackage($package);
         }
-        //$request->fixLockedPackage($linkedPackage->getPackage());
+        // $request->fixLockedPackage($linkedPackage->getPackage());
         $this->io->write($pool->__toString());
         $solver = new Solver($policy, $pool, $this->io);
         $transaction = $solver->solve($request);
