@@ -15,7 +15,13 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
+use Composer\Composer;
+use Composer\DependencyResolver\DefaultPolicy;
+use Composer\DependencyResolver\Pool;
+use Composer\DependencyResolver\Request;
+use Composer\DependencyResolver\Solver;
 use Composer\Installer\InstallationManager;
+use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
@@ -32,17 +38,23 @@ class LinkManager
     protected InstallationManager $installationManager;
 
     protected InstalledRepositoryInterface $installedRepository;
+    private Composer $composer;
+    private IOInterface $io;
 
     public function __construct(
         Filesystem $filesystem,
         Loop $loop,
         InstallationManager $installationManager,
-        InstalledRepositoryInterface $installedRepository
+        InstalledRepositoryInterface $installedRepository,
+        Composer $composer,
+        IOInterface $io
     ) {
         $this->filesystem = $filesystem;
         $this->loop = $loop;
         $this->installationManager = $installationManager;
         $this->installedRepository = $installedRepository;
+        $this->composer = $composer;
+        $this->io = $io;
     }
 
     /**
@@ -59,9 +71,37 @@ class LinkManager
      */
     public function linkPackage(LinkedPackage $linkedPackage): void
     {
+        var_dump(count($this->installedRepository->getPackages()));
         if (!is_null($linkedPackage->getOriginalPackage())) {
             $this->uninstall($linkedPackage->getOriginalPackage());
+            $leftOvers = $this->installedRepository->search($linkedPackage->getOriginalPackage()->getName());
+
+            // It could happen that we have alias left-overs here.
+            var_dump($leftOvers);
         }
+
+
+
+        $this->install($linkedPackage->getPackage());
+
+        $this->io->warning('----------------------');
+        var_dump(count($this->installedRepository->getPackages()));
+        $policy = new DefaultPolicy();
+        $pool = new Pool($this->installedRepository->getPackages());
+        $request = new Request($this->composer->getLocker()->getLockedRepository());
+        foreach ($pool->getPackages() as $package) {
+            $request->lockPackage($package);
+        }
+        //$request->fixLockedPackage($linkedPackage->getPackage());
+        $this->io->write($pool->__toString());
+        $solver = new Solver($policy, $pool, $this->io);
+        $transaction = $solver->solve($request);
+        $operations = $transaction->getOperations();
+        foreach ($operations as $operation) {
+            $this->io->write($operation->show(false));
+        }
+        $this->io->warning('----------------------');
+
         $this->install($linkedPackage->getPackage());
     }
 
