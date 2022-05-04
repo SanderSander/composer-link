@@ -31,7 +31,7 @@ class PathHelper
 
     public function isWildCard(): bool
     {
-        return substr($this->path, -1) === '*';
+        return substr($this->path, -2) === '/*';
     }
 
     /**
@@ -39,7 +39,7 @@ class PathHelper
      */
     public function getPathsFromWildcard(): array
     {
-        $path = substr($this->path, -1);
+        $path = substr($this->path, 0, -1);
         $paths = [];
 
         $entries = scandir($path);
@@ -49,8 +49,12 @@ class PathHelper
         }
 
         foreach ($entries as $entry) {
-            if (is_dir($entry)) {
-                $paths[] = new PathHelper($entry);
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+
+            if (is_dir($path . $entry)) {
+                $paths[] = new PathHelper($path . $entry);
             }
         }
 

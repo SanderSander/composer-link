@@ -23,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class LinkCommand extends Command
 {
+    // TODO We need to add a flag, to skip packages that are not installed (For when a wildcard is used)
     protected function configure(): void
     {
         $this->setName('link');
@@ -52,6 +53,9 @@ class LinkCommand extends Command
         return 0;
     }
 
+
+    // TODO instead of throwing exception, we should show a warning and continue,
+    //      this is needed when use wildcards so we can continue the process
     protected function linkPackage(PathHelper $helper): void
     {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
