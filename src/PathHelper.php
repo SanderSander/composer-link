@@ -39,26 +39,18 @@ class PathHelper
      */
     public function getPathsFromWildcard(): array
     {
-        $path = substr($this->path, 0, -1);
-        $paths = [];
-
-        $entries = scandir($path);
-
+        $entries = glob($this->path, GLOB_ONLYDIR);
         if ($entries === false) {
             throw new RuntimeException(sprintf('Cannot read directory "%s"', $this->path));
         }
 
+        // TODO Somehow we should skip directories that don't have a valid composer.json
+        $helpers = [];
         foreach ($entries as $entry) {
-            if ($entry === '.' || $entry === '..') {
-                continue;
-            }
-
-            if (is_dir($path . $entry)) {
-                $paths[] = new PathHelper($path . $entry);
-            }
+            $helpers[] = new PathHelper($entry);
         }
 
-        return $paths;
+        return $helpers;
     }
 
     public function toAbsolutePath(string $workingDirectory): PathHelper
