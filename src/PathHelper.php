@@ -29,7 +29,7 @@ class PathHelper
         $this->path = $path;
     }
 
-    // TODO this doesn't work with glob
+    // TODO this doesn't work with glob, or we only allow /* on the end of the path
     public function isWildCard(): bool
     {
         return substr($this->path, -2) === '/*';
@@ -56,9 +56,10 @@ class PathHelper
 
     public function toAbsolutePath(string $workingDirectory): PathHelper
     {
-        // TODO this doesn't work with glob();
+        // TODO this doesn't work with glob(), or we just have to allow /* on the end as wildcard
         $path = $this->isWildCard() ? substr($this->path, -1) : $this->path;
 
+        // TODO we can also skip the realpath call and do this in a later stage
         $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $path);
         if ($real === false) {
             throw new InvalidArgumentException(
