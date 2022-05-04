@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
+use ComposerLink\LinkedPackage;
 use ComposerLink\PathHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -54,13 +55,19 @@ class LinkCommand extends Command
         $paths = $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
         // TODO add support for --only-installed
         foreach ($paths as $path) {
-            $this->linkPackage($path);
+            $package = $this->getPackage($path);
+            if (is_null($package)) {
+                continue;
+            }
+            $this->plugin->getRepository()->store($package);
+            $this->plugin->getRepository()->persist();
+            $this->plugin->getLinkManager()->linkPackage($package);
         }
 
         return 0;
     }
 
-    protected function linkPackage(PathHelper $helper): void
+    protected function getPackage(PathHelper $helper): ?LinkedPackage
     {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
 
@@ -69,7 +76,7 @@ class LinkCommand extends Command
                 sprintf('Package in path "%s" already linked', $helper->getNormalizedPath())
             );
 
-            return;
+            return null;
         }
 
         $currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName());
@@ -82,11 +89,9 @@ class LinkCommand extends Command
                 )
             );
 
-            return;
+            return null;
         }
 
-        $this->plugin->getRepository()->store($linkedPackage);
-        $this->plugin->getRepository()->persist();
-        $this->plugin->getLinkManager()->linkPackage($linkedPackage);
+        return $linkedPackage;
     }
 }
