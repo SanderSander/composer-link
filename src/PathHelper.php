@@ -29,7 +29,6 @@ class PathHelper
         $this->path = $path;
     }
 
-    // TODO this doesn't work with glob, or we only allow /* on the end of the path
     public function isWildCard(): bool
     {
         return substr($this->path, -2) === '/*';
@@ -45,9 +44,14 @@ class PathHelper
             throw new RuntimeException(sprintf('Cannot read directory "%s"', $this->path));
         }
 
-        // TODO Somehow we should skip directories that don't have a valid composer.json
         $helpers = [];
         foreach ($entries as $entry) {
+            // TODO Somehow we should skip directories that don't have a valid composer.json
+            // TODO temporarily fix
+            if (!file_exists($entry . DIRECTORY_SEPARATOR . 'composer.json')) {
+                continue;
+            }
+
             $helpers[] = new PathHelper($entry);
         }
 
@@ -56,11 +60,9 @@ class PathHelper
 
     public function toAbsolutePath(string $workingDirectory): PathHelper
     {
-        // TODO this doesn't work with glob(), or we just have to allow /* on the end as wildcard
         $path = $this->isWildCard() ? substr($this->path, -1) : $this->path;
-
-        // TODO we can also skip the realpath call and do this in a later stage
         $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $path);
+
         if ($real === false) {
             throw new InvalidArgumentException(
                 sprintf('Cannot resolve absolute path to %s.', $path)

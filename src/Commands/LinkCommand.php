@@ -16,9 +16,9 @@ declare(strict_types=1);
 namespace ComposerLink\Commands;
 
 use ComposerLink\PathHelper;
-use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class LinkCommand extends Command
@@ -29,6 +29,12 @@ class LinkCommand extends Command
         $this->setName('link');
         $this->setDescription('Link a package to a local directory');
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
+        $this->addOption(
+            '--only-installed',
+            null,
+            InputOption::VALUE_NEGATABLE,
+            'Link only installed packages',
+        );
     }
 
     /**
@@ -46,6 +52,7 @@ class LinkCommand extends Command
         }
 
         $paths = $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
+        // TODO add support for --only-installed
         foreach ($paths as $path) {
             $this->linkPackage($path);
         }
@@ -53,27 +60,29 @@ class LinkCommand extends Command
         return 0;
     }
 
-    // TODO instead of throwing exception, we should show a warning and continue,
-    //      this is needed when use wildcards so we can continue the process
     protected function linkPackage(PathHelper $helper): void
     {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
 
         if (!is_null($this->plugin->getRepository()->findByPath($helper->getNormalizedPath()))) {
-            throw new InvalidArgumentException(
+            $this->getIO()->writeError(
                 sprintf('Package in path "%s" already linked', $helper->getNormalizedPath())
             );
+
+            return;
         }
 
         $currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName());
         if (!is_null($currentLinked)) {
-            throw new InvalidArgumentException(
+            $this->getIO()->writeError(
                 sprintf(
                     'Package "%s" already linked from path "%s"',
                     $linkedPackage->getName(),
                     $currentLinked->getPath()
                 )
             );
+
+            return;
         }
 
         $this->plugin->getRepository()->store($linkedPackage);

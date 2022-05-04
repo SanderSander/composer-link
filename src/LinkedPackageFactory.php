@@ -37,7 +37,7 @@ class LinkedPackageFactory
     private function loadFromJsonFile(string $path): CompletePackage
     {
         if (!file_exists($path . DIRECTORY_SEPARATOR . 'composer.json')) {
-            throw new RuntimeException('No composer.json file found in given path.');
+            throw new RuntimeException(sprintf('No composer.json file found in path %s.', $path));
         }
 
         $json = (new JsonFile($path . DIRECTORY_SEPARATOR . 'composer.json'))->read();
