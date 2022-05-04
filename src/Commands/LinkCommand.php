@@ -53,7 +53,6 @@ class LinkCommand extends Command
         return 0;
     }
 
-
     // TODO instead of throwing exception, we should show a warning and continue,
     //      this is needed when use wildcards so we can continue the process
     protected function linkPackage(PathHelper $helper): void
