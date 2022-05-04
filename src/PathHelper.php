@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace ComposerLink;
 
 use InvalidArgumentException;
+use RuntimeException;
 
 class PathHelper
 {
@@ -28,13 +29,47 @@ class PathHelper
         $this->path = $path;
     }
 
+    public function isWildCard(): bool
+    {
+        return substr($this->path, -1) === '*';
+    }
+
+    /**
+     * @return PathHelper[]
+     */
+    public function getPathsFromWildcard(): array
+    {
+        $path = substr($this->path, -1);
+        $paths = [];
+
+        $entries = scandir($path);
+
+        if ($entries === false) {
+            throw new RuntimeException(sprintf('Cannot read directory "%s"', $this->path));
+        }
+
+        foreach ($entries as $entry) {
+            if (is_dir($entry)) {
+                $paths[] = new PathHelper($entry);
+            }
+        }
+
+        return $paths;
+    }
+
     public function toAbsolutePath(string $workingDirectory): PathHelper
     {
-        $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $this->path);
+        $path = $this->isWildCard() ? substr($this->path, -1) : $this->path;
+
+        $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $path);
         if ($real === false) {
             throw new InvalidArgumentException(
-                sprintf('Cannot resolve absolute path to %s.', $this->path)
+                sprintf('Cannot resolve absolute path to %s.', $path)
             );
+        }
+
+        if ($this->isWildCard()) {
+            $real .= DIRECTORY_SEPARATOR . '*';
         }
 
         return new PathHelper($real);

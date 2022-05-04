@@ -44,6 +44,16 @@ class LinkCommand extends Command
             $helper = $helper->toAbsolutePath($working);
         }
 
+        $paths = $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
+        foreach ($paths as $path) {
+            $this->linkPackage($path);
+        }
+
+        return 0;
+    }
+
+    protected function linkPackage(PathHelper $helper): void
+    {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
 
         if (!is_null($this->plugin->getRepository()->findByPath($helper->getNormalizedPath()))) {
@@ -66,7 +76,5 @@ class LinkCommand extends Command
         $this->plugin->getRepository()->store($linkedPackage);
         $this->plugin->getRepository()->persist();
         $this->plugin->getLinkManager()->linkPackage($linkedPackage);
-
-        return 0;
     }
 }
