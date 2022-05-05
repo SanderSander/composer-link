@@ -28,7 +28,7 @@ class PathHelper
 
     public function isWildCard(): bool
     {
-        return substr($this->path, -2) === '/*';
+        return substr($this->path, -2) === DIRECTORY_SEPARATOR . '*';
     }
 
     /**
