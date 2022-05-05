@@ -42,18 +42,11 @@ class LinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $helper = new PathHelper($input->getArgument('path'));
+        $paths = $this->getPaths($input);
 
-        // When run in global we should transform path to absolute path
-        if ($this->plugin->isGlobal()) {
-            /** @var string $working */
-            $working = $this->getApplication()->getInitialWorkingDirectory();
-            $helper = $helper->toAbsolutePath($working);
-        }
-
-        $paths = $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
         foreach ($paths as $path) {
             $package = $this->getPackage($path, $output);
+
             if (is_null($package)) {
                 continue;
             }
@@ -65,11 +58,29 @@ class LinkCommand extends Command
             $this->plugin->getRepository()->store($package);
             $this->plugin->getLinkManager()->linkPackage($package);
 
-            // Could be optimized, but for now we persist every package, so we know what we have done when a package fails
+            // Could be optimized, but for now we persist every package,
+            // so we know what we have done when a package fails
             $this->plugin->getRepository()->persist();
         }
 
         return 0;
+    }
+
+    /**
+     * @return PathHelper[]
+     */
+    protected function getPaths(InputInterface $input): array
+    {
+        $helper = new PathHelper($input->getArgument('path'));
+
+        // When run in global we should transform path to absolute path
+        if ($this->plugin->isGlobal()) {
+            /** @var string $working */
+            $working = $this->getApplication()->getInitialWorkingDirectory();
+            $helper = $helper->toAbsolutePath($working);
+        }
+
+        return $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
     }
 
     protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
