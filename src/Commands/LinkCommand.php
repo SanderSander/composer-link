@@ -42,6 +42,8 @@ class LinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var bool $onlyInstalled */
+        $onlyInstalled = $input->getOption('only-installed');
         $paths = $this->getPaths($input);
 
         foreach ($paths as $path) {
@@ -51,7 +53,7 @@ class LinkCommand extends Command
                 continue;
             }
 
-            if ($input->getOption('only-installed') === true && $package->getOriginalPackage() === null) {
+            if ($onlyInstalled && is_null($package->getOriginalPackage())) {
                 continue;
             }
 
