@@ -131,7 +131,7 @@ class LinkCommandTest extends TestCase
         static::assertSame('link', $command->getName());
 
         $this->output->expects(static::once())->method('writeln')
-            ->with('<warning>Package "test/package" already linked from path "/test-path"</warning>');
+            ->with('<warning>Package "test/package" in "/test-path" already linked from path "/test-path"</warning>');
 
         $input = new StringInput('link /test-path');
         static::assertSame(0, $this->application->run($input, $this->output));
