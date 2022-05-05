@@ -70,8 +70,9 @@ class LinkCommand extends Command
     protected function getPackage(PathHelper $helper): ?LinkedPackage
     {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
+        $repository = $this->plugin->getRepository();
 
-        if (!is_null($this->plugin->getRepository()->findByPath($helper->getNormalizedPath()))) {
+        if (!is_null($repository->findByPath($helper->getNormalizedPath()))) {
             $this->getIO()->writeError(
                 sprintf('Package in path "%s" already linked', $helper->getNormalizedPath())
             );
@@ -79,7 +80,7 @@ class LinkCommand extends Command
             return null;
         }
 
-        $currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName());
+        $currentLinked = $repository->findByName($linkedPackage->getName());
         if (!is_null($currentLinked)) {
             $this->getIO()->writeError(
                 sprintf(
