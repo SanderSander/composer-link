@@ -53,6 +53,29 @@ class PathHelperTest extends TestCase
         static::assertSame($helper1->getNormalizedPath(), $helper2->getNormalizedPath());
     }
 
+    public function test_is_wildcard(): void
+    {
+        $pathWildcard = new PathHelper('..' . DIRECTORY_SEPARATOR . 'path' . DIRECTORY_SEPARATOR . '*');
+        $pathNonWildcard = new PathHelper('..' . DIRECTORY_SEPARATOR . 'path');
+
+        static::assertTrue($pathWildcard->isWildCard());
+        static::assertFalse($pathNonWildcard->isWildCard());
+    }
+
+    public function test_get_paths_from_wildcard(): void
+    {
+        mkdir($this->tmpDir . 'test-1');
+        touch($this->tmpDir . 'test-1/composer.json');
+        mkdir($this->tmpDir . 'test-2');
+        touch($this->tmpDir . 'test-2/composer.json');
+
+        $pathWildcard = new PathHelper($this->tmpDir . '*');
+        static::assertTrue($pathWildcard->isWildCard());
+        $paths = $pathWildcard->getPathsFromWildcard();
+
+        static::assertCount(2, $paths);
+    }
+
     /**
      * @return string[][]
      */

@@ -46,8 +46,6 @@ class PathHelper
 
         $helpers = [];
         foreach ($entries as $entry) {
-            // TODO Somehow we should skip directories that don't have a valid composer.json
-            // TODO temporarily fix
             if (!file_exists($entry . DIRECTORY_SEPARATOR . 'composer.json')) {
                 continue;
             }

@@ -26,13 +26,13 @@ class JsonStorageTest extends TestCase
         $this->expectException(RuntimeException::class);
         self::expectExceptionMessage('Cannot read data, no data stored.');
 
-        $storage = new JsonStorage($this->rootDir . 'test.json');
+        $storage = new JsonStorage($this->tmpDir . 'test.json');
         $storage->read();
     }
 
     public function test_can_write_and_read(): void
     {
-        $storage = new JsonStorage($this->rootDir . 'test.json');
+        $storage = new JsonStorage($this->tmpDir . 'test.json');
         $storage->write(['test' => 'data']);
         static::assertEquals(['test' => 'data'], $storage->read());
     }
