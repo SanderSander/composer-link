@@ -49,6 +49,7 @@ composer link ../packages/* --only-installed
 To unlink the package you can use the `unlink` command
 ```
 composer unlink ../path/to/package
+composer inlink ../packages/*
 composer global link ../path/to/package
 ```
 

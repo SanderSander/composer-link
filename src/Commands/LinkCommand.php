@@ -85,8 +85,9 @@ class LinkCommand extends Command
         if (!is_null($currentLinked)) {
             $output->writeln(
                 sprintf(
-                    '<warning>Package "%s" already linked from path "%s"</warning>',
+                    '<warning>Package "%s" in "%s" already linked from path "%s"</warning>',
                     $linkedPackage->getName(),
+                    $linkedPackage->getPath(),
                     $currentLinked->getPath()
                 )
             );

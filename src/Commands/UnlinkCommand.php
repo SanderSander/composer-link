@@ -15,8 +15,6 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
-use ComposerLink\PathHelper;
-use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,29 +33,22 @@ class UnlinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $helper = new PathHelper($input->getArgument('path'));
+        $paths = $this->getPaths($input);
 
-        // When run in global we should transform path to absolute path
-        if ($this->plugin->isGlobal()) {
-            /** @var string $working */
-            $working = $this->getApplication()->getInitialWorkingDirectory();
-            $helper = $helper->toAbsolutePath($working);
+        foreach ($paths as $path) {
+            $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path->getNormalizedPath());
+
+            $repository = $this->plugin->getRepository();
+            $linkedPackage = $repository->findByPath($linkedPackage->getPath());
+
+            if ($linkedPackage === null) {
+                continue;
+            }
+
+            $this->plugin->getLinkManager()->unlinkPackage($linkedPackage);
+            $this->plugin->getRepository()->remove($linkedPackage);
+            $this->plugin->getRepository()->persist();
         }
-
-        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
-
-        $repository = $this->plugin->getRepository();
-        $linkedPackage = $repository->findByPath($linkedPackage->getPath());
-
-        if ($linkedPackage === null) {
-            throw new InvalidArgumentException(
-                sprintf('No linked package found in path "%s"', $helper->getNormalizedPath())
-            );
-        }
-
-        $this->plugin->getLinkManager()->unlinkPackage($linkedPackage);
-        $this->plugin->getRepository()->remove($linkedPackage);
-        $this->plugin->getRepository()->persist();
 
         return 0;
     }
