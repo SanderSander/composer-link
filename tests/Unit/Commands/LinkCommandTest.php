@@ -23,9 +23,9 @@ use ComposerLink\LinkManager;
 use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tests\Unit\TestCase;
 
 class LinkCommandTest extends TestCase
 {
@@ -82,6 +82,35 @@ class LinkCommandTest extends TestCase
         $this->linkManager->expects(static::once())->method('linkPackage');
 
         $input = new StringInput('link /test-path');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_only_installed_when_not_installed(): void
+    {
+        $this->packageFactory->expects(static::once())
+            ->method('fromPath')
+            ->with('/test-path');
+
+        $this->repository->expects(static::never())->method('store');
+        $this->repository->expects(static::never())->method('persist');
+        $this->linkManager->expects(static::never())->method('linkPackage');
+
+        $input = new StringInput('link /test-path --only-installed');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_only_installed_when_installed(): void
+    {
+        $this->packageFactory->expects(static::once())
+            ->method('fromPath')
+            ->with('/test-path')
+            ->willReturn($this->mockPackage());
+
+        $this->repository->expects(static::once())->method('store');
+        $this->repository->expects(static::once())->method('persist');
+        $this->linkManager->expects(static::once())->method('linkPackage');
+
+        $input = new StringInput('link /test-path --only-installed');
         static::assertSame(0, $this->application->run($input, $this->output));
     }
 
