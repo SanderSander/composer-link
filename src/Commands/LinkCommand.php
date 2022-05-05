@@ -51,24 +51,19 @@ class LinkCommand extends Command
                 continue;
             }
 
-            if ($input->getOption('only-installed') === true && is_null($package->getOriginalPackage())) {
+            if ($input->getOption('only-installed') === true && $package->getOriginalPackage() === null) {
                 continue;
             }
 
-            $this->linkPackage($package);
+            $this->plugin->getRepository()->store($package);
+            $this->plugin->getLinkManager()->linkPackage($package);
+
+            // Could be optimized, but for now we persist every package,
+            // so we know what we have done when a package fails
+            $this->plugin->getRepository()->persist();
         }
 
         return 0;
-    }
-
-    protected function linkPackage(LinkedPackage $package): void
-    {
-        $this->plugin->getRepository()->store($package);
-        $this->plugin->getLinkManager()->linkPackage($package);
-
-        // Could be optimized, but for now we persist every package,
-        // so we know what we have done when a package fails
-        $this->plugin->getRepository()->persist();
     }
 
     /**
