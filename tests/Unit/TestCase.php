@@ -16,20 +16,35 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use Composer\Package\PackageInterface;
+use Composer\Util\Filesystem;
 use ComposerLink\LinkedPackage;
-use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 abstract class TestCase extends PHPUnitTestCase
 {
-    protected string $rootDir;
+    protected string $tmpAbsoluteDir;
+
+    protected string $tmpRelativeDir;
+
+    protected Filesystem $filesystem;
 
     /** @SuppressWarnings(PHPMD.StaticAccess) */
     protected function setUp(): void
     {
         parent::setUp();
-        vfsStream::setup();
-        $this->rootDir = vfsStream::url('root' . DIRECTORY_SEPARATOR);
+
+        $tmp = 'tests' . DIRECTORY_SEPARATOR . 'tmp';
+        $this->filesystem = new Filesystem();
+        $this->filesystem->emptyDirectory($tmp);
+
+        $this->tmpAbsoluteDir = realpath($tmp) . DIRECTORY_SEPARATOR;
+        $this->tmpRelativeDir = $tmp . DIRECTORY_SEPARATOR;
+    }
+
+    protected function tearDown(): void
+    {
+        $this->filesystem->removeDirectory($this->tmpAbsoluteDir);
+        parent::tearDown();
     }
 
     /** @SuppressWarnings(PHPMD.BooleanArgumentFlag) */

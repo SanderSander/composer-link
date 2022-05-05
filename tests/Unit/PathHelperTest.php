@@ -53,6 +53,38 @@ class PathHelperTest extends TestCase
         static::assertSame($helper1->getNormalizedPath(), $helper2->getNormalizedPath());
     }
 
+    public function test_is_wildcard(): void
+    {
+        $pathWildcard = new PathHelper('..' . DIRECTORY_SEPARATOR . 'path' . DIRECTORY_SEPARATOR . '*');
+        $pathNonWildcard = new PathHelper('..' . DIRECTORY_SEPARATOR . 'path');
+
+        static::assertTrue($pathWildcard->isWildCard());
+        static::assertFalse($pathNonWildcard->isWildCard());
+    }
+
+    public function test_get_paths_from_wildcard(): void
+    {
+        mkdir($this->tmpAbsoluteDir . 'test-1');
+        touch($this->tmpAbsoluteDir . 'test-1' . DIRECTORY_SEPARATOR . 'composer.json');
+        mkdir($this->tmpAbsoluteDir . 'test-2');
+        touch($this->tmpAbsoluteDir . 'test-2' . DIRECTORY_SEPARATOR . 'composer.json');
+        mkdir($this->tmpAbsoluteDir . 'test-3');
+
+        $pathWildcard = new PathHelper($this->tmpAbsoluteDir . '*');
+        static::assertCount(2, $pathWildcard->getPathsFromWildcard());
+    }
+
+    public function test_wildcard_path_to_wildcard_absolute(): void
+    {
+        /** @var string $cwd */
+        $cwd = getcwd();
+        $pathWildcard = new PathHelper($this->tmpRelativeDir . '*');
+        $absolute = $pathWildcard->toAbsolutePath($cwd);
+
+        static::assertTrue($absolute->isWildCard());
+        static::assertSame($this->tmpAbsoluteDir . '*', $absolute->getNormalizedPath());
+    }
+
     /**
      * @return string[][]
      */

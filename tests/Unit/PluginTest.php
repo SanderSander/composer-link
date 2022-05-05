@@ -79,7 +79,7 @@ class PluginTest extends TestCase
     {
         $this->config->method('get')
             ->withConsecutive(['vendor-dir'], ['home'])
-            ->willReturn($this->rootDir);
+            ->willReturn($this->tmpAbsoluteDir);
 
         $plugin = new Plugin();
         $plugin->activate($this->composer, $this->io);
@@ -103,7 +103,7 @@ class PluginTest extends TestCase
     {
         $this->config->method('get')
             ->withConsecutive(['vendor-dir'], ['home'])
-            ->willReturnOnConsecutiveCalls($this->rootDir, getcwd());
+            ->willReturnOnConsecutiveCalls($this->tmpAbsoluteDir, getcwd());
 
         $plugin = new Plugin();
         $plugin->activate($this->composer, $this->io);

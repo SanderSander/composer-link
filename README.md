@@ -38,9 +38,18 @@ composer link ../path/to/package
 composer global link ../path/to/package
 ```
 
+It's also possible to use a wildcard in your path, note that this will install all packages found in the directory `../packages`
+If you don't want to link all the packages but only the ones originally installed you can pass the `--only-installed` flag.
+
+```
+composer link ../packages/*
+composer link ../packages/* --only-installed
+```
+
 To unlink the package you can use the `unlink` command
 ```
 composer unlink ../path/to/package
+composer inlink ../packages/*
 composer global link ../path/to/package
 ```
 

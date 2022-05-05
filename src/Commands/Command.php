@@ -16,7 +16,9 @@ declare(strict_types=1);
 namespace ComposerLink\Commands;
 
 use Composer\Command\BaseCommand;
+use ComposerLink\PathHelper;
 use ComposerLink\Plugin;
+use Symfony\Component\Console\Input\InputInterface;
 
 abstract class Command extends BaseCommand
 {
@@ -27,5 +29,22 @@ abstract class Command extends BaseCommand
         parent::__construct();
 
         $this->plugin = $plugin;
+    }
+
+    /**
+     * @return PathHelper[]
+     */
+    protected function getPaths(InputInterface $input): array
+    {
+        $helper = new PathHelper($input->getArgument('path'));
+
+        // When run in global we should transform path to absolute path
+        if ($this->plugin->isGlobal()) {
+            /** @var string $working */
+            $working = $this->getApplication()->getInitialWorkingDirectory();
+            $helper = $helper->toAbsolutePath($working);
+        }
+
+        return $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
     }
 }

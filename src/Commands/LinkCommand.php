@@ -15,10 +15,11 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
+use ComposerLink\LinkedPackage;
 use ComposerLink\PathHelper;
-use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class LinkCommand extends Command
@@ -28,6 +29,12 @@ class LinkCommand extends Command
         $this->setName('link');
         $this->setDescription('Link a package to a local directory');
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
+        $this->addOption(
+            'only-installed',
+            null,
+            InputOption::VALUE_NEGATABLE,
+            'Link only installed packages',
+        );
     }
 
     /**
@@ -35,38 +42,59 @@ class LinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $helper = new PathHelper($input->getArgument('path'));
+        /** @var bool $onlyInstalled */
+        $onlyInstalled = $input->getOption('only-installed');
+        $paths = $this->getPaths($input);
 
-        // When run in global we should transform path to absolute path
-        if ($this->plugin->isGlobal()) {
-            /** @var string $working */
-            $working = $this->getApplication()->getInitialWorkingDirectory();
-            $helper = $helper->toAbsolutePath($working);
+        foreach ($paths as $path) {
+            $package = $this->getPackage($path, $output);
+
+            if (is_null($package)) {
+                continue;
+            }
+
+            if ($onlyInstalled && is_null($package->getOriginalPackage())) {
+                continue;
+            }
+
+            $this->plugin->getRepository()->store($package);
+            $this->plugin->getLinkManager()->linkPackage($package);
+
+            // Could be optimized, but for now we persist every package,
+            // so we know what we have done when a package fails
+            $this->plugin->getRepository()->persist();
         }
 
+        return 0;
+    }
+
+    protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
+    {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
+        $repository = $this->plugin->getRepository();
 
-        if (!is_null($this->plugin->getRepository()->findByPath($helper->getNormalizedPath()))) {
-            throw new InvalidArgumentException(
-                sprintf('Package in path "%s" already linked', $helper->getNormalizedPath())
+        if (!is_null($repository->findByPath($helper->getNormalizedPath()))) {
+            $output->writeln(
+                sprintf('<warning>Package in path "%s" already linked</warning>', $helper->getNormalizedPath())
             );
+
+            return null;
         }
 
-        $currentLinked = $this->plugin->getRepository()->findByName($linkedPackage->getName());
+        $currentLinked = $repository->findByName($linkedPackage->getName());
         if (!is_null($currentLinked)) {
-            throw new InvalidArgumentException(
+            $output->writeln(
                 sprintf(
-                    'Package "%s" already linked from path "%s"',
+                    '<warning>Package "%s" in "%s" already linked from path "%s"</warning>',
                     $linkedPackage->getName(),
+                    $linkedPackage->getPath(),
                     $currentLinked->getPath()
                 )
             );
+
+            return null;
         }
 
-        $this->plugin->getRepository()->store($linkedPackage);
-        $this->plugin->getRepository()->persist();
-        $this->plugin->getLinkManager()->linkPackage($linkedPackage);
-
-        return 0;
+        return $linkedPackage;
     }
 }

@@ -21,20 +21,48 @@ class PathHelper
 {
     protected string $path;
 
-    protected string $absolutePath;
-
     public function __construct(string $path)
     {
         $this->path = $path;
     }
 
+    public function isWildCard(): bool
+    {
+        return substr($this->path, -2) === DIRECTORY_SEPARATOR . '*';
+    }
+
+    /**
+     * @return PathHelper[]
+     */
+    public function getPathsFromWildcard(): array
+    {
+        /** @var string[] $entries */
+        $entries = glob($this->path, GLOB_ONLYDIR);
+        $helpers = [];
+        foreach ($entries as $entry) {
+            if (!file_exists($entry . DIRECTORY_SEPARATOR . 'composer.json')) {
+                continue;
+            }
+
+            $helpers[] = new PathHelper($entry);
+        }
+
+        return $helpers;
+    }
+
     public function toAbsolutePath(string $workingDirectory): PathHelper
     {
-        $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $this->path);
+        $path = $this->isWildCard() ? substr($this->path, 0, -1) : $this->path;
+        $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $path);
+
         if ($real === false) {
             throw new InvalidArgumentException(
-                sprintf('Cannot resolve absolute path to %s.', $this->path)
+                sprintf('Cannot resolve absolute path to %s.', $path)
             );
+        }
+
+        if ($this->isWildCard()) {
+            $real .= DIRECTORY_SEPARATOR . '*';
         }
 
         return new PathHelper($real);
