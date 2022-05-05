@@ -37,13 +37,13 @@ class LinkedPackageFactory
     private function loadFromJsonFile(string $path): CompletePackage
     {
         if (!file_exists($path . DIRECTORY_SEPARATOR . 'composer.json')) {
-            throw new RuntimeException(sprintf('No composer.json file found in path %s.', $path));
+            throw new RuntimeException(sprintf('No composer.json file found in "%s".', $path));
         }
 
         $json = (new JsonFile($path . DIRECTORY_SEPARATOR . 'composer.json'))->read();
 
         if (!is_array($json)) {
-            throw new RuntimeException(sprintf('Unable to read composer.json in %s', $path));
+            throw new RuntimeException(sprintf('Unable to read composer.json in "%s"', $path));
         }
 
         $json['version'] = 'dev-master';

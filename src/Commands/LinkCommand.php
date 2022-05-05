@@ -24,14 +24,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class LinkCommand extends Command
 {
-    // TODO We need to add a flag, to skip packages that are not installed (For when a wildcard is used)
     protected function configure(): void
     {
         $this->setName('link');
         $this->setDescription('Link a package to a local directory');
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
         $this->addOption(
-            '--only-installed',
+            'only-installed',
             null,
             InputOption::VALUE_NEGATABLE,
             'Link only installed packages',
@@ -53,28 +52,34 @@ class LinkCommand extends Command
         }
 
         $paths = $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
-        // TODO add support for --only-installed
         foreach ($paths as $path) {
-            $package = $this->getPackage($path);
+            $package = $this->getPackage($path, $output);
             if (is_null($package)) {
                 continue;
             }
+
+            if ($input->getOption('only-installed') === true && is_null($package->getOriginalPackage())) {
+                continue;
+            }
+
             $this->plugin->getRepository()->store($package);
-            $this->plugin->getRepository()->persist();
             $this->plugin->getLinkManager()->linkPackage($package);
+
+            // Could be optimized, but for now we persist every package, so we know what we have done when a package fails
+            $this->plugin->getRepository()->persist();
         }
 
         return 0;
     }
 
-    protected function getPackage(PathHelper $helper): ?LinkedPackage
+    protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
     {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
         $repository = $this->plugin->getRepository();
 
         if (!is_null($repository->findByPath($helper->getNormalizedPath()))) {
-            $this->getIO()->writeError(
-                sprintf('Package in path "%s" already linked', $helper->getNormalizedPath())
+            $output->writeln(
+                sprintf('<warning>Package in path "%s" already linked</warning>', $helper->getNormalizedPath())
             );
 
             return null;
@@ -82,9 +87,9 @@ class LinkCommand extends Command
 
         $currentLinked = $repository->findByName($linkedPackage->getName());
         if (!is_null($currentLinked)) {
-            $this->getIO()->writeError(
+            $output->writeln(
                 sprintf(
-                    'Package "%s" already linked from path "%s"',
+                    '<warning>Package "%s" already linked from path "%s"</warning>',
                     $linkedPackage->getName(),
                     $currentLinked->getPath()
                 )

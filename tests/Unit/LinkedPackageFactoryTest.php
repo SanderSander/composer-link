@@ -59,7 +59,7 @@ class LinkedPackageFactoryTest extends TestCase
         file_put_contents($this->rootDir . 'composer.json', 'null');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unable to read composer.json in vfs://root/');
+        $this->expectExceptionMessage('Unable to read composer.json in "vfs://root/"');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
         $factory->fromPath($this->rootDir);
@@ -72,7 +72,7 @@ class LinkedPackageFactoryTest extends TestCase
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('No composer.json file found in given path.');
+        $this->expectExceptionMessage('No composer.json file found in "tests/empty".');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
         $factory->fromPath('tests/empty');
