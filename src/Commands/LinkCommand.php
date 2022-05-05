@@ -68,23 +68,6 @@ class LinkCommand extends Command
         return 0;
     }
 
-    /**
-     * @return PathHelper[]
-     */
-    protected function getPaths(InputInterface $input): array
-    {
-        $helper = new PathHelper($input->getArgument('path'));
-
-        // When run in global we should transform path to absolute path
-        if ($this->plugin->isGlobal()) {
-            /** @var string $working */
-            $working = $this->getApplication()->getInitialWorkingDirectory();
-            $helper = $helper->toAbsolutePath($working);
-        }
-
-        return $helper->isWildCard() ? $helper->getPathsFromWildcard() : [$helper];
-    }
-
     protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
     {
         $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
