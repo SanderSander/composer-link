@@ -22,7 +22,9 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 abstract class TestCase extends PHPUnitTestCase
 {
-    protected string $tmpDir;
+    protected string $tmpAbsoluteDir;
+
+    protected string $tmpRelativeDir;
 
     protected Filesystem $filesystem;
 
@@ -31,17 +33,17 @@ abstract class TestCase extends PHPUnitTestCase
     {
         parent::setUp();
 
-        $tmp = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tmp';
+        $tmp = 'tests' . DIRECTORY_SEPARATOR . 'tmp';
         $this->filesystem = new Filesystem();
         $this->filesystem->emptyDirectory($tmp);
-        /** @var string $tmp */
-        $tmp = realpath($tmp);
-        $this->tmpDir = $tmp . DIRECTORY_SEPARATOR;
+
+        $this->tmpAbsoluteDir = realpath($tmp) . DIRECTORY_SEPARATOR;
+        $this->tmpRelativeDir = $tmp . DIRECTORY_SEPARATOR;
     }
 
     protected function tearDown(): void
     {
-        $this->filesystem->removeDirectory($this->tmpDir);
+        $this->filesystem->removeDirectory($this->tmpAbsoluteDir);
         parent::tearDown();
     }
 

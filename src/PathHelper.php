@@ -22,8 +22,6 @@ class PathHelper
 {
     protected string $path;
 
-    protected string $absolutePath;
-
     public function __construct(string $path)
     {
         $this->path = $path;
@@ -58,7 +56,7 @@ class PathHelper
 
     public function toAbsolutePath(string $workingDirectory): PathHelper
     {
-        $path = $this->isWildCard() ? substr($this->path, -1) : $this->path;
+        $path = $this->isWildCard() ? substr($this->path, 0, -1) : $this->path;
         $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $path);
 
         if ($real === false) {

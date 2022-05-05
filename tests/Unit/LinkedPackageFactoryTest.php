@@ -30,10 +30,10 @@ class LinkedPackageFactoryTest extends TestCase
         $originalPackage = $this->createMock(PackageInterface::class);
         $originalPackage->method('getName')->willReturn('test/package');
         $installedRepository->method('getCanonicalPackages')->willReturn([$originalPackage]);
-        file_put_contents($this->tmpDir . 'composer.json', '{"name": "test/package"}');
+        file_put_contents($this->tmpAbsoluteDir . 'composer.json', '{"name": "test/package"}');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
-        $result = $factory->fromPath($this->tmpDir);
+        $result = $factory->fromPath($this->tmpAbsoluteDir);
 
         static::assertSame('test/package', $result->getName());
         static::assertSame($originalPackage, $result->getOriginalPackage());
@@ -44,10 +44,10 @@ class LinkedPackageFactoryTest extends TestCase
         $installationManager = $this->createMock(InstallationManager::class);
         $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
-        file_put_contents($this->tmpDir . 'composer.json', '{"name": "test/package"}');
+        file_put_contents($this->tmpAbsoluteDir . 'composer.json', '{"name": "test/package"}');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
-        $package = $factory->fromPath($this->tmpDir);
+        $package = $factory->fromPath($this->tmpAbsoluteDir);
         static::assertNull($package->getOriginalPackage());
     }
 
@@ -56,13 +56,13 @@ class LinkedPackageFactoryTest extends TestCase
         $installationManager = $this->createMock(InstallationManager::class);
         $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
-        file_put_contents($this->tmpDir . 'composer.json', 'null');
+        file_put_contents($this->tmpAbsoluteDir . 'composer.json', 'null');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(sprintf('Unable to read composer.json in "%s"', $this->tmpDir));
+        $this->expectExceptionMessage(sprintf('Unable to read composer.json in "%s"', $this->tmpAbsoluteDir));
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
-        $factory->fromPath($this->tmpDir);
+        $factory->fromPath($this->tmpAbsoluteDir);
     }
 
     public function test_no_composer_file(): void
