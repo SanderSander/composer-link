@@ -28,8 +28,10 @@ class LinkedPackageFactory
 
     protected InstalledRepositoryInterface $installedRepository;
 
-    public function __construct(InstallationManager $installationManager, InstalledRepositoryInterface $installedRepository)
-    {
+    public function __construct(
+        InstallationManager $installationManager,
+        InstalledRepositoryInterface $installedRepository
+    ) {
         $this->installationManager = $installationManager;
         $this->installedRepository = $installedRepository;
     }

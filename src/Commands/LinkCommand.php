@@ -49,11 +49,7 @@ class LinkCommand extends Command
         foreach ($paths as $path) {
             $package = $this->getPackage($path, $output);
 
-            if (is_null($package)) {
-                continue;
-            }
-
-            if ($onlyInstalled && is_null($package->getOriginalPackage())) {
+            if (is_null($package) || $onlyInstalled && is_null($package->getOriginalPackage())) {
                 continue;
             }
 
