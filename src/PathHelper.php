@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace ComposerLink;
 
 use InvalidArgumentException;
-use RuntimeException;
 
 class PathHelper
 {
@@ -37,11 +36,8 @@ class PathHelper
      */
     public function getPathsFromWildcard(): array
     {
+        /** @var string[] $entries */
         $entries = glob($this->path, GLOB_ONLYDIR);
-        if ($entries === false) {
-            throw new RuntimeException(sprintf('Cannot read directory "%s"', $this->path));
-        }
-
         $helpers = [];
         foreach ($entries as $entry) {
             if (!file_exists($entry . DIRECTORY_SEPARATOR . 'composer.json')) {
