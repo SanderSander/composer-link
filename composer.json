@@ -22,10 +22,10 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
-        "composer-plugin-api": "^2.2"
+        "composer-plugin-api": "^2.0"
     },
     "require-dev": {
-        "composer/composer": "^2.2",
+        "composer/composer": "^2.0",
         "friendsofphp/php-cs-fixer": "^v3.4.0",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
