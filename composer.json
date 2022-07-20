@@ -16,7 +16,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Unit\\": "tests/Unit"
+            "Tests\\": "tests"
         }
     },
     "require": {
@@ -25,7 +25,7 @@
         "composer-plugin-api": "^2.0"
     },
     "require-dev": {
-        "composer/composer": "^2.0",
+        "composer/composer": "^2.2",
         "friendsofphp/php-cs-fixer": "^v3.4.0",
         "phpstan/phpstan": "^1.4",
         "phpunit/phpunit": "^9.5",
@@ -39,7 +39,8 @@
     },
     "scripts": {
         "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml",
-        "test": "./vendor/bin/phpunit",
+        "test": "./vendor/bin/phpunit --testsuite=Unit",
+        "test-integration": "./vendor/bin/phpunit --testsuite=Integration",
         "phpstan": "./vendor/bin/phpstan",
         "lint": "./vendor/bin/php-cs-fixer fix"
     }

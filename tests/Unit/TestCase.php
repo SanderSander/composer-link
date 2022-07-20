@@ -16,37 +16,11 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use Composer\Package\PackageInterface;
-use Composer\Util\Filesystem;
 use ComposerLink\LinkedPackage;
-use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use Tests\TestCase as BaseTest;
 
-abstract class TestCase extends PHPUnitTestCase
+abstract class TestCase extends BaseTest
 {
-    protected string $tmpAbsoluteDir;
-
-    protected string $tmpRelativeDir;
-
-    protected Filesystem $filesystem;
-
-    /** @SuppressWarnings(PHPMD.StaticAccess) */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $tmp = 'tests' . DIRECTORY_SEPARATOR . 'tmp';
-        $this->filesystem = new Filesystem();
-        $this->filesystem->emptyDirectory($tmp);
-
-        $this->tmpAbsoluteDir = realpath($tmp) . DIRECTORY_SEPARATOR;
-        $this->tmpRelativeDir = $tmp . DIRECTORY_SEPARATOR;
-    }
-
-    protected function tearDown(): void
-    {
-        $this->filesystem->removeDirectory($this->tmpAbsoluteDir);
-        parent::tearDown();
-    }
-
     /** @SuppressWarnings(PHPMD.BooleanArgumentFlag) */
     protected function mockPackage(string $name = 'package', bool $withOriginalPackage = true): LinkedPackage
     {
