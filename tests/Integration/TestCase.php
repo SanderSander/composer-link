@@ -44,6 +44,8 @@ abstract class TestCase extends BaseCase
 
     protected function useComposerLinkLocal()
     {
+        var_dump(is_dir($this->tmpAbsoluteDir));
+
         file_put_contents('composer.json', '{
             "repositories": [
                 {
