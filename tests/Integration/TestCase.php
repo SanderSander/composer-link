@@ -16,33 +16,25 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Composer\Console\Application;
-use Composer\Util\Filesystem;
-use PHPUnit\Framework\TestCase as BaseCase;
+use RuntimeException;
+use Tests\TestCase as BaseCase;
 
 abstract class TestCase extends BaseCase
 {
     protected Application $application;
-
-    private string $workingDirectory;
 
     private string $initialDirectory;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->workingDirectory = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'temp';
+
         if (getcwd() === false) {
-            throw new \RuntimeException('Unable to get CMD');
+            throw new RuntimeException('Unable to get CMD');
         }
         $this->initialDirectory = getcwd();
 
-        $filesystem = new Filesystem();
-        if (is_dir($this->workingDirectory)) {
-            $filesystem->removeDirectory($this->workingDirectory);
-        }
-
-        mkdir($this->workingDirectory);
-        chdir($this->workingDirectory);
+        chdir($this->tmpAbsoluteDir);
         file_put_contents('composer.json', '{}');
         $this->application = new Application();
         $this->application->setAutoExit(false);
@@ -53,9 +45,5 @@ abstract class TestCase extends BaseCase
     {
         parent::tearDown();
         chdir($this->initialDirectory);
-        $filesystem = new Filesystem();
-        if (is_dir($this->workingDirectory)) {
-            $filesystem->removeDirectory($this->workingDirectory);
-        }
     }
 }
