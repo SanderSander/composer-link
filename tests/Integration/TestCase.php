@@ -48,7 +48,7 @@ abstract class TestCase extends BaseCase
             "repositories": [
                 {
                     "type": "path",
-                    "url": "/app"
+                    "url": "' . $this->tmpAbsoluteDir . '"
                 }
             ],
             "config": {
