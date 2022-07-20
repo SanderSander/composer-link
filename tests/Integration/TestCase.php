@@ -86,6 +86,7 @@ abstract class TestCase extends BaseCase
         parent::tearDown();
         chdir($this->initialDirectory);
         $status = $this->getStatus();
+        var_dump($status);
         if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
             echo implode(PHP_EOL, $this->output);
         }
