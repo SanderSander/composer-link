@@ -54,7 +54,7 @@ abstract class TestCase extends BaseCase
             "repositories": [
                 {
                     "type": "path",
-                    "url": "' . $this->initialDirectory . '"
+                    "url": "' . addslashes($this->initialDirectory) . '"
                 }
             ],
             "config": {
