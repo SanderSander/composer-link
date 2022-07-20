@@ -20,7 +20,7 @@
         }
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=7.2",
         "ext-json": "*",
         "composer-plugin-api": "^2.0"
     },
