@@ -20,8 +20,8 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: [ '7.4', '8.1' ]
-        composer-versions: [ '2.0', '2.3' ]
+        php-versions: [ '7.2', '8.1' ]
+        composer-versions: [ '2.0', 'v2' ]
     steps:
       - uses: actions/checkout@v2
 
