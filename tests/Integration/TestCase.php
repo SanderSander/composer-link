@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Composer\Console\Application;
+use PHPUnit\Runner\BaseTestRunner;
 use RuntimeException;
 use Tests\TestCase as BaseCase;
 
@@ -24,6 +25,11 @@ abstract class TestCase extends BaseCase
     protected Application $application;
 
     private string $initialDirectory;
+
+    /**
+     * @var string[];
+     */
+    private array $output = [];
 
     public function setUp(): void
     {
@@ -44,7 +50,8 @@ abstract class TestCase extends BaseCase
     {
         $output = [];
         exec('composer ' . $command . ' 2>&1', $output);
-        var_dump($output);
+        $this->output = array_merge($this->output, $output);
+
         return $output;
     }
 
@@ -64,7 +71,9 @@ abstract class TestCase extends BaseCase
             }
         }');
 
-        shell_exec('composer require sandersander/composer-link @dev  2>&1');
+        $output = [];
+        exec('composer require sandersander/composer-link @dev  2>&1', $output);
+        $this->output = array_merge($this->output, $output);
     }
 
     protected function useComposerLinkGlobal(): void
@@ -76,5 +85,9 @@ abstract class TestCase extends BaseCase
     {
         parent::tearDown();
         chdir($this->initialDirectory);
+        $status = $this->getStatus();
+        if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
+            echo implode(PHP_EOL, $this->output);
+        }
     }
 }

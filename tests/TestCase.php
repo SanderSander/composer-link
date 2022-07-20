@@ -40,7 +40,7 @@ abstract class TestCase extends PHPUnitTestCase
 
     protected function tearDown(): void
     {
-        $this->filesystem->removeDirectory($this->tmpAbsoluteDir);
         parent::tearDown();
+        $this->filesystem->removeDirectory($this->tmpAbsoluteDir);
     }
 }
