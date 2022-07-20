@@ -27,6 +27,7 @@ use ComposerLink\LinkManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+
 use function React\Promise\resolve;
 
 class LinkManagerTest extends TestCase
