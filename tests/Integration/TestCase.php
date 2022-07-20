@@ -43,6 +43,11 @@ abstract class TestCase extends BaseCase
         chdir($this->tmpAbsoluteDir);
     }
 
+    public function getMockDirectory(): string
+    {
+        return $this->initialDirectory . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
+    }
+
     /**
      * @return string[]
      */
@@ -71,14 +76,27 @@ abstract class TestCase extends BaseCase
             }
         }');
 
-        $output = [];
-        exec('composer require sandersander/composer-link @dev  2>&1', $output);
-        $this->output = array_merge($this->output, $output);
+        shell_exec('composer require sandersander/composer-link @dev  2>&1');
     }
 
     protected function useComposerLinkGlobal(): void
     {
-        throw new RuntimeException('Not implemented');
+        $global = exec('composer config --global home');
+        file_put_contents($global . DIRECTORY_SEPARATOR . 'composer.json', '{
+            "repositories": [
+                {
+                    "type": "path",
+                    "url": "' . addslashes($this->initialDirectory) . '"
+                }
+            ],
+            "config": {
+                "allow-plugins": {
+                    "sandersander/composer-link": true
+                }
+            }
+        }');
+
+        shell_exec('composer global require sandersander/composer-link @dev  2>&1');
     }
 
     public function tearDown(): void
@@ -87,7 +105,10 @@ abstract class TestCase extends BaseCase
         chdir($this->initialDirectory);
         $status = $this->getStatus();
         if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
-            echo implode(PHP_EOL, $this->output);
+            echo str_repeat(PHP_EOL, 2) .
+                implode(PHP_EOL, $this->output) .
+                str_repeat(PHP_EOL, 2);
         }
+        $this->output = [];
     }
 }

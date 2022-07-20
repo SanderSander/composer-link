@@ -17,7 +17,11 @@ namespace Tests\Integration;
 
 class BasicTest extends TestCase
 {
-    public function test_package_can_be_linked_and_unlinked(): void
+    /**
+     * Test if we can link a package in a project while using relative paths.
+     * The plugin is installed in project.
+     */
+    public function test_link_package_in_project_with_relative_paths_with_local_plugin(): void
     {
         $this->useComposerLinkLocal();
 
@@ -42,6 +46,167 @@ class BasicTest extends TestCase
         static::assertContains(
             'No packages are linked',
             $this->runLinkCommand('linked')
+        );
+    }
+
+    /**
+     * Test if we can link a package in a project while using absolute paths.
+     * The plugin is installed in project.
+     */
+    public function test_link_package_in_project_with_absolute_paths_with_local_plugin(): void
+    {
+        $this->useComposerLinkLocal();
+
+        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
+
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('link ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertContains(
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
+    }
+
+    /**
+     * Test if we can link a package in a project while using relative paths.
+     * The plugin is installed globally.
+     */
+    public function test_link_package_in_project_with_relative_paths_with_global_plugin(): void
+    {
+        $this->useComposerLinkGlobal();
+
+        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
+
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ../mock/package-1',
+            $this->runLinkCommand('link ../mock/package-1')
+        );
+        static::assertContains(
+            'test/package-1	../mock/package-1',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('unlink ../mock/package-1')
+        );
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
+    }
+
+    /**
+     * Test if we can link a package in a project while using relative paths.
+     * The plugin is installed globally.
+     */
+    public function test_link_package_in_project_with_absolute_paths_with_global_plugin(): void
+    {
+        $this->useComposerLinkGlobal();
+
+        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
+
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('link ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertContains(
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
+    }
+
+    /**
+     * Test if we can link a package globally while using relative paths.
+     * The plugin is installed globally.
+     */
+    public function test_link_package_in_global_with_relative_paths_with_global_plugin(): void
+    {
+        $this->useComposerLinkGlobal();
+
+        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
+
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertContains(
+            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global link ../mock/package-1')
+        );
+        static::assertContains(
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertContains(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('global unlink ../mock/package-1')
+        );
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
+        );
+    }
+
+    /**
+     * Test if we can link a package globally while using absolute paths.
+     * The plugin is installed globally.
+     */
+    public function test_link_package_in_global_with_absolute_paths_with_global_plugin(): void
+    {
+        static::markTestSkipped('Known issue, should be resolved');
+        $this->useComposerLinkGlobal();
+
+        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
+
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertContains(
+            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global link ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertContains(
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertContains(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('global unlink ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
         );
     }
 }
