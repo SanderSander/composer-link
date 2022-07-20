@@ -37,12 +37,15 @@ abstract class TestCase extends BaseCase
         chdir($this->tmpAbsoluteDir);
     }
 
+    /**
+     * @param string[] $output
+     */
     protected function runLinkCommand(string $command, array &$output): void
     {
         exec('composer ' . $command, $output);
     }
 
-    protected function useComposerLinkLocal()
+    protected function useComposerLinkLocal(): void
     {
         file_put_contents('composer.json', '{
             "repositories": [
@@ -61,7 +64,7 @@ abstract class TestCase extends BaseCase
         shell_exec('composer require sandersander/composer-link @dev');
     }
 
-    protected function useComposerLinkGlobal()
+    protected function useComposerLinkGlobal(): void
     {
         throw new RuntimeException('Not implemented');
     }
