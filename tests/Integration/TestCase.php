@@ -105,9 +105,12 @@ abstract class TestCase extends BaseCase
         chdir($this->initialDirectory);
         $status = $this->getStatus();
         if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
-            echo str_repeat(PHP_EOL, 2) .
+            fwrite(
+                STDERR,
+                str_repeat(PHP_EOL, 2) .
                 implode(PHP_EOL, $this->output) .
-                str_repeat(PHP_EOL, 2);
+                str_repeat(PHP_EOL, 2)
+            );
         }
         $this->output = [];
     }
