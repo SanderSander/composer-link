@@ -183,7 +183,7 @@ class BasicTest extends TestCase
      */
     public function test_link_package_in_global_with_absolute_paths_with_global_plugin(): void
     {
-        static::markTestSkipped('Known issue, should be resolved');
+        static::markTestSkipped('Known issue, https://github.com/SanderSander/composer-link/issues/36');
         $this->useComposerLinkGlobal();
 
         $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
