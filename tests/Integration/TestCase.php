@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Composer\Console\Application;
-use PHPUnit\Runner\BaseTestRunner;
 use RuntimeException;
 use Tests\TestCase as BaseCase;
 
@@ -85,10 +84,5 @@ abstract class TestCase extends BaseCase
     {
         parent::tearDown();
         chdir($this->initialDirectory);
-        $status = $this->getStatus();
-        var_dump($status);
-        if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
-            echo implode(PHP_EOL, $this->output);
-        }
     }
 }

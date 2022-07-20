@@ -17,12 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: [ '8.1' ]
+        php-versions: [ '7.4', '8.1' ]
+        composer-versions: [ '2.0', '2.3' ]
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
+        tools: composer:${{ matrix.composer-version }}
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: fileinfo
