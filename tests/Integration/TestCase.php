@@ -44,7 +44,7 @@ abstract class TestCase extends BaseCase
     {
         $output = [];
         exec('composer ' . $command . ' 2>&1', $output);
-
+        var_dump($output);
         return $output;
     }
 
