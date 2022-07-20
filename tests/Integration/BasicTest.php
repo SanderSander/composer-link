@@ -21,12 +21,14 @@ class BasicTest extends TestCase
     {
         $this->useComposerLinkLocal();
 
+        $linkType = PHP_OS === 'Windows' ? 'Junctioning' : 'Symlinking';
+
         static::assertContains(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): Symlinking from ../mock/package-1',
+            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ../mock/package-1',
             $this->runLinkCommand('link ../mock/package-1')
         );
         static::assertContains(

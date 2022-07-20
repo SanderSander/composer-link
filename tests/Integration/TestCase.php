@@ -44,7 +44,7 @@ abstract class TestCase extends BaseCase
     {
         $output = [];
         exec('composer ' . $command . ' 2>&1', $output);
-        var_dump($output);
+
         return $output;
     }
 
@@ -64,9 +64,7 @@ abstract class TestCase extends BaseCase
             }
         }');
 
-        $output = [];
-        exec('composer require sandersander/composer-link @dev', $output);
-        var_dump($output);
+        shell_exec('composer require sandersander/composer-link @dev  2>&1');
     }
 
     protected function useComposerLinkGlobal(): void
