@@ -38,11 +38,14 @@ abstract class TestCase extends BaseCase
     }
 
     /**
-     * @param string[] $output
+     * @return string[]
      */
-    protected function runLinkCommand(string $command, array &$output): void
+    protected function runLinkCommand(string $command): array
     {
-        exec('composer ' . $command, $output);
+        $output = [];
+        exec('composer ' . $command . ' 2>&1', $output);
+
+        return $output;
     }
 
     protected function useComposerLinkLocal(): void
@@ -61,7 +64,7 @@ abstract class TestCase extends BaseCase
             }
         }');
 
-        shell_exec('composer require sandersander/composer-link @dev');
+        shell_exec('composer require sandersander/composer-link @dev &> /dev/null');
     }
 
     protected function useComposerLinkGlobal(): void

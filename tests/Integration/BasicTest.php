@@ -15,31 +15,31 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-
 class BasicTest extends TestCase
 {
     public function test_package_can_be_linked_and_unlinked(): void
     {
         $this->useComposerLinkLocal();
 
-        $output = [];
-        $this->runLinkCommand('linked', $output);
-        static::assertContains('No packages are linked', $output);
-
-        /*
-        $this->application->run(new StringInput('link ../mock/package-1'), $output);
-        static::assertStringContainsString('Installing test/package-1 (dev-master): Symlinking from ../mock/package-1', $output->fetch());
-
-        $this->application->run(new StringInput('linked'), $output);
-        static::assertStringContainsString('test/package-1	../mock/package-1', $output->fetch());
-
-        $this->application->run(new StringInput('unlink ../mock/package-1'), $output);
-        static::assertStringContainsString('Removing test/package-1 (dev-master)', $output->fetch());
-
-        $this->application->run(new StringInput('linked'), $output);
-        static::assertStringContainsString('No packages are linked', $output->fetch());
-        */
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Installing test/package-1 (dev-master): Symlinking from ../mock/package-1',
+            $this->runLinkCommand('link ../mock/package-1')
+        );
+        static::assertContains(
+            'test/package-1	../mock/package-1',
+            $this->runLinkCommand('linked')
+        );
+        static::assertContains(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('unlink ../mock/package-1')
+        );
+        static::assertContains(
+            'No packages are linked',
+            $this->runLinkCommand('linked')
+        );
     }
 }
