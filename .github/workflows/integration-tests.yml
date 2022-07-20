@@ -12,6 +12,7 @@ on:
 
 jobs:
   integration-tests:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ matrix.operating-system }}
     strategy:
       fail-fast: false
