@@ -104,12 +104,12 @@ abstract class TestCase extends BaseCase
         parent::tearDown();
         chdir($this->initialDirectory);
         $status = $this->getStatus();
-        //if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
-            echo str_repeat(PHP_EOL, 2) .
+        // if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
+        echo str_repeat(PHP_EOL, 2) .
                 implode(PHP_EOL, $this->output) .
                 str_repeat(PHP_EOL, 2);
-            var_dump($this->getStatus());
-        //}
+        var_dump($this->getStatus());
+        // }
         $this->output = [];
     }
 }
