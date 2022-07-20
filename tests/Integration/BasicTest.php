@@ -21,7 +21,7 @@ class BasicTest extends TestCase
     {
         $this->useComposerLinkLocal();
 
-        $linkType = PHP_OS === 'Windows' ? 'Junctioning' : 'Symlinking';
+        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
 
         static::assertContains(
             'No packages are linked',
