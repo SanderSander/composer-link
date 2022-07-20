@@ -32,7 +32,7 @@ class LinkCommand extends Command
         $this->addOption(
             'only-installed',
             null,
-            InputOption::VALUE_NEGATABLE,
+            InputOption::VALUE_NONE,
             'Link only installed packages',
         );
     }
