@@ -108,7 +108,7 @@ abstract class TestCase extends BaseCase
             echo str_repeat(PHP_EOL, 2) .
                 implode(PHP_EOL, $this->output) .
                 str_repeat(PHP_EOL, 2);
-            var_dump($this->-$status);
+            var_dump($this->getStatus());
         //}
         $this->output = [];
     }
