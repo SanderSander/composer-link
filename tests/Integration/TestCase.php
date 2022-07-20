@@ -35,10 +35,35 @@ abstract class TestCase extends BaseCase
         $this->initialDirectory = getcwd();
 
         chdir($this->tmpAbsoluteDir);
-        file_put_contents('composer.json', '{}');
-        $this->application = new Application();
-        $this->application->setAutoExit(false);
-        $this->application->setCatchExceptions(false);
+    }
+
+    protected function runLinkCommand(string $command, array &$output): void
+    {
+        exec('composer ' . $command, $output);
+    }
+
+    protected function useComposerLinkLocal()
+    {
+        file_put_contents('composer.json', '{
+            "repositories": [
+                {
+                    "type": "path",
+                    "url": "/app"
+                }
+            ],
+            "config": {
+                "allow-plugins": {
+                    "sandersander/composer-link": true
+                }
+            }
+        }');
+
+        shell_exec('composer require sandersander/composer-link @dev');
+    }
+
+    protected function useComposerLinkGlobal()
+    {
+        throw new RuntimeException('Not implemented');
     }
 
     public function tearDown(): void

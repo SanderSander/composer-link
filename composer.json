@@ -39,7 +39,8 @@
     },
     "scripts": {
         "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml",
-        "test": "./vendor/bin/phpunit",
+        "test": "./vendor/bin/phpunit --testsuite=Unit",
+        "test-integration": "./vendor/bin/phpunit --testsuite=Integration",
         "phpstan": "./vendor/bin/phpstan",
         "lint": "./vendor/bin/php-cs-fixer fix"
     }
