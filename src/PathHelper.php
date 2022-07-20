@@ -52,12 +52,16 @@ class PathHelper
 
     public function toAbsolutePath(string $workingDirectory): PathHelper
     {
+        if ($this->isAbsolutePath($this->path)) {
+            return $this;
+        }
+
         $path = $this->isWildCard() ? substr($this->path, 0, -1) : $this->path;
         $real = realpath($workingDirectory . DIRECTORY_SEPARATOR . $path);
 
         if ($real === false) {
             throw new InvalidArgumentException(
-                sprintf('Cannot resolve absolute path to %s.', $path)
+                sprintf('Cannot resolve absolute path to %s from %s.', $path, $workingDirectory)
             );
         }
 
@@ -75,5 +79,10 @@ class PathHelper
         }
 
         return $this->path;
+    }
+
+    public function isAbsolutePath(string $path): bool
+    {
+        return strpos($path, '/') === 0 || substr($path, 1, 1) === ':' || strpos($path, '\\\\') === 0;
     }
 }

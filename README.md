@@ -55,7 +55,7 @@ To unlink the package you can use the `unlink` command
 ```
 composer unlink ../path/to/package
 composer unlink ../packages/*
-composer global link ../path/to/package
+composer global unlink ../path/to/package
 ```
 
 To see all linked packages in your project you can use the `linked` command

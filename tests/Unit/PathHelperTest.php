@@ -35,6 +35,20 @@ class PathHelperTest extends TestCase
         );
     }
 
+    public function test_absolute_path_to_absolute(): void
+    {
+        /** @var string $cwd */
+        $cwd = getcwd();
+        $pathWildcard = new PathHelper($this->tmpAbsoluteDir);
+        $absolute = $pathWildcard->toAbsolutePath($cwd);
+
+        // We expect a normalized path, so we remove the trailing slash
+        static::assertSame(
+            substr($this->tmpAbsoluteDir, 0, -1),
+            $absolute->getNormalizedPath()
+        );
+    }
+
     public function test_get_invalid_absolute_path(): void
     {
         $this->expectException(InvalidArgumentException::class);
