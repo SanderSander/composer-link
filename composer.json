@@ -25,10 +25,10 @@
         "composer-plugin-api": "^2.0"
     },
     "require-dev": {
-        "composer/composer": "^2.0",
+        "composer/composer": "^2.2",
         "friendsofphp/php-cs-fixer": "^v3.4.0",
         "phpstan/phpstan": "^1.4",
-        "phpunit/phpunit": "^8.5.27",
+        "phpunit/phpunit": "^9.5",
         "phpstan/phpstan-phpunit": "^1.1",
         "phpmd/phpmd": "^2.12",
         "phpstan/phpstan-strict-rules": "^1.1",

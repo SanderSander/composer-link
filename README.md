@@ -9,6 +9,11 @@ Adds ability to link local packages in composer for development.
 This plugin won't alter your `composer.json` or `composer.lock` file, 
 while maintaining the composer abilities to manage/upgrade your packages.
 
+## Requirements
+
+- PHP >= 7.4
+- Composer >= 2.2
+
 ## Installation
 
 This plugin can be installed globally or per project
