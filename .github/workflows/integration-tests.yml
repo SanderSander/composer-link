@@ -40,3 +40,6 @@ jobs:
       - name: Run unit tests
         run: ./vendor/bin/phpunit --testsuite=Integration
 
+      - name: Debug
+        run: cat result.txt
+
