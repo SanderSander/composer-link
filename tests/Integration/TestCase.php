@@ -57,6 +57,10 @@ abstract class TestCase extends BaseCase
         exec('composer ' . $command . ' 2>&1', $output);
         $this->output = array_merge($this->output, $output);
 
+        if (PHP_OS_FAMILY === 'Windows') {
+            echo PHP_EOL . implode(PHP_EOL, $this->output) . PHP_EOL;
+        }
+
         return $output;
     }
 
@@ -106,8 +110,8 @@ abstract class TestCase extends BaseCase
         $status = $this->getStatus();
         if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
             echo str_repeat(PHP_EOL, 2) .
-                implode(PHP_EOL, $this->output) .
-                str_repeat(PHP_EOL, 2);
+                    implode(PHP_EOL, $this->output) .
+                    str_repeat(PHP_EOL, 2);
         }
         $this->output = [];
     }
