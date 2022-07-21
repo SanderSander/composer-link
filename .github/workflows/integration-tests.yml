@@ -39,8 +39,3 @@ jobs:
 
       - name: Run unit tests
         run: ./vendor/bin/phpunit --testsuite=Integration
-
-      - name: Debug
-        if: always()
-        run: cat result.txt
-
