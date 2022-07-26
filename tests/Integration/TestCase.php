@@ -91,7 +91,9 @@ abstract class TestCase extends BaseCase
 
     public function tearDown(): void
     {
-        parent::tearDown();
+        // We have to change directory, before parent class remove the directory.
+        // Windows has problems with removing directories when they are open in console
         chdir($this->initialDirectory);
+        parent::tearDown();
     }
 }
