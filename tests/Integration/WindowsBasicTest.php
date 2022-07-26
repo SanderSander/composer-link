@@ -58,8 +58,6 @@ class WindowsBasicTest extends TestCase
     {
         $this->useComposerLinkLocal();
 
-        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
-
         static::assertContains(
             'No packages are linked',
             $this->runLinkCommand('linked')
@@ -89,8 +87,6 @@ class WindowsBasicTest extends TestCase
     public function test_link_package_in_project_with_relative_paths_with_global_plugin(): void
     {
         $this->useComposerLinkGlobal();
-
-        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
 
         static::assertContains(
             'No packages are linked',
@@ -122,8 +118,6 @@ class WindowsBasicTest extends TestCase
     {
         $this->useComposerLinkGlobal();
 
-        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
-
         static::assertContains(
             'No packages are linked',
             $this->runLinkCommand('linked')
@@ -153,8 +147,6 @@ class WindowsBasicTest extends TestCase
     public function test_link_package_in_global_with_relative_paths_with_global_plugin(): void
     {
         $this->useComposerLinkGlobal();
-        var_dump('hello');
-        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
 
         static::assertContains(
             'No packages are linked',
@@ -184,7 +176,7 @@ class WindowsBasicTest extends TestCase
      */
     public function test_link_package_in_global_with_absolute_paths_with_global_plugin(): void
     {
-        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
+        $this->useComposerLinkGlobal();
 
         static::assertContains(
             'No packages are linked',
