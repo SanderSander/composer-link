@@ -25,14 +25,16 @@ abstract class TestCase extends BaseCase
 
     private string $initialDirectory;
 
+    protected string $composerGlobalDir;
+
     public function setUp(): void
     {
         parent::setUp();
-
         if (getcwd() === false) {
             throw new RuntimeException('Unable to get CMD');
         }
         $this->initialDirectory = getcwd();
+        $this->composerGlobalDir = exec('composer config --global home');
 
         chdir($this->tmpAbsoluteDir);
     }
@@ -71,8 +73,7 @@ abstract class TestCase extends BaseCase
 
     protected function useComposerLinkGlobal(): void
     {
-        $global = exec('composer config --global home');
-        file_put_contents($global . DIRECTORY_SEPARATOR . 'composer.json', '{
+        file_put_contents($this->composerGlobalDir . DIRECTORY_SEPARATOR . 'composer.json', '{
             "repositories": [
                 {
                     "type": "path",
