@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Composer\Console\Application;
-use PHPUnit\Runner\BaseTestRunner;
 use RuntimeException;
 use Tests\TestCase as BaseCase;
 
@@ -25,11 +24,6 @@ abstract class TestCase extends BaseCase
     protected Application $application;
 
     private string $initialDirectory;
-
-    /**
-     * @var string[];
-     */
-    private array $output = [];
 
     public function setUp(): void
     {
@@ -48,20 +42,12 @@ abstract class TestCase extends BaseCase
         return $this->initialDirectory . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
     }
 
-    /**
-     * @return string[]
-     */
-    protected function runLinkCommand(string $command): array
+    protected function runLinkCommand(string $command): string
     {
         $output = [];
         exec('composer ' . $command . ' 2>&1', $output);
-        $this->output = array_merge($this->output, $output);
 
-        if (PHP_OS_FAMILY === 'Windows') {
-            echo PHP_EOL . implode(PHP_EOL, $this->output) . PHP_EOL;
-        }
-
-        return $output;
+        return implode(PHP_EOL, $output);
     }
 
     protected function useComposerLinkLocal(): void
@@ -107,12 +93,5 @@ abstract class TestCase extends BaseCase
     {
         parent::tearDown();
         chdir($this->initialDirectory);
-        $status = $this->getStatus();
-        if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
-            echo str_repeat(PHP_EOL, 2) .
-                    implode(PHP_EOL, $this->output) .
-                    str_repeat(PHP_EOL, 2);
-        }
-        $this->output = [];
     }
 }

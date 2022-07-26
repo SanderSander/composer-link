@@ -29,23 +29,23 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkLocal();
 
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Installing test/package-1 (dev-master): Symlinking from ../mock/package-1',
             $this->runLinkCommand('link ../mock/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'test/package-1	../mock/package-1',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
             $this->runLinkCommand('unlink ../mock/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
@@ -59,23 +59,23 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkLocal();
 
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('link ' . $this->getMockDirectory() . '/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
             $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
@@ -89,23 +89,23 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkGlobal();
 
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Installing test/package-1 (dev-master): Symlinking from ../mock/package-1',
             $this->runLinkCommand('link ../mock/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'test/package-1	../mock/package-1',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
             $this->runLinkCommand('unlink ../mock/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
@@ -119,23 +119,23 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkGlobal();
 
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('link ' . $this->getMockDirectory() . '/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
             $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
@@ -149,23 +149,23 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkGlobal();
 
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('global linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('global link ../mock/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('global linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
             $this->runLinkCommand('global unlink ../mock/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('global linked')
         );
@@ -179,23 +179,23 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkGlobal();
 
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('global linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('global link ' . $this->getMockDirectory() . '/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('global linked')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
             $this->runLinkCommand('global unlink ' . $this->getMockDirectory() . '/package-1')
         );
-        static::assertContains(
+        static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('global linked')
         );
