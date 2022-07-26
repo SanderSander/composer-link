@@ -15,7 +15,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-class BasicTest extends TestCase
+/**
+ * @group windows-latest
+ */
+class WindowsBasicTest extends TestCase
 {
     /**
      * Test if we can link a package in a project while using relative paths.
@@ -207,3 +210,4 @@ class BasicTest extends TestCase
         );
     }
 }
+
