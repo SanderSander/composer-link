@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use Composer\Console\Application;
-use PHPUnit\Runner\BaseTestRunner;
 use RuntimeException;
 use Tests\TestCase as BaseCase;
 
@@ -26,19 +25,16 @@ abstract class TestCase extends BaseCase
 
     private string $initialDirectory;
 
-    /**
-     * @var string[];
-     */
-    private array $output = [];
+    protected string $composerGlobalDir;
 
     public function setUp(): void
     {
         parent::setUp();
-
         if (getcwd() === false) {
             throw new RuntimeException('Unable to get CMD');
         }
         $this->initialDirectory = getcwd();
+        $this->composerGlobalDir = (string) realpath((string) exec('composer config --global home'));
 
         chdir($this->tmpAbsoluteDir);
     }
@@ -48,16 +44,12 @@ abstract class TestCase extends BaseCase
         return $this->initialDirectory . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
     }
 
-    /**
-     * @return string[]
-     */
-    protected function runLinkCommand(string $command): array
+    protected function runLinkCommand(string $command): string
     {
         $output = [];
         exec('composer ' . $command . ' 2>&1', $output);
-        $this->output = array_merge($this->output, $output);
 
-        return $output;
+        return implode(PHP_EOL, $output);
     }
 
     protected function useComposerLinkLocal(): void
@@ -81,8 +73,7 @@ abstract class TestCase extends BaseCase
 
     protected function useComposerLinkGlobal(): void
     {
-        $global = exec('composer config --global home');
-        file_put_contents($global . DIRECTORY_SEPARATOR . 'composer.json', '{
+        file_put_contents($this->composerGlobalDir . DIRECTORY_SEPARATOR . 'composer.json', '{
             "repositories": [
                 {
                     "type": "path",
@@ -101,14 +92,9 @@ abstract class TestCase extends BaseCase
 
     public function tearDown(): void
     {
-        parent::tearDown();
+        // We have to change directory, before parent class remove the directory.
+        // Windows has problems with removing directories when they are open in console
         chdir($this->initialDirectory);
-        $status = $this->getStatus();
-        if ($status == BaseTestRunner::STATUS_ERROR || $status == BaseTestRunner::STATUS_FAILURE) {
-            echo str_repeat(PHP_EOL, 2) .
-                implode(PHP_EOL, $this->output) .
-                str_repeat(PHP_EOL, 2);
-        }
-        $this->output = [];
+        parent::tearDown();
     }
 }
