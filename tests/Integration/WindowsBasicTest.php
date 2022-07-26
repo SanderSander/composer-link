@@ -93,16 +93,16 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): Junctioning from ../mock/package-1',
-            $this->runLinkCommand('link ../mock/package-1')
+            '  - Installing test/package-1 (dev-master): Junctioning from ..\mock\package-1',
+            $this->runLinkCommand('link ..\mock\package-1')
         );
         static::assertContains(
-            'test/package-1	../mock/package-1',
+            'test/package-1	..\mock\package-1',
             $this->runLinkCommand('linked')
         );
         static::assertContains(
             '  - Removing test/package-1 (dev-master), source is still present in ' . $this->getMockDirectory() . '\package-1',
-            $this->runLinkCommand('unlink ../mock/package-1')
+            $this->runLinkCommand('unlink ..\mock\package-1')
         );
         static::assertContains(
             'No packages are linked',
