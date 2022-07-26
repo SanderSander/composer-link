@@ -154,7 +154,7 @@ class WindowsBasicTest extends TestCase
         );
         static::assertStringContainsString(
             '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
-            $this->runLinkCommand('global link ..\mock\package-1')
+            $this->runLinkCommand('global link ../mock/package-1')
         );
         static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '\package-1',
