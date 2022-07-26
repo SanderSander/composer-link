@@ -28,14 +28,12 @@ class WindowsBasicTest extends TestCase
     {
         $this->useComposerLinkLocal();
 
-        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
-
         static::assertContains(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ../mock/package-1',
+            '  - Installing test/package-1 (dev-master): Junctioning from ../mock/package-1',
             $this->runLinkCommand('link ../mock/package-1')
         );
         static::assertContains(
@@ -67,16 +65,16 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
-            $this->runLinkCommand('link ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1')
+            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertContains(
-            'test/package-1	' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
+            'test/package-1	' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('linked')
         );
         static::assertContains(
             '  - Removing test/package-1 (dev-master)',
-            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1')
+            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertContains(
             'No packages are linked',
@@ -99,7 +97,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ../mock/package-1',
+            '  - Installing test/package-1 (dev-master): Junctioning from ../mock/package-1',
             $this->runLinkCommand('link ../mock/package-1')
         );
         static::assertContains(
@@ -131,16 +129,16 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
-            $this->runLinkCommand('link ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1')
+            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertContains(
-            'test/package-1	' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
+            'test/package-1	' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('linked')
         );
         static::assertContains(
             '  - Removing test/package-1 (dev-master)',
-            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1')
+            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertContains(
             'No packages are linked',
@@ -163,11 +161,11 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('global linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
+            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('global link ../mock/package-1')
         );
         static::assertContains(
-            'test/package-1	' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
+            'test/package-1	' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('global linked')
         );
         static::assertContains(
@@ -193,16 +191,16 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('global linked')
         );
         static::assertContains(
-            '  - Installing test/package-1 (dev-master): ' . $linkType . ' from ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
-            $this->runLinkCommand('global link ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1')
+            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            $this->runLinkCommand('global link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertContains(
-            'test/package-1	' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1',
+            'test/package-1	' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('global linked')
         );
         static::assertContains(
             '  - Removing test/package-1 (dev-master)',
-            $this->runLinkCommand('global unlink ' . $this->getMockDirectory() . DIRECTORY_SEPARATOR . 'package-1')
+            $this->runLinkCommand('global unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertContains(
             'No packages are linked',
@@ -210,4 +208,3 @@ class WindowsBasicTest extends TestCase
         );
     }
 }
-

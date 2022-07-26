@@ -29,8 +29,6 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkLocal();
 
-        $linkType = PHP_OS_FAMILY === 'Windows' ? 'Junctioning' : 'Symlinking';
-
         static::assertContains(
             'No packages are linked',
             $this->runLinkCommand('linked')
