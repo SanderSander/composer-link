@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 /**
- * @group linux-latest
+ * @group ubuntu-latest
  * @group macos-latest
  */
 class LinuxMacosBasicTest extends TestCase
