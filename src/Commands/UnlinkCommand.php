@@ -36,10 +36,8 @@ class UnlinkCommand extends Command
         $paths = $this->getPaths($input);
 
         foreach ($paths as $path) {
-            $linkedPackage = $this->plugin->getPackageFactory()->fromPath($path->getNormalizedPath());
-
             $repository = $this->plugin->getRepository();
-            $linkedPackage = $repository->findByPath($linkedPackage->getPath());
+            $linkedPackage = $repository->findByPath($path->getNormalizedPath());
 
             if ($linkedPackage === null) {
                 continue;
