@@ -48,7 +48,6 @@ class DependencyResolver
      */
     public function resolveForPackage(LinkedPackage $package): array
     {
-        // ////////////////////////////////////////////////////
         $repositorySet = new RepositorySet(
             'dev',
             [],
@@ -60,14 +59,13 @@ class DependencyResolver
 
         // Fill repositories
         // $repositorySet->addRepository(new RootPackageRepository($this->composer->getPackage()));
+        $repo = new PathRepository(['url' => $package->getPath()], $this->io, $this->composer->getConfig(), null, null, $exexutor);
+        $repositorySet->addRepository($repo);
 
         $repositories = $this->composer->getRepositoryManager()->getRepositories();
         foreach ($repositories as $repository) {
             $repositorySet->addRepository($repository);
         }
-
-        $repo = new PathRepository(['url' => $package->getPath()], $this->io, $this->composer->getConfig(), null, null, $exexutor);
-        $repositorySet->addRepository($repo);
 
         // Make request for package
         $request = new Request();
@@ -97,7 +95,5 @@ class DependencyResolver
         } catch (SolverProblemsException $exception) {
             $this->io->write($exception->getPrettyString($repositorySet, $request, $pool, true));
         }
-
-        // //////////////////////////////////////////////
     }
 }
