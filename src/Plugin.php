@@ -81,7 +81,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
         $this->initializeRepository();
         $this->initializeLinkedPackageFactory();
-        $this->initializeLinkManager();
+        $this->initializeLinkManager($io);
         $this->initializeLinkPackages();
     }
 
@@ -103,13 +103,14 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         );
     }
 
-    protected function initializeLinkManager(): void
+    protected function initializeLinkManager(IOInterface $io): void
     {
         $this->linkManager = new LinkManager(
             $this->filesystem,
             $this->composer->getLoop(),
             $this->composer->getInstallationManager(),
-            $this->composer->getRepositoryManager()->getLocalRepository()
+            $this->composer->getRepositoryManager()->getLocalRepository(),
+            new DependencyResolver($this->composer, $io)
         );
     }
 

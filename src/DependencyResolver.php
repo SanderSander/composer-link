@@ -17,17 +17,15 @@ namespace ComposerLink;
 
 use Composer\Composer;
 use Composer\DependencyResolver\DefaultPolicy;
-use Composer\DependencyResolver\Operation\InstallOperation;
-use Composer\DependencyResolver\Operation\UninstallOperation;
-use Composer\DependencyResolver\Operation\UpdateOperation;
+use Composer\DependencyResolver\Operation\OperationInterface;
 use Composer\DependencyResolver\Request;
 use Composer\DependencyResolver\Solver;
 use Composer\DependencyResolver\SolverProblemsException;
 use Composer\Filter\PlatformRequirementFilter\PlatformRequirementFilterFactory;
 use Composer\IO\IOInterface;
-use Composer\Package\PackageInterface;
 use Composer\Repository\PathRepository;
 use Composer\Repository\RepositorySet;
+use Composer\Repository\RootPackageRepository;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Util\ProcessExecutor;
 
@@ -44,56 +42,59 @@ class DependencyResolver
     }
 
     /**
-     * @return PackageInterface[]
+     * @return OperationInterface[]
      */
     public function resolveForPackage(LinkedPackage $package): array
     {
+        // TODO use configuration of original composer.json
         $repositorySet = new RepositorySet(
             'dev',
             [],
             [],
         );
 
+        // TODO we can't use this
         $exexutor = new ProcessExecutor($this->io);
         $exexutor->enableAsync();
 
-        // Fill repositories
-        // $repositorySet->addRepository(new RootPackageRepository($this->composer->getPackage()));
+        // Fill repositories first the root package repository
+        $repositorySet->addRepository(new RootPackageRepository($this->composer->getPackage()));
+
+        // The locked repository, we don't do a full upgrade, so we want to keep as much as possible packages up to date
+        $repositorySet->addRepository($this->composer->getLocker()->getLockedRepository(true));
+
+        // No we add our custom path repositories, we  need to do this before we add the original repositories
+        // otherwise we do not get precedence over the other repositories
         $repo = new PathRepository(['url' => $package->getPath()], $this->io, $this->composer->getConfig(), null, null, $exexutor);
         $repositorySet->addRepository($repo);
 
+        // Add custom repositories defined in the composer file
         $repositories = $this->composer->getRepositoryManager()->getRepositories();
         foreach ($repositories as $repository) {
             $repositorySet->addRepository($repository);
         }
 
-        // Make request for package
+        // Make request for package, and fix all the currently existing packages
         $request = new Request();
         $request->requireName($package->getName(), new Constraint('=', 'dev-master'));
+        foreach ($this->composer->getRepositoryManager()->getLocalRepository()->getPackages() as $localPackage) {
+            $request->fixPackage($localPackage);
+        }
         $policy = new DefaultPolicy(true);
 
         // Create pool and solve?
         $pool = $repositorySet->createPool($request, $this->io);
         $solver = new Solver($policy, $pool, $this->io);
 
-        $installs = [];
+        $operations = [];
 
         try {
             $transaction = $solver->solve($request, PlatformRequirementFilterFactory::ignoreAll());
             $operations = $transaction->getOperations();
-            foreach ($operations as $operation) {
-                if ($operation instanceof InstallOperation) {
-                    $installs[] = $operation->getPackage();
-                }
-                if ($operation instanceof UpdateOperation) {
-                    $updates = $operation->getTargetPackage();
-                }
-                if ($operation instanceof UninstallOperation) {
-                    // TODO implement
-                }
-            }
         } catch (SolverProblemsException $exception) {
             $this->io->write($exception->getPrettyString($repositorySet, $request, $pool, true));
         }
+
+        return $operations;
     }
 }
