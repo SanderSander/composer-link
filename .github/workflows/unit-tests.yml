@@ -27,7 +27,11 @@ jobs:
           php-version: ${{ matrix.php-versions }}
 
       - name: Validate composer.json
-        run: composer validate
+        run: composer validate --strict
+
+      - name: Remove lock file
+        run: rm composer.lock
+        if: matrix.php-versions == '7.4' || matrix.php-versions == '8.0'
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
