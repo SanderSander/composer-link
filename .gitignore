@@ -2,5 +2,4 @@
 .php-cs-fixer.cache
 /.idea
 .phpunit.result.cache
-composer.lock
 /tests/tmp
