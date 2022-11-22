@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink\Actions;
 
+use Composer\IO\IOInterface;
 use Composer\Repository\RepositoryManager;
 use ComposerLink\LinkedPackage;
 use ComposerLink\LinkManager;
@@ -31,18 +32,23 @@ class LinkPackages
 
     protected LinkManager $linkManager;
 
+    protected IOInterface $io;
+
     public function __construct(
         LinkManager $linkManager,
         Repository $repository,
-        RepositoryManager $repositoryManager
+        RepositoryManager $repositoryManager,
+        IOInterface $io
     ) {
         $this->linkManager = $linkManager;
         $this->repository = $repository;
         $this->repositoryManager = $repositoryManager;
+        $this->io = $io;
     }
 
     public function execute(): void
     {
+        $this->io->warning('Linking linked packages for development.');
         foreach ($this->repository->all() as $package) {
             if (!$this->linkManager->isLinked($package)) {
                 $this->linkAndUpdate($package);
