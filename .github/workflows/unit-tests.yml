@@ -53,4 +53,4 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
         with:
-          coverageLocations: build/logs/clover.xml
+          coverageLocations: build/logs/clover.xml:clover
