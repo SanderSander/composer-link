@@ -46,3 +46,11 @@ jobs:
         run: |
           composer global require php-coveralls/php-coveralls
           php-coveralls --coverage_clover=build/logs/clover.xml -v
+
+      - name: Publish code coverage to codeclimate
+        uses: paambaati/codeclimate-action@v3.2.0
+        if: matrix.php-versions == '8.1' && matrix.operating-system == 'ubuntu-latest'
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
+        with:
+          coverageLocations: build/logs/clover.xml
