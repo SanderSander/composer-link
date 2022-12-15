@@ -30,24 +30,23 @@ use RuntimeException;
 
 class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
-    protected ?Repository $repository = null;
+    protected Composer $composer;
 
     protected ComposerFileSystem $filesystem;
 
     protected ?LinkManager $linkManager = null;
 
-    protected ?LinkedPackageFactory $packageFactory = null;
-
-    protected Composer $composer;
-
     protected ?LinkPackages $linkPackages;
+
+    protected ?LinkedPackageFactory $packageFactory = null;
+    protected ?Repository $repository = null;
 
     private ?RepositoryFactory $repositoryFactory;
 
     public function __construct(
-        ComposerFileSystem $filesystem = null,
-        LinkPackages $linkPackages = null,
-        RepositoryFactory $repositoryFactory = null
+        ?ComposerFileSystem $filesystem = null,
+        ?LinkPackages $linkPackages = null,
+        ?RepositoryFactory $repositoryFactory = null
     ) {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
         $this->linkPackages = $linkPackages;
@@ -57,24 +56,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public function deactivate(Composer $composer, IOInterface $io)
-    {
-        $io->debug("[ComposerLink]\tPlugin is deactivated");
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function uninstall(Composer $composer, IOInterface $io)
-    {
-        // TODO remove repository file and restore all packages
-        $io->debug("[ComposerLink]\tPlugin uninstalling");
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
@@ -85,14 +67,80 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $this->initializeLinkPackages();
     }
 
-    protected function initializeRepository(): void
+    /**
+     * {@inheritdoc}
+     */
+    public function deactivate(Composer $composer, IOInterface $io): void
     {
-        $storageFile = $this->composer->getConfig()
-                ->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
-        if (is_null($this->repositoryFactory)) {
-            $this->repositoryFactory = new RepositoryFactory();
+        $io->debug("[ComposerLink]\tPlugin is deactivated");
+    }
+
+    public function getCapabilities(): array
+    {
+        return [
+            ComposerCommandProvider::class => CommandProvider::class,
+        ];
+    }
+
+    public function getLinkManager(): LinkManager
+    {
+        if (is_null($this->linkManager)) {
+            throw new RuntimeException('Plugin not activated');
         }
-        $this->repository = $this->repositoryFactory->create($storageFile);
+
+        return $this->linkManager;
+    }
+
+    public function getPackageFactory(): LinkedPackageFactory
+    {
+        if (is_null($this->packageFactory)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
+        return $this->packageFactory;
+    }
+
+    public function getRepository(): Repository
+    {
+        if (is_null($this->repository)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+
+        return $this->repository;
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ScriptEvents::POST_UPDATE_CMD => [
+                ['linkLinkedPackages'],
+            ],
+        ];
+    }
+
+    /**
+     * Check if this plugin is running from global or local project.
+     */
+    public function isGlobal(): bool
+    {
+        return getcwd() === $this->composer->getConfig()->get('home');
+    }
+
+    public function linkLinkedPackages(): void
+    {
+        if (is_null($this->linkPackages)) {
+            throw new RuntimeException('Plugin not activated');
+        }
+        $this->linkPackages->execute();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function uninstall(Composer $composer, IOInterface $io): void
+    {
+        // TODO remove repository file and restore all packages
+        $io->debug("[ComposerLink]\tPlugin uninstalling");
     }
 
     protected function initializeLinkedPackageFactory(): void
@@ -124,62 +172,13 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
+    protected function initializeRepository(): void
     {
-        return [
-            ScriptEvents::POST_UPDATE_CMD => [
-                ['linkLinkedPackages'],
-            ],
-        ];
-    }
-
-    public function getLinkManager(): LinkManager
-    {
-        if (is_null($this->linkManager)) {
-            throw new RuntimeException('Plugin not activated');
+        $storageFile = $this->composer->getConfig()
+            ->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
+        if (is_null($this->repositoryFactory)) {
+            $this->repositoryFactory = new RepositoryFactory();
         }
-
-        return $this->linkManager;
-    }
-
-    public function linkLinkedPackages(): void
-    {
-        if (is_null($this->linkPackages)) {
-            throw new RuntimeException('Plugin not activated');
-        }
-        $this->linkPackages->execute();
-    }
-
-    public function getCapabilities(): array
-    {
-        return [
-            ComposerCommandProvider::class => CommandProvider::class,
-        ];
-    }
-
-    public function getRepository(): Repository
-    {
-        if (is_null($this->repository)) {
-            throw new RuntimeException('Plugin not activated');
-        }
-
-        return $this->repository;
-    }
-
-    public function getPackageFactory(): LinkedPackageFactory
-    {
-        if (is_null($this->packageFactory)) {
-            throw new RuntimeException('Plugin not activated');
-        }
-
-        return $this->packageFactory;
-    }
-
-    /**
-     * Check if this plugin is running from global or local project.
-     */
-    public function isGlobal(): bool
-    {
-        return getcwd() === $this->composer->getConfig()->get('home');
+        $this->repository = $this->repositoryFactory->create($storageFile);
     }
 }

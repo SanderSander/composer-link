@@ -22,28 +22,88 @@ namespace Tests\Integration;
 class LinuxMacosBasicTest extends TestCase
 {
     /**
-     * Test if we can link a package in a project while using relative paths.
-     * The plugin is installed in project.
+     * Test if we can link a package globally while using absolute paths.
+     * The plugin is installed globally.
      */
-    public function test_link_package_in_project_with_relative_paths_with_local_plugin(): void
+    public function test_link_package_in_global_with_absolute_paths_with_global_plugin(): void
     {
-        $this->useComposerLinkLocal();
+        $this->useComposerLinkGlobal();
+
+        static::assertStringContainsString(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertStringContainsString(
+            '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global link ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertStringContainsString(
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertStringContainsString(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('global unlink ' . $this->getMockDirectory() . '/package-1')
+        );
+        static::assertStringContainsString(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
+        );
+    }
+
+    /**
+     * Test if we can link a package globally while using relative paths.
+     * The plugin is installed globally.
+     */
+    public function test_link_package_in_global_with_relative_paths_with_global_plugin(): void
+    {
+        $this->useComposerLinkGlobal();
+
+        static::assertStringContainsString(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertStringContainsString(
+            '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global link ../mock/package-1')
+        );
+        static::assertStringContainsString(
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('global linked')
+        );
+        static::assertStringContainsString(
+            '  - Removing test/package-1 (dev-master)',
+            $this->runLinkCommand('global unlink ../mock/package-1')
+        );
+        static::assertStringContainsString(
+            'No packages are linked',
+            $this->runLinkCommand('global linked')
+        );
+    }
+
+    /**
+     * Test if we can link a package in a project while using relative paths.
+     * The plugin is installed globally.
+     */
+    public function test_link_package_in_project_with_absolute_paths_with_global_plugin(): void
+    {
+        $this->useComposerLinkGlobal();
 
         static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Symlinking from ../mock/package-1',
-            $this->runLinkCommand('link ../mock/package-1')
+            '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
+            $this->runLinkCommand('link ' . $this->getMockDirectory() . '/package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	../mock/package-1',
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
-            $this->runLinkCommand('unlink ../mock/package-1')
+            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '/package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
@@ -113,91 +173,31 @@ class LinuxMacosBasicTest extends TestCase
 
     /**
      * Test if we can link a package in a project while using relative paths.
-     * The plugin is installed globally.
+     * The plugin is installed in project.
      */
-    public function test_link_package_in_project_with_absolute_paths_with_global_plugin(): void
+    public function test_link_package_in_project_with_relative_paths_with_local_plugin(): void
     {
-        $this->useComposerLinkGlobal();
+        $this->useComposerLinkLocal();
 
         static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
-            $this->runLinkCommand('link ' . $this->getMockDirectory() . '/package-1')
+            '  - Installing test/package-1 (dev-master): Symlinking from ../mock/package-1',
+            $this->runLinkCommand('link ../mock/package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . $this->getMockDirectory() . '/package-1',
+            'test/package-1	../mock/package-1',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-master)',
-            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '/package-1')
+            $this->runLinkCommand('unlink ../mock/package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
-        );
-    }
-
-    /**
-     * Test if we can link a package globally while using relative paths.
-     * The plugin is installed globally.
-     */
-    public function test_link_package_in_global_with_relative_paths_with_global_plugin(): void
-    {
-        $this->useComposerLinkGlobal();
-
-        static::assertStringContainsString(
-            'No packages are linked',
-            $this->runLinkCommand('global linked')
-        );
-        static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
-            $this->runLinkCommand('global link ../mock/package-1')
-        );
-        static::assertStringContainsString(
-            'test/package-1	' . $this->getMockDirectory() . '/package-1',
-            $this->runLinkCommand('global linked')
-        );
-        static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master)',
-            $this->runLinkCommand('global unlink ../mock/package-1')
-        );
-        static::assertStringContainsString(
-            'No packages are linked',
-            $this->runLinkCommand('global linked')
-        );
-    }
-
-    /**
-     * Test if we can link a package globally while using absolute paths.
-     * The plugin is installed globally.
-     */
-    public function test_link_package_in_global_with_absolute_paths_with_global_plugin(): void
-    {
-        $this->useComposerLinkGlobal();
-
-        static::assertStringContainsString(
-            'No packages are linked',
-            $this->runLinkCommand('global linked')
-        );
-        static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Symlinking from ' . $this->getMockDirectory() . '/package-1',
-            $this->runLinkCommand('global link ' . $this->getMockDirectory() . '/package-1')
-        );
-        static::assertStringContainsString(
-            'test/package-1	' . $this->getMockDirectory() . '/package-1',
-            $this->runLinkCommand('global linked')
-        );
-        static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master)',
-            $this->runLinkCommand('global unlink ' . $this->getMockDirectory() . '/package-1')
-        );
-        static::assertStringContainsString(
-            'No packages are linked',
-            $this->runLinkCommand('global linked')
         );
     }
 }

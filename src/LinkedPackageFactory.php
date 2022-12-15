@@ -36,6 +36,27 @@ class LinkedPackageFactory
         $this->installedRepository = $installedRepository;
     }
 
+    public function fromPath(string $path): LinkedPackage
+    {
+        $originalPackage = null;
+        $newPackage = $this->loadFromJsonFile($path);
+        $packages = $this->installedRepository->getCanonicalPackages();
+        foreach ($packages as $package) {
+            if ($package->getName() === $newPackage->getName()) {
+                $originalPackage = $package;
+            }
+        }
+
+        $destination = $this->installationManager->getInstallPath($newPackage);
+
+        return new LinkedPackage(
+            $path,
+            $newPackage,
+            $originalPackage,
+            $destination
+        );
+    }
+
     private function loadFromJsonFile(string $path): CompletePackage
     {
         if (!file_exists($path . DIRECTORY_SEPARATOR . 'composer.json')) {
@@ -61,26 +82,5 @@ class LinkedPackageFactory
         $package->setDistType('path');
 
         return $package;
-    }
-
-    public function fromPath(string $path): LinkedPackage
-    {
-        $originalPackage = null;
-        $newPackage = $this->loadFromJsonFile($path);
-        $packages = $this->installedRepository->getCanonicalPackages();
-        foreach ($packages as $package) {
-            if ($package->getName() === $newPackage->getName()) {
-                $originalPackage = $package;
-            }
-        }
-
-        $destination = $this->installationManager->getInstallPath($newPackage);
-
-        return new LinkedPackage(
-            $path,
-            $newPackage,
-            $originalPackage,
-            $destination
-        );
     }
 }

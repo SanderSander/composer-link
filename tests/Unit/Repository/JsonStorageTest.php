@@ -21,6 +21,13 @@ use Tests\Unit\TestCase;
 
 class JsonStorageTest extends TestCase
 {
+    public function test_can_write_and_read(): void
+    {
+        $storage = new JsonStorage($this->tmpAbsoluteDir . 'test.json');
+        $storage->write(['test' => 'data']);
+        static::assertEquals(['test' => 'data'], $storage->read());
+    }
+
     public function test_throws_exception_when_not_data_available(): void
     {
         $this->expectException(RuntimeException::class);
@@ -28,12 +35,5 @@ class JsonStorageTest extends TestCase
 
         $storage = new JsonStorage($this->tmpAbsoluteDir . 'test.json');
         $storage->read();
-    }
-
-    public function test_can_write_and_read(): void
-    {
-        $storage = new JsonStorage($this->tmpAbsoluteDir . 'test.json');
-        $storage->write(['test' => 'data']);
-        static::assertEquals(['test' => 'data'], $storage->read());
     }
 }

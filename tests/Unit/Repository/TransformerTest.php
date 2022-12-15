@@ -21,6 +21,41 @@ use Tests\Unit\TestCase;
 
 class TransformerTest extends TestCase
 {
+    public function test_export(): void
+    {
+        $transformer = new Transformer();
+
+        $data = $transformer->export($this->mockPackage());
+        static::assertEquals([
+            'path' => '../test-path-package',
+            'installationPath' => '../install-path-package',
+            'package' => [
+                'name' => '',
+                'version' => '',
+                'version_normalized' => '',
+                'type' => '',
+            ],
+            'originalPackage' => [
+                'name' => '',
+                'version' => '',
+                'version_normalized' => '',
+                'type' => '',
+            ],
+        ], $data);
+
+        $data = $transformer->export($this->mockPackage('package', false));
+        static::assertEquals([
+            'path' => '../test-path-package',
+            'installationPath' => '../install-path-package',
+            'package' => [
+                'name' => '',
+                'version' => '',
+                'version_normalized' => '',
+                'type' => '',
+            ],
+        ], $data);
+    }
+
     public function test_load(): void
     {
         $transformer = new Transformer();
@@ -57,40 +92,5 @@ class TransformerTest extends TestCase
             ]
         );
         static::assertNull($package->getOriginalPackage());
-    }
-
-    public function test_export(): void
-    {
-        $transformer = new Transformer();
-
-        $data = $transformer->export($this->mockPackage());
-        static::assertEquals([
-            'path' => '../test-path-package',
-            'installationPath' => '../install-path-package',
-            'package' => [
-                'name' => '',
-                'version' => '',
-                'version_normalized' => '',
-                'type' => '',
-            ],
-            'originalPackage' => [
-                'name' => '',
-                'version' => '',
-                'version_normalized' => '',
-                'type' => '',
-            ],
-        ], $data);
-
-        $data = $transformer->export($this->mockPackage('package', false));
-        static::assertEquals([
-            'path' => '../test-path-package',
-            'installationPath' => '../install-path-package',
-            'package' => [
-                'name' => '',
-                'version' => '',
-                'version_normalized' => '',
-                'type' => '',
-            ],
-        ], $data);
     }
 }

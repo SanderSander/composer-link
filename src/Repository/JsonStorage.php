@@ -26,11 +26,9 @@ class JsonStorage implements StorageInterface
         $this->file = $file;
     }
 
-    public function write(array $data): void
+    public function hasData(): bool
     {
-        /** @var string $json */
-        $json = json_encode($data);
-        file_put_contents($this->file, $json);
+        return file_exists($this->file);
     }
 
     public function read(): array
@@ -45,8 +43,10 @@ class JsonStorage implements StorageInterface
         return json_decode($data, true);
     }
 
-    public function hasData(): bool
+    public function write(array $data): void
     {
-        return file_exists($this->file);
+        /** @var string $json */
+        $json = json_encode($data);
+        file_put_contents($this->file, $json);
     }
 }

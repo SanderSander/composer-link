@@ -25,11 +25,10 @@ use ComposerLink\Repository\Repository;
  */
 class LinkPackages
 {
-    protected RepositoryManager $repositoryManager;
+    protected LinkManager $linkManager;
 
     protected Repository $repository;
-
-    protected LinkManager $linkManager;
+    protected RepositoryManager $repositoryManager;
 
     public function __construct(
         LinkManager $linkManager,

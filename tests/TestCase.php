@@ -20,11 +20,10 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 abstract class TestCase extends PHPUnitTestCase
 {
+    protected Filesystem $filesystem;
     protected string $tmpAbsoluteDir;
 
     protected string $tmpRelativeDir;
-
-    protected Filesystem $filesystem;
 
     protected function setUp(): void
     {

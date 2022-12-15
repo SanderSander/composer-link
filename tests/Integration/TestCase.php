@@ -23,9 +23,9 @@ abstract class TestCase extends BaseCase
 {
     protected Application $application;
 
-    private string $initialDirectory;
-
     protected string $composerGlobalDir;
+
+    private string $initialDirectory;
 
     public function setUp(): void
     {
@@ -39,6 +39,14 @@ abstract class TestCase extends BaseCase
         chdir($this->tmpAbsoluteDir);
     }
 
+    public function tearDown(): void
+    {
+        // We have to change directory, before parent class remove the directory.
+        // Windows has problems with removing directories when they are open in console
+        chdir($this->initialDirectory);
+        parent::tearDown();
+    }
+
     public function getMockDirectory(): string
     {
         return $this->initialDirectory . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
@@ -50,25 +58,6 @@ abstract class TestCase extends BaseCase
         exec('composer ' . $command . ' 2>&1', $output);
 
         return implode(PHP_EOL, $output);
-    }
-
-    protected function useComposerLinkLocal(): void
-    {
-        file_put_contents('composer.json', '{
-            "repositories": [
-                {
-                    "type": "path",
-                    "url": "' . addslashes($this->initialDirectory) . '"
-                }
-            ],
-            "config": {
-                "allow-plugins": {
-                    "sandersander/composer-link": true
-                }
-            }
-        }');
-
-        shell_exec('composer require sandersander/composer-link @dev  2>&1');
     }
 
     protected function useComposerLinkGlobal(): void
@@ -90,11 +79,22 @@ abstract class TestCase extends BaseCase
         shell_exec('composer global require sandersander/composer-link @dev  2>&1');
     }
 
-    public function tearDown(): void
+    protected function useComposerLinkLocal(): void
     {
-        // We have to change directory, before parent class remove the directory.
-        // Windows has problems with removing directories when they are open in console
-        chdir($this->initialDirectory);
-        parent::tearDown();
+        file_put_contents('composer.json', '{
+            "repositories": [
+                {
+                    "type": "path",
+                    "url": "' . addslashes($this->initialDirectory) . '"
+                }
+            ],
+            "config": {
+                "allow-plugins": {
+                    "sandersander/composer-link": true
+                }
+            }
+        }');
+
+        shell_exec('composer require sandersander/composer-link @dev  2>&1');
     }
 }

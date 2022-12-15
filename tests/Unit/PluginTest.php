@@ -38,14 +38,13 @@ use RuntimeException;
 class PluginTest extends TestCase
 {
     /**
-     * @var Config&MockObject
-     */
-    protected Config $config;
-
-    /**
      * @var Composer&MockObject
      */
     protected Composer $composer;
+    /**
+     * @var Config&MockObject
+     */
+    protected Config $config;
 
     /**
      * @var IOInterface&MockObject
@@ -111,27 +110,6 @@ class PluginTest extends TestCase
         static::assertTrue($plugin->isGlobal());
     }
 
-    public function test_plugin_throws_exception_package_factory(): void
-    {
-        self::expectException(RuntimeException::class);
-        $plugin = new Plugin();
-        $plugin->getPackageFactory();
-    }
-
-    public function test_plugin_throws_exception_link_manager(): void
-    {
-        self::expectException(RuntimeException::class);
-        $plugin = new Plugin();
-        $plugin->getLinkManager();
-    }
-
-    public function test_plugin_throws_exception_repository(): void
-    {
-        self::expectException(RuntimeException::class);
-        $plugin = new Plugin();
-        $plugin->getRepository();
-    }
-
     public function test_plugin_link_linked_packages(): void
     {
         $linkPackages = $this->createMock(LinkPackages::class);
@@ -142,5 +120,26 @@ class PluginTest extends TestCase
         static::expectException(RuntimeException::class);
         $plugin = new Plugin($this->createMock(Filesystem::class));
         $plugin->linkLinkedPackages();
+    }
+
+    public function test_plugin_throws_exception_link_manager(): void
+    {
+        self::expectException(RuntimeException::class);
+        $plugin = new Plugin();
+        $plugin->getLinkManager();
+    }
+
+    public function test_plugin_throws_exception_package_factory(): void
+    {
+        self::expectException(RuntimeException::class);
+        $plugin = new Plugin();
+        $plugin->getPackageFactory();
+    }
+
+    public function test_plugin_throws_exception_repository(): void
+    {
+        self::expectException(RuntimeException::class);
+        $plugin = new Plugin();
+        $plugin->getRepository();
     }
 }

@@ -39,18 +39,6 @@ class LinkedPackageFactoryTest extends TestCase
         static::assertSame($originalPackage, $result->getOriginalPackage());
     }
 
-    public function test_no_original_package(): void
-    {
-        $installationManager = $this->createMock(InstallationManager::class);
-        $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
-        $installedRepository->method('getCanonicalPackages')->willReturn([]);
-        file_put_contents($this->tmpAbsoluteDir . 'composer.json', '{"name": "test/package"}');
-
-        $factory = new LinkedPackageFactory($installationManager, $installedRepository);
-        $package = $factory->fromPath($this->tmpAbsoluteDir);
-        static::assertNull($package->getOriginalPackage());
-    }
-
     public function test_invalid_package(): void
     {
         $installationManager = $this->createMock(InstallationManager::class);
@@ -76,5 +64,17 @@ class LinkedPackageFactoryTest extends TestCase
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
         $factory->fromPath('tests/empty');
+    }
+
+    public function test_no_original_package(): void
+    {
+        $installationManager = $this->createMock(InstallationManager::class);
+        $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $installedRepository->method('getCanonicalPackages')->willReturn([]);
+        file_put_contents($this->tmpAbsoluteDir . 'composer.json', '{"name": "test/package"}');
+
+        $factory = new LinkedPackageFactory($installationManager, $installedRepository);
+        $package = $factory->fromPath($this->tmpAbsoluteDir);
+        static::assertNull($package->getOriginalPackage());
     }
 }

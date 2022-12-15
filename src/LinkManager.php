@@ -27,11 +27,11 @@ class LinkManager
 {
     protected Filesystem $filesystem;
 
-    protected Loop $loop;
-
     protected InstallationManager $installationManager;
 
     protected InstalledRepositoryInterface $installedRepository;
+
+    protected Loop $loop;
 
     public function __construct(
         Filesystem $filesystem,
@@ -82,19 +82,6 @@ class LinkManager
         }
     }
 
-    protected function uninstall(PackageInterface $package): void
-    {
-        $installer = $this->installationManager->getInstaller($package->getType());
-        try {
-            $this->wait($installer->uninstall($this->installedRepository, $package));
-        } catch (Exception $exception) {
-            $this->wait($installer->cleanup('uninstall', $package));
-            throw $exception;
-        }
-
-        $this->wait($installer->cleanup('uninstall', $package));
-    }
-
     /**
      * Downloads and installs the given package
      * https://github.com/composer/composer/blob/2.0.0/src/Composer/Util/SyncHelper.php.
@@ -113,6 +100,19 @@ class LinkManager
         }
 
         $this->wait($installer->cleanup('install', $package));
+    }
+
+    protected function uninstall(PackageInterface $package): void
+    {
+        $installer = $this->installationManager->getInstaller($package->getType());
+        try {
+            $this->wait($installer->uninstall($this->installedRepository, $package));
+        } catch (Exception $exception) {
+            $this->wait($installer->cleanup('uninstall', $package));
+            throw $exception;
+        }
+
+        $this->wait($installer->cleanup('uninstall', $package));
     }
 
     /**

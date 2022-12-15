@@ -22,27 +22,27 @@ class WindowsBasicTest extends TestCase
 {
     /**
      * Test if we can link a package in a project while using relative paths.
-     * The plugin is installed in project.
+     * The plugin is installed globally.
      */
-    public function test_link_package_in_project_with_relative_paths_with_local_plugin(): void
+    public function test_link_package_in_project_with_absolute_paths_with_global_plugin(): void
     {
-        $this->useComposerLinkLocal();
+        $this->useComposerLinkGlobal();
 
         static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Junctioning from ..\mock\package-1',
-            $this->runLinkCommand('link ..\mock\package-1')
+            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	..\mock\package-1',
+            'test/package-1	' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
-            $this->runLinkCommand('unlink ..\mock\package-1')
+            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
+            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
@@ -112,27 +112,27 @@ class WindowsBasicTest extends TestCase
 
     /**
      * Test if we can link a package in a project while using relative paths.
-     * The plugin is installed globally.
+     * The plugin is installed in project.
      */
-    public function test_link_package_in_project_with_absolute_paths_with_global_plugin(): void
+    public function test_link_package_in_project_with_relative_paths_with_local_plugin(): void
     {
-        $this->useComposerLinkGlobal();
+        $this->useComposerLinkLocal();
 
         static::assertStringContainsString(
             'No packages are linked',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
-            $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
+            '  - Installing test/package-1 (dev-master): Junctioning from ..\mock\package-1',
+            $this->runLinkCommand('link ..\mock\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . $this->getMockDirectory() . '\package-1',
+            'test/package-1	..\mock\package-1',
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
-            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
+            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
+            $this->runLinkCommand('unlink ..\mock\package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',

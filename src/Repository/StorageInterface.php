@@ -18,11 +18,9 @@ namespace ComposerLink\Repository;
 interface StorageInterface
 {
     /**
-     * Write data to storage.
-     *
-     * @param array<string, mixed> $data
+     * Check if storage has data stored.
      */
-    public function write(array $data): void;
+    public function hasData(): bool;
 
     /**
      * Read data from storage.
@@ -32,7 +30,9 @@ interface StorageInterface
     public function read(): array;
 
     /**
-     * Check if storage has data stored.
+     * Write data to storage.
+     *
+     * @param array<string, mixed> $data
      */
-    public function hasData(): bool;
+    public function write(array $data): void;
 }

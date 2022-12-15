@@ -35,22 +35,22 @@ class LinkManagerTest extends TestCase
     /** @var Filesystem&MockObject */
     protected Filesystem $filesystem;
 
-    /** @var InstallerInterface&MockObject */
-    protected InstallerInterface $installer;
-
-    /** @var Loop&MockObject */
-    protected Loop $loop;
-
-    /** @var LinkedPackage&MockObject */
-    protected LinkedPackage $package;
-
     /** @var InstallationManager|MockObject */
     protected InstallationManager $installationManager;
 
     /** @var InstalledRepositoryInterface|MockObject */
     protected InstalledRepositoryInterface $installedRepository;
 
+    /** @var InstallerInterface&MockObject */
+    protected InstallerInterface $installer;
+
     protected LinkManager $linkManager;
+
+    /** @var Loop&MockObject */
+    protected Loop $loop;
+
+    /** @var LinkedPackage&MockObject */
+    protected LinkedPackage $package;
 
     protected function setUp(): void
     {
@@ -73,20 +73,7 @@ class LinkManagerTest extends TestCase
         );
     }
 
-    public function test_is_linked(): void
-    {
-        $this->filesystem->method('isSymlinkedDirectory')
-            ->willReturnOnConsecutiveCalls(false, true, false);
-        // Short circuit, so we only expect 2 calls
-        $this->filesystem->method('isJunction')
-            ->willReturnOnConsecutiveCalls(false, true);
-
-        static::assertFalse($this->linkManager->isLinked($this->package));
-        static::assertTrue($this->linkManager->isLinked($this->package));
-        static::assertTrue($this->linkManager->isLinked($this->package));
-    }
-
-    public function test_link_without_original_package(): void
+    public function test_is_cleaned_up_after_install_failure(): void
     {
         $package = $this->createMock(CompletePackage::class);
         $this->package->method('getPackage')->willReturn($package);
@@ -99,9 +86,51 @@ class LinkManagerTest extends TestCase
             ->expects(static::once())
             ->method('install')
             ->with($this->installedRepository, $this->package->getPackage())
-            ->willReturn(resolve());
+            ->willThrowException(new RuntimeException());
 
+        $this->installer
+            ->expects(static::once())
+            ->method('cleanup')
+            ->with('install', $package);
+
+        $this->expectException(RuntimeException::class);
         $this->linkManager->linkPackage($this->package);
+    }
+
+    public function test_is_cleaned_up_after_uninstall_failure(): void
+    {
+        $package = $this->createMock(CompletePackage::class);
+        $this->package->method('getPackage')->willReturn($package);
+
+        $this->installer
+            ->expects(static::once())
+            ->method('uninstall')
+            ->willThrowException(new RuntimeException());
+
+        $this->installer
+            ->expects(static::once())
+            ->method('cleanup')
+            ->with('uninstall', $package);
+
+        $this->installer
+            ->expects(static::never())
+            ->method('install');
+
+        $this->expectException(RuntimeException::class);
+        $this->linkManager->unlinkPackage($this->package);
+    }
+
+    public function test_is_linked(): void
+    {
+        $this->filesystem->method('isSymlinkedDirectory')
+            ->willReturnOnConsecutiveCalls(false, true, false);
+        // Short circuit, so we only expect 2 calls
+        $this->filesystem->method('isJunction')
+            ->willReturnOnConsecutiveCalls(false, true);
+
+        static::assertFalse($this->linkManager->isLinked($this->package));
+        static::assertTrue($this->linkManager->isLinked($this->package));
+        static::assertTrue($this->linkManager->isLinked($this->package));
     }
 
     public function test_link_with_original_package(): void
@@ -124,6 +153,24 @@ class LinkManagerTest extends TestCase
             ->method('install')
             ->with($this->installedRepository, $this->package->getPackage())
             ->willReturn(resolve(null));
+
+        $this->linkManager->linkPackage($this->package);
+    }
+
+    public function test_link_without_original_package(): void
+    {
+        $package = $this->createMock(CompletePackage::class);
+        $this->package->method('getPackage')->willReturn($package);
+
+        $this->installer
+            ->expects(static::never())
+            ->method('uninstall');
+
+        $this->installer
+            ->expects(static::once())
+            ->method('install')
+            ->with($this->installedRepository, $this->package->getPackage())
+            ->willReturn(resolve());
 
         $this->linkManager->linkPackage($this->package);
     }
@@ -166,52 +213,5 @@ class LinkManagerTest extends TestCase
             ->method('install');
 
         $this->linkManager->unlinkPackage($this->package);
-    }
-
-    public function test_is_cleaned_up_after_uninstall_failure(): void
-    {
-        $package = $this->createMock(CompletePackage::class);
-        $this->package->method('getPackage')->willReturn($package);
-
-        $this->installer
-            ->expects(static::once())
-            ->method('uninstall')
-            ->willThrowException(new RuntimeException());
-
-        $this->installer
-            ->expects(static::once())
-            ->method('cleanup')
-            ->with('uninstall', $package);
-
-        $this->installer
-            ->expects(static::never())
-            ->method('install');
-
-        $this->expectException(RuntimeException::class);
-        $this->linkManager->unlinkPackage($this->package);
-    }
-
-    public function test_is_cleaned_up_after_install_failure(): void
-    {
-        $package = $this->createMock(CompletePackage::class);
-        $this->package->method('getPackage')->willReturn($package);
-
-        $this->installer
-            ->expects(static::never())
-            ->method('uninstall');
-
-        $this->installer
-            ->expects(static::once())
-            ->method('install')
-            ->with($this->installedRepository, $this->package->getPackage())
-            ->willThrowException(new RuntimeException());
-
-        $this->installer
-            ->expects(static::once())
-            ->method('cleanup')
-            ->with('install', $package);
-
-        $this->expectException(RuntimeException::class);
-        $this->linkManager->linkPackage($this->package);
     }
 }

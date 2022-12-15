@@ -28,22 +28,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UnlinkCommandTest extends TestCase
 {
-    /** @var Plugin&MockObject */
-    protected Plugin $plugin;
-
-    /** @var OutputInterface&MockObject */
-    protected OutputInterface $output;
+    protected Application $application;
 
     /** @var LinkManager&MockObject */
     protected LinkManager $linkManager;
 
-    /** @var Repository&MockObject */
-    protected Repository $repository;
+    /** @var OutputInterface&MockObject */
+    protected OutputInterface $output;
 
     /** @var LinkedPackage&MockObject */
     protected LinkedPackage $package;
+    /** @var Plugin&MockObject */
+    protected Plugin $plugin;
 
-    protected Application $application;
+    /** @var Repository&MockObject */
+    protected Repository $repository;
 
     protected function setUp(): void
     {

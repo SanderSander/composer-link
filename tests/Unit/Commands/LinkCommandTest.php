@@ -29,25 +29,24 @@ use Tests\Unit\TestCase;
 
 class LinkCommandTest extends TestCase
 {
-    /** @var Plugin&MockObject */
-    protected Plugin $plugin;
-
-    /** @var OutputInterface&MockObject */
-    protected OutputInterface $output;
+    protected Application $application;
 
     /** @var LinkManager&MockObject */
     protected LinkManager $linkManager;
 
-    /** @var Repository&MockObject */
-    protected Repository $repository;
-
-    /** @var LinkedPackageFactory&MockObject */
-    protected LinkedPackageFactory $packageFactory;
+    /** @var OutputInterface&MockObject */
+    protected OutputInterface $output;
 
     /** @var LinkedPackage&MockObject */
     protected LinkedPackage $package;
 
-    protected Application $application;
+    /** @var LinkedPackageFactory&MockObject */
+    protected LinkedPackageFactory $packageFactory;
+    /** @var Plugin&MockObject */
+    protected Plugin $plugin;
+
+    /** @var Repository&MockObject */
+    protected Repository $repository;
 
     protected function setUp(): void
     {
@@ -71,77 +70,6 @@ class LinkCommandTest extends TestCase
         $this->application->add($command);
     }
 
-    public function test_link_command(): void
-    {
-        $this->packageFactory->expects(static::once())
-            ->method('fromPath')
-            ->with('/test-path');
-
-        $this->repository->expects(static::once())->method('store');
-        $this->repository->expects(static::once())->method('persist');
-        $this->linkManager->expects(static::once())->method('linkPackage');
-
-        $input = new StringInput('link /test-path');
-        static::assertSame(0, $this->application->run($input, $this->output));
-    }
-
-    public function test_only_installed_when_not_installed(): void
-    {
-        $this->packageFactory->expects(static::once())
-            ->method('fromPath')
-            ->with('/test-path');
-
-        $this->repository->expects(static::never())->method('store');
-        $this->repository->expects(static::never())->method('persist');
-        $this->linkManager->expects(static::never())->method('linkPackage');
-
-        $input = new StringInput('link /test-path --only-installed');
-        static::assertSame(0, $this->application->run($input, $this->output));
-    }
-
-    public function test_only_installed_when_installed(): void
-    {
-        $this->packageFactory->expects(static::once())
-            ->method('fromPath')
-            ->with('/test-path')
-            ->willReturn($this->mockPackage());
-
-        $this->repository->expects(static::once())->method('store');
-        $this->repository->expects(static::once())->method('persist');
-        $this->linkManager->expects(static::once())->method('linkPackage');
-
-        $input = new StringInput('link /test-path --only-installed');
-        static::assertSame(0, $this->application->run($input, $this->output));
-    }
-
-    public function test_link_command_from_global(): void
-    {
-        $this->plugin->method('isGlobal')->willReturn(true);
-        $this->packageFactory->expects(static::once())
-            ->method('fromPath')
-            ->with(realpath(__DIR__ . '/../..'));
-
-        $this->repository->expects(static::once())->method('store');
-        $this->repository->expects(static::once())->method('persist');
-        $this->linkManager->expects(static::once())->method('linkPackage');
-
-        $input = new StringInput('link tests');
-        static::assertSame(0, $this->application->run($input, $this->output));
-    }
-
-    public function test_existing_path(): void
-    {
-        $this->repository->expects(static::once())->method('findByPath')
-            ->with('/test-path')
-            ->willReturn($this->createMock(LinkedPackage::class));
-
-        $this->output->expects(static::once())->method('writeln')
-            ->with('<warning>Package in path "/test-path" already linked</warning>');
-
-        $input = new StringInput('link /test-path');
-        static::assertSame(0, $this->application->run($input, $this->output));
-    }
-
     public function test_existing_package_name(): void
     {
         $this->package->method('getName')->willReturn('test/package');
@@ -163,6 +91,77 @@ class LinkCommandTest extends TestCase
             ->with('<warning>Package "test/package" in "/test-path" already linked from path "/test-path"</warning>');
 
         $input = new StringInput('link /test-path');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_existing_path(): void
+    {
+        $this->repository->expects(static::once())->method('findByPath')
+            ->with('/test-path')
+            ->willReturn($this->createMock(LinkedPackage::class));
+
+        $this->output->expects(static::once())->method('writeln')
+            ->with('<warning>Package in path "/test-path" already linked</warning>');
+
+        $input = new StringInput('link /test-path');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_link_command(): void
+    {
+        $this->packageFactory->expects(static::once())
+            ->method('fromPath')
+            ->with('/test-path');
+
+        $this->repository->expects(static::once())->method('store');
+        $this->repository->expects(static::once())->method('persist');
+        $this->linkManager->expects(static::once())->method('linkPackage');
+
+        $input = new StringInput('link /test-path');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_link_command_from_global(): void
+    {
+        $this->plugin->method('isGlobal')->willReturn(true);
+        $this->packageFactory->expects(static::once())
+            ->method('fromPath')
+            ->with(realpath(__DIR__ . '/../..'));
+
+        $this->repository->expects(static::once())->method('store');
+        $this->repository->expects(static::once())->method('persist');
+        $this->linkManager->expects(static::once())->method('linkPackage');
+
+        $input = new StringInput('link tests');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_only_installed_when_installed(): void
+    {
+        $this->packageFactory->expects(static::once())
+            ->method('fromPath')
+            ->with('/test-path')
+            ->willReturn($this->mockPackage());
+
+        $this->repository->expects(static::once())->method('store');
+        $this->repository->expects(static::once())->method('persist');
+        $this->linkManager->expects(static::once())->method('linkPackage');
+
+        $input = new StringInput('link /test-path --only-installed');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
+    public function test_only_installed_when_not_installed(): void
+    {
+        $this->packageFactory->expects(static::once())
+            ->method('fromPath')
+            ->with('/test-path');
+
+        $this->repository->expects(static::never())->method('store');
+        $this->repository->expects(static::never())->method('persist');
+        $this->linkManager->expects(static::never())->method('linkPackage');
+
+        $input = new StringInput('link /test-path --only-installed');
         static::assertSame(0, $this->application->run($input, $this->output));
     }
 }

@@ -50,4 +50,7 @@ return $config
         'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
         'single_line_throw' => false,
         'global_namespace_import' => ['import_classes' => true, 'import_constants' => true, 'import_functions' => true],
+        'ordered_class_elements' => [
+            'sort_algorithm' => 'alpha'
+        ]
     ])->setFinder($finder);

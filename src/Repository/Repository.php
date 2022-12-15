@@ -20,14 +20,13 @@ use RuntimeException;
 
 class Repository
 {
-    protected Transformer $transformer;
-
-    protected StorageInterface $storage;
-
     /**
      * @var array<int, LinkedPackage>
      */
     protected array $linkedPackages = [];
+
+    protected StorageInterface $storage;
+    protected Transformer $transformer;
 
     public function __construct(StorageInterface $storage, Transformer $transformer)
     {
@@ -35,19 +34,6 @@ class Repository
         $this->storage = $storage;
 
         $this->load();
-    }
-
-    public function store(LinkedPackage $linkedPackage): void
-    {
-        $index = $this->findIndex($linkedPackage);
-
-        if (is_null($index)) {
-            $this->linkedPackages[] = clone $linkedPackage;
-
-            return;
-        }
-
-        $this->linkedPackages[$index] = clone $linkedPackage;
     }
 
     /**
@@ -63,17 +49,6 @@ class Repository
         return $all;
     }
 
-    public function findByPath(string $path): ?LinkedPackage
-    {
-        foreach ($this->linkedPackages as $linkedPackage) {
-            if ($linkedPackage->getPath() === $path) {
-                return clone $linkedPackage;
-            }
-        }
-
-        return null;
-    }
-
     public function findByName(string $name): ?LinkedPackage
     {
         foreach ($this->linkedPackages as $linkedPackage) {
@@ -85,15 +60,15 @@ class Repository
         return null;
     }
 
-    public function remove(LinkedPackage $linkedPackage): void
+    public function findByPath(string $path): ?LinkedPackage
     {
-        $index = $this->findIndex($linkedPackage);
-
-        if (is_null($index)) {
-            throw new RuntimeException('Linked package not found');
+        foreach ($this->linkedPackages as $linkedPackage) {
+            if ($linkedPackage->getPath() === $path) {
+                return clone $linkedPackage;
+            }
         }
 
-        array_splice($this->linkedPackages, $index, 1);
+        return null;
     }
 
     public function persist(): void
@@ -108,17 +83,28 @@ class Repository
         $this->storage->write($data);
     }
 
-    private function load(): void
+    public function remove(LinkedPackage $linkedPackage): void
     {
-        if (!$this->storage->hasData()) {
+        $index = $this->findIndex($linkedPackage);
+
+        if (is_null($index)) {
+            throw new RuntimeException('Linked package not found');
+        }
+
+        array_splice($this->linkedPackages, $index, 1);
+    }
+
+    public function store(LinkedPackage $linkedPackage): void
+    {
+        $index = $this->findIndex($linkedPackage);
+
+        if (is_null($index)) {
+            $this->linkedPackages[] = clone $linkedPackage;
+
             return;
         }
 
-        $data = $this->storage->read();
-
-        foreach ($data['packages'] as $package) {
-            $this->linkedPackages[] = $this->transformer->load($package);
-        }
+        $this->linkedPackages[$index] = clone $linkedPackage;
     }
 
     private function findIndex(LinkedPackage $package): ?int
@@ -130,5 +116,18 @@ class Repository
         }
 
         return null;
+    }
+
+    private function load(): void
+    {
+        if (!$this->storage->hasData()) {
+            return;
+        }
+
+        $data = $this->storage->read();
+
+        foreach ($data['packages'] as $package) {
+            $this->linkedPackages[] = $this->transformer->load($package);
+        }
     }
 }

@@ -20,13 +20,12 @@ use Composer\Package\PackageInterface;
 
 class LinkedPackage
 {
-    protected string $path;
-
-    protected CompletePackage $package;
+    protected string $installationPath;
 
     protected ?PackageInterface $originalPackage;
 
-    protected string $installationPath;
+    protected CompletePackage $package;
+    protected string $path;
 
     public function __construct(
         string $path,
@@ -40,9 +39,9 @@ class LinkedPackage
         $this->installationPath = $installationPath;
     }
 
-    public function getPath(): string
+    public function getInstallationPath(): string
     {
-        return $this->path;
+        return $this->installationPath;
     }
 
     public function getName(): string
@@ -50,19 +49,19 @@ class LinkedPackage
         return $this->package->getName();
     }
 
-    public function getPackage(): CompletePackage
-    {
-        return $this->package;
-    }
-
     public function getOriginalPackage(): ?PackageInterface
     {
         return $this->originalPackage;
     }
 
-    public function getInstallationPath(): string
+    public function getPackage(): CompletePackage
     {
-        return $this->installationPath;
+        return $this->package;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
     }
 
     public function setOriginalPackage(?PackageInterface $package): void

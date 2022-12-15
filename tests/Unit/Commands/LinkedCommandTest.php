@@ -44,17 +44,6 @@ class LinkedCommandTest extends TestCase
         $this->application->add(new LinkedCommand($this->plugin));
     }
 
-    public function test_no_linked_packages(): void
-    {
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects(static::once())
-            ->method('writeln')
-            ->with('No packages are linked');
-
-        $input = new StringInput('linked');
-        static::assertSame(0, $this->application->run($input, $output));
-    }
-
     public function test_linked_packages(): void
     {
         $repository = $this->createMock(Repository::class);
@@ -71,6 +60,17 @@ class LinkedCommandTest extends TestCase
                 static::equalTo("package/test-1\t../package/test-1"),
                 static::equalTo("package/test-2\t../package/test-2")
             ));
+
+        $input = new StringInput('linked');
+        static::assertSame(0, $this->application->run($input, $output));
+    }
+
+    public function test_no_linked_packages(): void
+    {
+        $output = $this->createMock(OutputInterface::class);
+        $output->expects(static::once())
+            ->method('writeln')
+            ->with('No packages are linked');
 
         $input = new StringInput('linked');
         static::assertSame(0, $this->application->run($input, $output));

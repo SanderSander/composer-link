@@ -22,14 +22,31 @@ use ComposerLink\LinkedPackage;
 
 class Transformer
 {
-    protected ArrayLoader $composerLoader;
-
     protected ArrayDumper $composerDumper;
+    protected ArrayLoader $composerLoader;
 
     public function __construct()
     {
         $this->composerLoader = new ArrayLoader();
         $this->composerDumper = new ArrayDumper();
+    }
+
+    /**
+     * Export LinkedPackage to array data.
+     *
+     * @return array<string, mixed>
+     */
+    public function export(LinkedPackage $package): array
+    {
+        $data = [];
+        $data['path'] = $package->getPath();
+        $data['installationPath'] = $package->getInstallationPath();
+        $data['package'] = $this->composerDumper->dump($package->getPackage());
+        if (!is_null($package->getOriginalPackage())) {
+            $data['originalPackage'] = $this->composerDumper->dump($package->getOriginalPackage());
+        }
+
+        return $data;
     }
 
     /**
@@ -50,23 +67,5 @@ class Transformer
             $originalPackage,
             $data['installationPath']
         );
-    }
-
-    /**
-     * Export LinkedPackage to array data.
-     *
-     * @return array<string, mixed>
-     */
-    public function export(LinkedPackage $package): array
-    {
-        $data = [];
-        $data['path'] = $package->getPath();
-        $data['installationPath'] = $package->getInstallationPath();
-        $data['package'] = $this->composerDumper->dump($package->getPackage());
-        if (!is_null($package->getOriginalPackage())) {
-            $data['originalPackage'] = $this->composerDumper->dump($package->getOriginalPackage());
-        }
-
-        return $data;
     }
 }

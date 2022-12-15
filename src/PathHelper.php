@@ -26,9 +26,13 @@ class PathHelper
         $this->path = $path;
     }
 
-    public function isWildCard(): bool
+    public function getNormalizedPath(): string
     {
-        return substr($this->path, -2) === DIRECTORY_SEPARATOR . '*';
+        if (substr($this->path, -1) === DIRECTORY_SEPARATOR) {
+            return substr($this->path, 0, -1);
+        }
+
+        return $this->path;
     }
 
     /**
@@ -48,6 +52,16 @@ class PathHelper
         }
 
         return $helpers;
+    }
+
+    public function isAbsolutePath(string $path): bool
+    {
+        return strpos($path, '/') === 0 || substr($path, 1, 1) === ':' || strpos($path, '\\\\') === 0;
+    }
+
+    public function isWildCard(): bool
+    {
+        return substr($this->path, -2) === DIRECTORY_SEPARATOR . '*';
     }
 
     public function toAbsolutePath(string $workingDirectory): PathHelper
@@ -70,19 +84,5 @@ class PathHelper
         }
 
         return new PathHelper($real);
-    }
-
-    public function getNormalizedPath(): string
-    {
-        if (substr($this->path, -1) === DIRECTORY_SEPARATOR) {
-            return substr($this->path, 0, -1);
-        }
-
-        return $this->path;
-    }
-
-    public function isAbsolutePath(string $path): bool
-    {
-        return strpos($path, '/') === 0 || substr($path, 1, 1) === ':' || strpos($path, '\\\\') === 0;
     }
 }

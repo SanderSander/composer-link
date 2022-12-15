@@ -43,5 +43,10 @@
         "test-integration": "./vendor/bin/phpunit --testsuite=Integration",
         "phpstan": "./vendor/bin/phpstan",
         "lint": "./vendor/bin/php-cs-fixer fix"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": false
+        }
     }
 }
