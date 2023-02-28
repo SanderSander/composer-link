@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2022 Sander Visser <themastersleader@hotmail.com>.
+ * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -78,8 +78,12 @@ class PluginTest extends TestCase
     public function test_if_plugin_can_be_utilized(): void
     {
         $this->config->method('get')
-            ->withConsecutive(['vendor-dir'], ['home'])
-            ->willReturn($this->tmpAbsoluteDir);
+            ->willReturnCallback(function ($path) {
+                return match ($path) {
+                    'vendor-dir', 'home' => $this->tmpAbsoluteDir,
+                    default => null,
+                };
+            });
 
         $plugin = new Plugin();
         $plugin->activate($this->composer, $this->io);
@@ -102,8 +106,13 @@ class PluginTest extends TestCase
     public function test_is_global(): void
     {
         $this->config->method('get')
-            ->withConsecutive(['vendor-dir'], ['home'])
-            ->willReturnOnConsecutiveCalls($this->tmpAbsoluteDir, getcwd());
+            ->willReturnCallback(function ($path) {
+                return match ($path) {
+                    'vendor-dir' => $this->tmpAbsoluteDir,
+                    'home' => getcwd(),
+                    default => null,
+                };
+            });
 
         $plugin = new Plugin();
         $plugin->activate($this->composer, $this->io);
