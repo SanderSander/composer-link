@@ -28,7 +28,7 @@
         "composer/composer": "^2.2",
         "friendsofphp/php-cs-fixer": "^v3.4.0",
         "phpstan/phpstan": "^1.4",
-        "phpunit/phpunit": "^10.0.13",
+        "phpunit/phpunit": "^9.6.3",
         "phpstan/phpstan-phpunit": "^1.1",
         "phpmd/phpmd": "^2.12",
         "phpstan/phpstan-strict-rules": "^1.1",
