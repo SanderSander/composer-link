@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
+use Composer\DependencyResolver\Operation\InstallOperation;
+use Composer\Installer;
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
@@ -33,16 +35,20 @@ class LinkManager
 
     protected InstalledRepositoryInterface $installedRepository;
 
+    private DependencyResolver $resolver;
+
     public function __construct(
         Filesystem $filesystem,
         Loop $loop,
         InstallationManager $installationManager,
-        InstalledRepositoryInterface $installedRepository
+        InstalledRepositoryInterface $installedRepository,
+        DependencyResolver $resolver
     ) {
         $this->filesystem = $filesystem;
         $this->loop = $loop;
         $this->installationManager = $installationManager;
         $this->installedRepository = $installedRepository;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -59,10 +65,17 @@ class LinkManager
      */
     public function linkPackage(LinkedPackage $linkedPackage): void
     {
+        $operations = $this->resolver->resolveForPackage($linkedPackage);
+
         if (!is_null($linkedPackage->getOriginalPackage())) {
             $this->uninstall($linkedPackage->getOriginalPackage());
         }
-        $this->install($linkedPackage->getPackage());
+
+        foreach ($operations as $operation) {
+            if ($operation instanceof InstallOperation) {
+                $this->install($operation->getPackage());
+            }
+        }
     }
 
     /**
