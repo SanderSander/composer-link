@@ -37,6 +37,9 @@ class LinkCommand extends Command
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var bool $onlyInstalled */
