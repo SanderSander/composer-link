@@ -50,8 +50,8 @@ class LinkManager
      */
     public function isLinked(LinkedPackage $linkedPackage): bool
     {
-        return $this->filesystem->isSymlinkedDirectory($linkedPackage->getInstallationPath()) ||
-        $this->filesystem->isJunction($linkedPackage->getInstallationPath());
+        return $this->filesystem->isSymlinkedDirectory($linkedPackage->getInstallationPath())
+        || $this->filesystem->isJunction($linkedPackage->getInstallationPath());
     }
 
     /**
@@ -117,6 +117,8 @@ class LinkManager
 
     /**
      * Waits for promise to be finished.
+     *
+     * @param PromiseInterface<void|null>|null $promise
      */
     protected function wait(?PromiseInterface $promise): void
     {

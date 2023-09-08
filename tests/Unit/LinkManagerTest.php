@@ -99,7 +99,7 @@ class LinkManagerTest extends TestCase
             ->expects(static::once())
             ->method('install')
             ->with($this->installedRepository, $this->package->getPackage())
-            ->willReturn(resolve());
+            ->willReturn(resolve(null));
 
         $this->linkManager->linkPackage($this->package);
     }

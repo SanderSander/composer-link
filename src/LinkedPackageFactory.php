@@ -75,6 +75,9 @@ class LinkedPackageFactory
         }
 
         $destination = $this->installationManager->getInstallPath($newPackage);
+        if (is_null($destination)) {
+            throw new RuntimeException('No instalation path found.');
+        }
 
         return new LinkedPackage(
             $path,
