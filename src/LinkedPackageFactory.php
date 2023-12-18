@@ -68,9 +68,11 @@ class LinkedPackageFactory
             }
         }
 
+        // TODO installation path exists only if package is installed
+        //      we should add support when the package isn't required yet in composer.json
         $destination = $this->installationManager->getInstallPath($newPackage);
         if (is_null($destination)) {
-            throw new RuntimeException('No instalation path found.');
+            throw new RuntimeException('No installation path found.');
         }
 
         return new LinkedPackage(
