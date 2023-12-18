@@ -57,7 +57,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public function deactivate(Composer $composer, IOInterface $io)
+    public function deactivate(Composer $composer, IOInterface $io): void
     {
         $io->debug("[ComposerLink]\tPlugin is deactivated");
     }
@@ -65,7 +65,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public function uninstall(Composer $composer, IOInterface $io)
+    public function uninstall(Composer $composer, IOInterface $io): void
     {
         // TODO remove repository file and restore all packages
         $io->debug("[ComposerLink]\tPlugin uninstalling");
@@ -74,7 +74,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     /**
      * {@inheritDoc}
      */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
