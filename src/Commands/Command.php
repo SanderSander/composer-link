@@ -22,13 +22,10 @@ use Symfony\Component\Console\Input\InputInterface;
 
 abstract class Command extends BaseCommand
 {
-    protected Plugin $plugin;
-
-    public function __construct(Plugin $plugin)
-    {
+    public function __construct(
+        protected readonly Plugin $plugin
+    ) {
         parent::__construct();
-
-        $this->plugin = $plugin;
     }
 
     /**

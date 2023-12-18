@@ -27,8 +27,8 @@ class LinkPackages
 {
     public function __construct(
         protected readonly LinkManager $linkManager,
-        protected Repository $repository,
-        protected RepositoryManager $repositoryManager
+        protected readonly Repository $repository,
+        protected readonly RepositoryManager $repositoryManager
     ) {
     }
 

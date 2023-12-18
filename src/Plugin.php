@@ -40,18 +40,12 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected Composer $composer;
 
-    protected ?LinkPackages $linkPackages;
-
-    private ?RepositoryFactory $repositoryFactory;
-
     public function __construct(
         ComposerFileSystem $filesystem = null,
-        LinkPackages $linkPackages = null,
-        RepositoryFactory $repositoryFactory = null
+        protected ?LinkPackages $linkPackages = null,
+        protected ?RepositoryFactory $repositoryFactory = null
     ) {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
-        $this->linkPackages = $linkPackages;
-        $this->repositoryFactory = $repositoryFactory;
     }
 
     /**

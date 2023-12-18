@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2022 Sander Visser <themastersleader@hotmail.com>.
+ * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -50,5 +50,5 @@ return $config
         'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
         'single_line_throw' => false,
         'global_namespace_import' => ['import_classes' => true, 'import_constants' => true, 'import_functions' => true],
-        'no_superfluous_phpdoc_tags' => ['remove_inheritdoc' => false]
+        'no_superfluous_phpdoc_tags' => ['remove_inheritdoc' => false],
     ])->setFinder($finder);

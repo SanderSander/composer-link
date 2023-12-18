@@ -24,16 +24,10 @@ use RuntimeException;
 
 class LinkedPackageFactory
 {
-    protected InstallationManager $installationManager;
-
-    protected InstalledRepositoryInterface $installedRepository;
-
     public function __construct(
-        InstallationManager $installationManager,
-        InstalledRepositoryInterface $installedRepository
+        protected readonly InstallationManager $installationManager,
+        protected readonly InstalledRepositoryInterface $installedRepository
     ) {
-        $this->installationManager = $installationManager;
-        $this->installedRepository = $installedRepository;
     }
 
     private function loadFromJsonFile(string $path): CompletePackage

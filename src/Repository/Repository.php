@@ -20,20 +20,15 @@ use RuntimeException;
 
 class Repository
 {
-    protected Transformer $transformer;
-
-    protected StorageInterface $storage;
-
     /**
      * @var array<int, LinkedPackage>
      */
     protected array $linkedPackages = [];
 
-    public function __construct(StorageInterface $storage, Transformer $transformer)
-    {
-        $this->transformer = $transformer;
-        $this->storage = $storage;
-
+    public function __construct(
+        protected readonly StorageInterface $storage,
+        protected readonly Transformer $transformer
+    ) {
         $this->load();
     }
 
