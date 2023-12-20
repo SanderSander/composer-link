@@ -19,11 +19,9 @@ use RuntimeException;
 
 class JsonStorage implements StorageInterface
 {
-    protected string $file;
-
-    public function __construct(string $file)
-    {
-        $this->file = $file;
+    public function __construct(
+        protected readonly string $file
+    ) {
     }
 
     public function write(array $data): void

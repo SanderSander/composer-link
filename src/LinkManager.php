@@ -25,24 +25,12 @@ use React\Promise\PromiseInterface;
 
 class LinkManager
 {
-    protected Filesystem $filesystem;
-
-    protected Loop $loop;
-
-    protected InstallationManager $installationManager;
-
-    protected InstalledRepositoryInterface $installedRepository;
-
     public function __construct(
-        Filesystem $filesystem,
-        Loop $loop,
-        InstallationManager $installationManager,
-        InstalledRepositoryInterface $installedRepository
+        protected readonly Filesystem $filesystem,
+        protected readonly Loop $loop,
+        protected readonly InstallationManager $installationManager,
+        protected readonly InstalledRepositoryInterface $installedRepository
     ) {
-        $this->filesystem = $filesystem;
-        $this->loop = $loop;
-        $this->installationManager = $installationManager;
-        $this->installedRepository = $installedRepository;
     }
 
     /**
@@ -50,8 +38,8 @@ class LinkManager
      */
     public function isLinked(LinkedPackage $linkedPackage): bool
     {
-        return $this->filesystem->isSymlinkedDirectory($linkedPackage->getInstallationPath()) ||
-        $this->filesystem->isJunction($linkedPackage->getInstallationPath());
+        return $this->filesystem->isSymlinkedDirectory($linkedPackage->getInstallationPath())
+        || $this->filesystem->isJunction($linkedPackage->getInstallationPath());
     }
 
     /**
@@ -117,6 +105,8 @@ class LinkManager
 
     /**
      * Waits for promise to be finished.
+     *
+     * @param PromiseInterface<void|null>|null $promise
      */
     protected function wait(?PromiseInterface $promise): void
     {

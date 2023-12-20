@@ -25,20 +25,11 @@ use ComposerLink\Repository\Repository;
  */
 class LinkPackages
 {
-    protected RepositoryManager $repositoryManager;
-
-    protected Repository $repository;
-
-    protected LinkManager $linkManager;
-
     public function __construct(
-        LinkManager $linkManager,
-        Repository $repository,
-        RepositoryManager $repositoryManager
+        protected readonly LinkManager $linkManager,
+        protected readonly Repository $repository,
+        protected readonly RepositoryManager $repositoryManager
     ) {
-        $this->linkManager = $linkManager;
-        $this->repository = $repository;
-        $this->repositoryManager = $repositoryManager;
     }
 
     public function execute(): void

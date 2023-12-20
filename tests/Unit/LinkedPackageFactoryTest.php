@@ -30,6 +30,7 @@ class LinkedPackageFactoryTest extends TestCase
         $originalPackage = $this->createMock(PackageInterface::class);
         $originalPackage->method('getName')->willReturn('test/package');
         $installedRepository->method('getCanonicalPackages')->willReturn([$originalPackage]);
+        $installationManager->method('getInstallPath')->willReturn('vendor/test/package/');
         file_put_contents($this->tmpAbsoluteDir . 'composer.json', '{"name": "test/package"}');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);
@@ -44,6 +45,7 @@ class LinkedPackageFactoryTest extends TestCase
         $installationManager = $this->createMock(InstallationManager::class);
         $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
+        $installationManager->method('getInstallPath')->willReturn('vendor/test/package/');
         file_put_contents($this->tmpAbsoluteDir . 'composer.json', '{"name": "test/package"}');
 
         $factory = new LinkedPackageFactory($installationManager, $installedRepository);

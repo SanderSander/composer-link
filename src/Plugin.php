@@ -40,41 +40,35 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected Composer $composer;
 
-    protected ?LinkPackages $linkPackages;
-
-    private ?RepositoryFactory $repositoryFactory;
-
     public function __construct(
         ComposerFileSystem $filesystem = null,
-        LinkPackages $linkPackages = null,
-        RepositoryFactory $repositoryFactory = null
+        protected ?LinkPackages $linkPackages = null,
+        protected ?RepositoryFactory $repositoryFactory = null
     ) {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
-        $this->linkPackages = $linkPackages;
-        $this->repositoryFactory = $repositoryFactory;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function deactivate(Composer $composer, IOInterface $io)
+    public function deactivate(Composer $composer, IOInterface $io): void
     {
         $io->debug("[ComposerLink]\tPlugin is deactivated");
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function uninstall(Composer $composer, IOInterface $io)
+    public function uninstall(Composer $composer, IOInterface $io): void
     {
         // TODO remove repository file and restore all packages
         $io->debug("[ComposerLink]\tPlugin uninstalling");
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function activate(Composer $composer, IOInterface $io)
+    public function activate(Composer $composer, IOInterface $io): void
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;

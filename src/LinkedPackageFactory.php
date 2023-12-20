@@ -24,16 +24,10 @@ use RuntimeException;
 
 class LinkedPackageFactory
 {
-    protected InstallationManager $installationManager;
-
-    protected InstalledRepositoryInterface $installedRepository;
-
     public function __construct(
-        InstallationManager $installationManager,
-        InstalledRepositoryInterface $installedRepository
+        protected readonly InstallationManager $installationManager,
+        protected readonly InstalledRepositoryInterface $installedRepository
     ) {
-        $this->installationManager = $installationManager;
-        $this->installedRepository = $installedRepository;
     }
 
     private function loadFromJsonFile(string $path): CompletePackage
@@ -74,6 +68,9 @@ class LinkedPackageFactory
             }
         }
 
+        // TODO installation path exists only if package is installed
+        //      we should add support when the package isn't required yet in composer.json
+        /** @var string $destination */
         $destination = $this->installationManager->getInstallPath($newPackage);
 
         return new LinkedPackage(
