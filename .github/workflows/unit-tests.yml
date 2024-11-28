@@ -34,7 +34,7 @@ jobs:
 
       - name: Run unit tests
         run: ./vendor/bin/phpunit
-        if: matrix.php-versions != '8.4' && matrix.operating-system != 'ubuntu-latest'
+        if: (matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest') == false
 
       - name: Run unit tests with coverage
         run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml --testsuite=Unit
