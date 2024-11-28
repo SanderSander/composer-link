@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        php-versions: [ '8.1', '8.2', '8.3' ]
+        php-versions: [ '8.1', '8.2', '8.3', '8.4' ]
         composer-versions: [ '2.2', 'v2' ]
     steps:
       - uses: actions/checkout@v3
@@ -35,10 +35,6 @@ jobs:
 
       - name: Validate composer.json
         run: composer validate --strict
-
-      - name: Remove lock file
-        run: rm composer.lock
-        if: matrix.php-versions == '8.0'
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
