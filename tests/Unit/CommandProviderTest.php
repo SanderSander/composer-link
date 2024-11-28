@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
+ * Created by: Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -28,8 +28,8 @@ class CommandProviderTest extends TestCase
     public function test_command_provider(): void
     {
         $arguments = [];
-        $arguments['io'] = $this->createStub(IOInterface::class);
-        $arguments['plugin'] = $this->createStub(Plugin::class);
+        $arguments['io'] = self::createStub(IOInterface::class);
+        $arguments['plugin'] = self::createStub(Plugin::class);
 
         $provider = new CommandProvider($arguments);
         $commands = $provider->getCommands();

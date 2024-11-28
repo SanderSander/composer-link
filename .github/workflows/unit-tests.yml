@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: [ '8.1', 'latest' ]
+        php-versions: [ '8.1', '8.4' ]
     steps:
       - uses: actions/checkout@v3
 
@@ -29,19 +29,20 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict
 
-      - name: Remove lock file
-        run: rm composer.lock
-        if: matrix.php-versions == '8.0'
-
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
       - name: Run unit tests
+        run: ./vendor/bin/phpunit --testsuite=Unit
+        if: (matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest') == false
+
+      - name: Run unit tests with coverage
         run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml --testsuite=Unit
+        if: matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest'
 
       - name: Publish code coverage to codeclimate
         uses: paambaati/codeclimate-action@v3.2.0
-        if: matrix.php-versions == 'latest' && matrix.operating-system == 'ubuntu-latest'
+        if: matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest'
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
         with:

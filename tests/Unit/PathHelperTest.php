@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
+ * Created by: Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -17,12 +17,11 @@ namespace Tests\Unit;
 
 use ComposerLink\PathHelper;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PathHelperTest extends TestCase
 {
-    /**
-     * @dataProvider provideAbsolutePaths
-     */
+    #[DataProvider('provideAbsolutePaths')]
     public function test_get_absolute_path(string $pah): void
     {
         $testPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
@@ -37,7 +36,7 @@ class PathHelperTest extends TestCase
 
     public function test_absolute_path_to_absolute(): void
     {
-        /** @var string $cwd */
+        /** @var non-empty-string $cwd */
         $cwd = getcwd();
         $pathWildcard = new PathHelper($this->tmpAbsoluteDir);
         $absolute = $pathWildcard->toAbsolutePath($cwd);
@@ -90,7 +89,7 @@ class PathHelperTest extends TestCase
 
     public function test_wildcard_path_to_wildcard_absolute(): void
     {
-        /** @var string $cwd */
+        /** @var non-empty-string $cwd */
         $cwd = getcwd();
         $pathWildcard = new PathHelper($this->tmpRelativeDir . '*');
         $absolute = $pathWildcard->toAbsolutePath($cwd);
@@ -102,7 +101,7 @@ class PathHelperTest extends TestCase
     /**
      * @return string[][]
      */
-    public function provideAbsolutePaths(): array
+    public static function provideAbsolutePaths(): array
     {
         return [
             ['tests'],

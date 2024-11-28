@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
+ * Created by: Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -20,7 +20,7 @@ use InvalidArgumentException;
 class PathHelper
 {
     public function __construct(
-        protected readonly string $path
+        protected readonly string $path,
     ) {
     }
 
@@ -34,7 +34,7 @@ class PathHelper
      */
     public function getPathsFromWildcard(): array
     {
-        /** @var string[] $entries */
+        /** @var list<string> $entries */
         $entries = glob($this->path, GLOB_ONLYDIR);
         $helpers = [];
         foreach ($entries as $entry) {
@@ -81,6 +81,6 @@ class PathHelper
 
     public function isAbsolutePath(string $path): bool
     {
-        return strpos($path, '/') === 0 || substr($path, 1, 1) === ':' || strpos($path, '\\\\') === 0;
+        return str_starts_with($path, '/') || substr($path, 1, 1) === ':' || str_starts_with($path, '\\\\');
     }
 }

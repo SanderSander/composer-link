@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
+ * Created by: Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -20,13 +20,12 @@ use RuntimeException;
 class JsonStorage implements StorageInterface
 {
     public function __construct(
-        protected readonly string $file
+        protected readonly string $file,
     ) {
     }
 
     public function write(array $data): void
     {
-        /** @var string $json */
         $json = json_encode($data);
         file_put_contents($this->file, $json);
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
+ * Created by: Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -24,9 +24,9 @@ class LinkedPackageTest extends TestCase
 {
     public function test_linked_package(): void
     {
-        $package = $this->createStub(CompletePackage::class);
+        $package = self::createStub(CompletePackage::class);
         $package->method('getName')->willReturn('test/package');
-        $originalPackage = $this->createStub(PackageInterface::class);
+        $originalPackage = self::createStub(PackageInterface::class);
 
         $linkedPackage = new LinkedPackage(
             '/test-path',
