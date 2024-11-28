@@ -33,7 +33,12 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run unit tests
+        run: ./vendor/bin/phpunit
+        if: matrix.php-versions != '8.4' && matrix.operating-system != 'ubuntu-latest'
+
+      - name: Run unit tests with coverage
         run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml --testsuite=Unit
+        if: matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest'
 
       - name: Publish code coverage to codeclimate
         uses: paambaati/codeclimate-action@v3.2.0
