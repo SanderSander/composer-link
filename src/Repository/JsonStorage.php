@@ -26,7 +26,6 @@ class JsonStorage implements StorageInterface
 
     public function write(array $data): void
     {
-        /** @var string $json */
         $json = json_encode($data);
         file_put_contents($this->file, $json);
     }

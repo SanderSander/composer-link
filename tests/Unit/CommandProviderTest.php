@@ -28,8 +28,8 @@ class CommandProviderTest extends TestCase
     public function test_command_provider(): void
     {
         $arguments = [];
-        $arguments['io'] = $this->createStub(IOInterface::class);
-        $arguments['plugin'] = $this->createStub(Plugin::class);
+        $arguments['io'] = self::createStub(IOInterface::class);
+        $arguments['plugin'] = self::createStub(Plugin::class);
 
         $provider = new CommandProvider($arguments);
         $commands = $provider->getCommands();

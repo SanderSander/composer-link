@@ -34,7 +34,7 @@ class PathHelper
      */
     public function getPathsFromWildcard(): array
     {
-        /** @var string[] $entries */
+        /** @var list<string> $entries */
         $entries = glob($this->path, GLOB_ONLYDIR);
         $helpers = [];
         foreach ($entries as $entry) {
@@ -81,6 +81,6 @@ class PathHelper
 
     public function isAbsolutePath(string $path): bool
     {
-        return strpos($path, '/') === 0 || substr($path, 1, 1) === ':' || strpos($path, '\\\\') === 0;
+        return str_starts_with($path, '/') || substr($path, 1, 1) === ':' || str_starts_with($path, '\\\\');
     }
 }

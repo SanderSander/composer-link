@@ -36,7 +36,7 @@ class PathHelperTest extends TestCase
 
     public function test_absolute_path_to_absolute(): void
     {
-        /** @var string $cwd */
+        /** @var non-empty-string $cwd */
         $cwd = getcwd();
         $pathWildcard = new PathHelper($this->tmpAbsoluteDir);
         $absolute = $pathWildcard->toAbsolutePath($cwd);
@@ -89,7 +89,7 @@ class PathHelperTest extends TestCase
 
     public function test_wildcard_path_to_wildcard_absolute(): void
     {
-        /** @var string $cwd */
+        /** @var non-empty-string $cwd */
         $cwd = getcwd();
         $pathWildcard = new PathHelper($this->tmpRelativeDir . '*');
         $absolute = $pathWildcard->toAbsolutePath($cwd);

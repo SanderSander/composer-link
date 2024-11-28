@@ -24,9 +24,9 @@ class LinkedPackageTest extends TestCase
 {
     public function test_linked_package(): void
     {
-        $package = $this->createStub(CompletePackage::class);
+        $package = self::createStub(CompletePackage::class);
         $package->method('getName')->willReturn('test/package');
-        $originalPackage = $this->createStub(PackageInterface::class);
+        $originalPackage = self::createStub(PackageInterface::class);
 
         $linkedPackage = new LinkedPackage(
             '/test-path',
