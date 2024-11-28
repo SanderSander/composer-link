@@ -17,12 +17,11 @@ namespace Tests\Unit;
 
 use ComposerLink\PathHelper;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PathHelperTest extends TestCase
 {
-    /**
-     * @dataProvider provideAbsolutePaths
-     */
+    #[DataProvider('provideAbsolutePaths')]
     public function test_get_absolute_path(string $pah): void
     {
         $testPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
@@ -102,7 +101,7 @@ class PathHelperTest extends TestCase
     /**
      * @return string[][]
      */
-    public function provideAbsolutePaths(): array
+    public static function provideAbsolutePaths(): array
     {
         return [
             ['tests'],
