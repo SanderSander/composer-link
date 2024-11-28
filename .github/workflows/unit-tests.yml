@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        php-versions: [ '8.1', 'latest' ]
+        php-versions: [ '8.1', '8.4' ]
     steps:
       - uses: actions/checkout@v3
 
@@ -37,7 +37,7 @@ jobs:
 
       - name: Publish code coverage to codeclimate
         uses: paambaati/codeclimate-action@v3.2.0
-        if: matrix.php-versions == 'latest' && matrix.operating-system == 'ubuntu-latest'
+        if: matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest'
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
         with:
