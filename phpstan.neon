@@ -3,6 +3,8 @@ parameters:
 	paths:
 		- src
 		- tests
+	ignoreErrors:
+		- '#PHPDoc tag @SuppressWarnings has invalid value \(\(PHPMD.[a-zA-Z]+#'
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-phpunit/rules.neon
