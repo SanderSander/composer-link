@@ -22,7 +22,7 @@ $finder = PhpCsFixer\Finder::create()
 
 $header = 'This file is part of the composer-link plugin.
 
-Copyright (c) 2021-' . date('Y') . ' Sander Visser <themastersleader@hotmail.com>.
+Created by: Sander Visser <themastersleader@hotmail.com>.
 
 For the full copyright and license information, please view the LICENSE.md
 file that was distributed with this source code.
