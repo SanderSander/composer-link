@@ -33,7 +33,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run unit tests
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit --testsuite=Unit
         if: (matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest') == false
 
       - name: Run unit tests with coverage
