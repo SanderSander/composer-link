@@ -27,12 +27,12 @@
     "require-dev": {
         "composer/composer": "^2.2",
         "friendsofphp/php-cs-fixer": "^v3.15.0",
-        "phpstan/phpstan": "^1.4",
+        "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^9.6.3",
-        "phpstan/phpstan-phpunit": "^1.1",
+        "phpstan/phpstan-phpunit": "^2.0",
         "phpmd/phpmd": "^2.12",
-        "phpstan/phpstan-strict-rules": "^1.1",
-        "phpstan/phpstan-deprecation-rules": "^1.0"
+        "phpstan/phpstan-strict-rules": "2.0",
+        "phpstan/phpstan-deprecation-rules": "^2.0"
     },
     "extra": {
         "class": "ComposerLink\\Plugin"

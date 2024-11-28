@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the composer-link plugin.
  *
- * Copyright (c) 2021-2023 Sander Visser <themastersleader@hotmail.com>.
+ * Copyright (c) 2021-2024 Sander Visser <themastersleader@hotmail.com>.
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -29,7 +29,7 @@ class LinkManager
         protected readonly Filesystem $filesystem,
         protected readonly Loop $loop,
         protected readonly InstallationManager $installationManager,
-        protected readonly InstalledRepositoryInterface $installedRepository
+        protected readonly InstalledRepositoryInterface $installedRepository,
     ) {
     }
 
