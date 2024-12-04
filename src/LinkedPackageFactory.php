@@ -20,6 +20,7 @@ use Composer\Json\JsonFile;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\InstalledRepositoryInterface;
+use ComposerLink\Package\LinkedCompletePackage;
 use RuntimeException;
 
 class LinkedPackageFactory
@@ -30,7 +31,10 @@ class LinkedPackageFactory
     ) {
     }
 
-    private function loadFromJsonFile(string $path): CompletePackage
+    /**
+     * @param non-empty-string $path
+     */
+    private function loadFromJsonFile(string $path): LinkedCompletePackage
     {
         if (!file_exists($path . DIRECTORY_SEPARATOR . 'composer.json')) {
             throw new RuntimeException(sprintf('No composer.json file found in "%s".', $path));
@@ -42,7 +46,7 @@ class LinkedPackageFactory
             throw new RuntimeException(sprintf('Unable to read composer.json in "%s"', $path));
         }
 
-        $json['version'] = 'dev-master';
+        $json['version'] = 'dev-linked';
 
         // branch alias won't work, otherwise the ArrayLoader::load won't return an instance of CompletePackage
         unset($json['extra']['branch-alias']);
@@ -50,14 +54,14 @@ class LinkedPackageFactory
         $loader = new ArrayLoader();
         /** @var CompletePackage $package */
         $package = $loader->load($json);
-        $package->setDistUrl($path);
-        $package->setInstallationSource('dist');
-        $package->setDistType('path');
 
-        return $package;
+        return new LinkedCompletePackage($package, $path);
     }
 
-    public function fromPath(string $path, bool $withDependencies): LinkedPackage
+    /**
+     * @param non-empty-string $path
+     */
+    public function fromPath(string $path): LinkedPackage
     {
         $originalPackage = null;
         $newPackage = $this->loadFromJsonFile($path);
@@ -77,8 +81,7 @@ class LinkedPackageFactory
             $path,
             $newPackage,
             $originalPackage,
-            $destination,
-            $withDependencies
+            $destination
         );
     }
 }

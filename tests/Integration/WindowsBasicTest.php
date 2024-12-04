@@ -33,7 +33,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Junctioning from ..\mock\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ..\mock\package-1',
             $this->runLinkCommand('link ..\mock\package-1')
         );
         static::assertStringContainsString(
@@ -41,7 +41,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
+            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
             $this->runLinkCommand('unlink ..\mock\package-1')
         );
         static::assertStringContainsString(
@@ -63,7 +63,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
@@ -71,7 +71,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
+            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
             $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
@@ -93,7 +93,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Junctioning from ..\mock\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ..\mock\package-1',
             $this->runLinkCommand('link ..\mock\package-1')
         );
         static::assertStringContainsString(
@@ -101,7 +101,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
+            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
             $this->runLinkCommand('unlink ..\mock\package-1')
         );
         static::assertStringContainsString(
@@ -123,7 +123,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-master): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '\package-1',
             $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
@@ -131,7 +131,7 @@ class WindowsBasicTest extends TestCase
             $this->runLinkCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-master), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
+            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
             $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(

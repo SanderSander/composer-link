@@ -15,106 +15,101 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
-use Composer\Installer;
-use Composer\Installer\InstallationManager;
-use Composer\IO\NullIO;
-use Composer\Package\PackageInterface;
-use Composer\Repository\InstalledRepositoryInterface;
+use Composer\DependencyResolver\Request;
+use Composer\EventDispatcher\EventDispatcher;
+use Composer\IO\IOInterface;
+use Composer\Package\Link;
+use Composer\Package\RootPackageInterface;
+use Composer\Repository\ArrayRepository;
+use Composer\Repository\RepositoryManager;
 use Composer\Util\Filesystem;
-use Composer\Util\Loop;
-use Exception;
-use React\Promise\PromiseInterface;
+use ComposerLink\Repository\Repository;
 
 class LinkManager
 {
+    protected readonly ArrayRepository $linkedRepository;
+
+    /**
+     * @var array<string, Link>
+     */
+    protected array $requires = [];
+
     public function __construct(
         protected readonly Filesystem $filesystem,
-        protected readonly Loop $loop,
-        protected readonly InstallationManager $installationManager,
-        protected readonly InstalledRepositoryInterface $installedRepository,
+        protected readonly Repository $repository,
+        protected readonly InstallerFactory $installerFactory,
+        protected readonly IOInterface $io,
+        protected readonly EventDispatcher $eventDispatcher,
+        protected readonly RootPackageInterface $rootPackage,
+        protected readonly RepositoryManager $repositoryManager,
     ) {
-    }
+        $this->linkedRepository = new ArrayRepository();
 
-    /**
-     * Checks if the given package is linked.
-     */
-    public function isLinked(LinkedPackage $linkedPackage): bool
-    {
-        return $this->filesystem->isSymlinkedDirectory($linkedPackage->getInstallationPath())
-        || $this->filesystem->isJunction($linkedPackage->getInstallationPath());
-    }
-
-    /**
-     * Links the package into the vendor directory.
-     */
-    public function linkPackage(LinkedPackage $linkedPackage): void
-    {
-        if (!is_null($linkedPackage->getOriginalPackage())) {
-            $this->uninstall($linkedPackage->getOriginalPackage());
-        }
-
-        $this->install($linkedPackage->getPackage());
-    }
-
-    /**
-     * Unlinks the package from the vendor directory.
-     */
-    public function unlinkPackage(LinkedPackage $linkedPackage): void
-    {
-        // Update the repository to the current situation
-        if (!is_null($linkedPackage->getOriginalPackage())) {
-            $this->installedRepository->removePackage($linkedPackage->getOriginalPackage());
-        }
-        $this->installedRepository->addPackage($linkedPackage->getPackage());
-
-        $this->uninstall($linkedPackage->getPackage());
-        if (!is_null($linkedPackage->getOriginalPackage())) {
-            $this->install($linkedPackage->getOriginalPackage());
+        // Load already linked packages
+        foreach ($this->repository->all() as $package) {
+            $this->linkedRepository->addPackage($package->getPackage());
+            $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
         }
     }
 
-    protected function uninstall(PackageInterface $package): void
+    public function add(LinkedPackage $package): void
     {
-        $installer = $this->installationManager->getInstaller($package->getType());
-        try {
-            $this->wait($installer->uninstall($this->installedRepository, $package));
-        } catch (Exception $exception) {
-            $this->wait($installer->cleanup('uninstall', $package));
-            throw $exception;
+        $this->repository->store($package);
+        $this->repository->persist();
+
+        if (!$this->linkedRepository->hasPackage($package->getPackage())) {
+            $this->linkedRepository->addPackage($package->getPackage());
         }
 
-        $this->wait($installer->cleanup('uninstall', $package));
+        $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
     }
 
-    /**
-     * Downloads and installs the given package
-     * https://github.com/composer/composer/blob/2.0.0/src/Composer/Util/SyncHelper.php.
-     */
-    protected function install(PackageInterface $package): void
+    public function remove(LinkedPackage $package): void
     {
-        $installer = $this->installationManager->getInstaller($package->getType());
+        $this->linkedRepository->removePackage($package->getPackage());
+        unset($this->requires[$package->getName()]);
 
-        try {
-            $this->wait($installer->download($package));
-            $this->wait($installer->prepare('install', $package));
-            $this->wait($installer->install($this->installedRepository, $package));
-        } catch (Exception $exception) {
-            $this->wait($installer->cleanup('install', $package));
-            throw $exception;
-        }
-
-        $this->wait($installer->cleanup('install', $package));
+        $this->repository->remove($package);
+        $this->repository->persist();
     }
 
-    /**
-     * Waits for promise to be finished.
-     *
-     * @param PromiseInterface<void|null>|null $promise
-     */
-    protected function wait(?PromiseInterface $promise): void
+    public function hasLinkedPackages(): bool
     {
-        if (!is_null($promise)) {
-            $this->loop->wait([$promise]);
+        return $this->linkedRepository->count() > 0;
+    }
+
+    public function linkPackages(): void
+    {
+        // Use the composer installer to install the linked packages with dependencies
+        $this->repositoryManager->prependRepository($this->linkedRepository);
+
+        // Add requirement to the current/loaded composer.json
+        $this->rootPackage->setRequires(array_merge($this->rootPackage->getRequires(), $this->requires));
+        $this->io->warning('<warning>Linking packages, Lock file will be generated in memory but not written to disk.</warning>');
+
+        // We need to remove dev-requires from the list of packages that are linked
+        $devRequires = $this->rootPackage->getDevRequires();
+        foreach ($this->linkedRepository->getPackages() as $package) {
+            unset($devRequires[$package->getName()]);
         }
+        $this->rootPackage->setDevRequires($devRequires);
+
+        // Prevent circular call to script handler 'post-update-cmd' by creating a new composer instance
+        // We also need to set this on the Installer while it's deprecated
+        $this->eventDispatcher->setRunScripts(false);
+
+        $installer = $this->installerFactory->create() /* @phpstan-ignore method.deprecated */
+            ->setUpdate(true)
+            ->setInstall(true)
+            ->setWriteLock(false)
+            ->setRunScripts(false)
+            ->setUpdateAllowList(array_keys($this->requires))
+            // TODO we should be able to configure this
+            ->setDevMode(true)
+            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
+        $installer->run();
+
+        $this->eventDispatcher->setRunScripts();
+        $this->io->warning('<warning>Linking packages finished!</warning>');
     }
 }

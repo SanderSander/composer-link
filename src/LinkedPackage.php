@@ -15,17 +15,19 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
-use Composer\Package\CompletePackage;
+use Composer\Package\Link;
 use Composer\Package\PackageInterface;
+use Composer\Package\RootPackageInterface;
+use Composer\Semver\Constraint\Constraint;
+use ComposerLink\Package\LinkedCompletePackage;
 
 class LinkedPackage
 {
     public function __construct(
         protected readonly string $path,
-        protected readonly CompletePackage $package,
+        protected readonly LinkedCompletePackage $package,
         protected ?PackageInterface $originalPackage,
         protected readonly string $installationPath,
-        protected readonly bool $withDependencies = false,
     ) {
     }
 
@@ -39,7 +41,7 @@ class LinkedPackage
         return $this->package->getName();
     }
 
-    public function getPackage(): CompletePackage
+    public function getPackage(): LinkedCompletePackage
     {
         return $this->package;
     }
@@ -54,13 +56,21 @@ class LinkedPackage
         return $this->installationPath;
     }
 
+    /**
+     * Creates a Link to this package from the given root.
+     */
+    public function createLink(RootPackageInterface $root): Link
+    {
+        return new Link(
+            $root->getName(),
+            $this->getName(),
+            new Constraint('=', 'dev-linked'),
+            Link::TYPE_REQUIRE
+        );
+    }
+
     public function setOriginalPackage(?PackageInterface $package): void
     {
         $this->originalPackage = $package;
-    }
-
-    public function getWithDependencies(): bool
-    {
-        return $this->withDependencies;
     }
 }

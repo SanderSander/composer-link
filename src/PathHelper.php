@@ -19,6 +19,9 @@ use InvalidArgumentException;
 
 class PathHelper
 {
+    /**
+     * @param non-empty-string $path
+     */
     public function __construct(
         protected readonly string $path,
     ) {
@@ -37,6 +40,8 @@ class PathHelper
         /** @var list<string> $entries */
         $entries = glob($this->path, GLOB_ONLYDIR);
         $helpers = [];
+
+        /** @var non-empty-string $entry */
         foreach ($entries as $entry) {
             if (!file_exists($entry . DIRECTORY_SEPARATOR . 'composer.json')) {
                 continue;
@@ -70,10 +75,16 @@ class PathHelper
         return new PathHelper($real);
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getNormalizedPath(): string
     {
         if (substr($this->path, -1) === DIRECTORY_SEPARATOR) {
-            return substr($this->path, 0, -1);
+            /** @var non-empty-string $path */
+            $path = substr($this->path, 0, -1);
+
+            return $path;
         }
 
         return $this->path;

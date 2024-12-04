@@ -77,9 +77,7 @@ class LinkCommandTest extends TestCase
             ->method('fromPath')
             ->with('/test-path');
 
-        $this->repository->expects(static::once())->method('store');
-        $this->repository->expects(static::once())->method('persist');
-        $this->linkManager->expects(static::once())->method('linkPackage');
+        $this->linkManager->expects(static::once())->method('add');
 
         $input = new StringInput('link /test-path');
         static::assertSame(0, $this->application->run($input, $this->output));
@@ -91,9 +89,7 @@ class LinkCommandTest extends TestCase
             ->method('fromPath')
             ->with('/test-path');
 
-        $this->repository->expects(static::never())->method('store');
-        $this->repository->expects(static::never())->method('persist');
-        $this->linkManager->expects(static::never())->method('linkPackage');
+        $this->linkManager->expects(static::never())->method('add');
 
         $input = new StringInput('link /test-path --only-installed');
         static::assertSame(0, $this->application->run($input, $this->output));
@@ -106,9 +102,7 @@ class LinkCommandTest extends TestCase
             ->with('/test-path')
             ->willReturn($this->mockPackage());
 
-        $this->repository->expects(static::once())->method('store');
-        $this->repository->expects(static::once())->method('persist');
-        $this->linkManager->expects(static::once())->method('linkPackage');
+        $this->linkManager->expects(static::once())->method('add');
 
         $input = new StringInput('link /test-path --only-installed');
         static::assertSame(0, $this->application->run($input, $this->output));
@@ -121,9 +115,7 @@ class LinkCommandTest extends TestCase
             ->method('fromPath')
             ->with(realpath(__DIR__ . '/../..'));
 
-        $this->repository->expects(static::once())->method('store');
-        $this->repository->expects(static::once())->method('persist');
-        $this->linkManager->expects(static::once())->method('linkPackage');
+        $this->linkManager->expects(static::once())->method('add');
 
         $input = new StringInput('link tests');
         static::assertSame(0, $this->application->run($input, $this->output));

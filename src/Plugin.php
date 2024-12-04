@@ -23,7 +23,6 @@ use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
-use ComposerLink\Actions\LinkPackages;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\RepositoryFactory;
 use RuntimeException;
@@ -42,7 +41,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function __construct(
         ?ComposerFileSystem $filesystem = null,
-        protected ?LinkPackages $linkPackages = null,
         protected ?RepositoryFactory $repositoryFactory = null,
     ) {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
@@ -61,7 +59,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
      */
     public function uninstall(Composer $composer, IOInterface $io): void
     {
-        // TODO remove repository file and restore all packages
         $io->debug("[ComposerLink]\tPlugin uninstalling");
     }
 
@@ -75,8 +72,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
         $this->initializeRepository();
         $this->initializeLinkedPackageFactory();
-        $this->initializeLinkManager();
-        $this->initializeLinkPackages();
+        $this->initializeLinkManager($io);
     }
 
     protected function initializeRepository(): void
@@ -97,34 +93,44 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         );
     }
 
-    protected function initializeLinkManager(): void
+    protected function initializeLinkManager(IOInterface $io): void
     {
+        if (is_null($this->repository)) {
+            throw new RuntimeException('Repository not initialized');
+        }
+
         $this->linkManager = new LinkManager(
             $this->filesystem,
-            $this->composer->getLoop(),
-            $this->composer->getInstallationManager(),
-            $this->composer->getRepositoryManager()->getLocalRepository()
+            $this->repository,
+            new InstallerFactory($io, $this->composer),
+            $io,
+            $this->composer->getEventDispatcher(),
+            $this->composer->getPackage(),
+            $this->composer->getRepositoryManager(),
         );
-    }
-
-    protected function initializeLinkPackages(): void
-    {
-        if (is_null($this->linkPackages)) {
-            $this->linkPackages = new LinkPackages(
-                $this->getLinkManager(),
-                $this->getRepository(),
-                $this->composer->getRepositoryManager()
-            );
-        }
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             ScriptEvents::POST_UPDATE_CMD => [
-                ['linkLinkedPackages'],
+                ['relinkPackages'],
+            ],
+            ScriptEvents::POST_INSTALL_CMD => [
+                ['relinkPackages'],
             ],
         ];
+    }
+
+    public function relinkPackages(): void
+    {
+        if (is_null($this->linkManager)) {
+            throw new RuntimeException('Link manager not initialized');
+        }
+
+        if ($this->linkManager->hasLinkedPackages()) {
+            $this->linkManager->linkPackages();
+        }
     }
 
     public function getLinkManager(): LinkManager
@@ -134,14 +140,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         }
 
         return $this->linkManager;
-    }
-
-    public function linkLinkedPackages(): void
-    {
-        if (is_null($this->linkPackages)) {
-            throw new RuntimeException('Plugin not activated');
-        }
-        $this->linkPackages->execute();
     }
 
     public function getCapabilities(): array

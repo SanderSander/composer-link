@@ -15,16 +15,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Composer\Package\CompletePackage;
 use Composer\Package\PackageInterface;
 use ComposerLink\LinkedPackage;
+use ComposerLink\Package\LinkedCompletePackage;
 use PHPUnit\Framework\TestCase;
 
 class LinkedPackageTest extends TestCase
 {
     public function test_linked_package(): void
     {
-        $package = self::createStub(CompletePackage::class);
+        $package = self::createStub(LinkedCompletePackage::class);
         $package->method('getName')->willReturn('test/package');
         $originalPackage = self::createStub(PackageInterface::class);
 

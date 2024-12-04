@@ -34,6 +34,7 @@ class UnlinkCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $paths = $this->getPaths($input);
+        $manager = $this->plugin->getLinkManager();
 
         foreach ($paths as $path) {
             $repository = $this->plugin->getRepository();
@@ -43,10 +44,10 @@ class UnlinkCommand extends Command
                 continue;
             }
 
-            $this->plugin->getLinkManager()->unlinkPackage($linkedPackage);
-            $this->plugin->getRepository()->remove($linkedPackage);
-            $this->plugin->getRepository()->persist();
+            $manager->remove($linkedPackage);
         }
+
+        $manager->linkPackages();
 
         return 0;
     }

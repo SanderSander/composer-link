@@ -21,14 +21,17 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class PathHelperTest extends TestCase
 {
+    /**
+     * @param non-empty-string $path
+     */
     #[DataProvider('provideAbsolutePaths')]
-    public function test_get_absolute_path(string $pah): void
+    public function test_get_absolute_path(string $path): void
     {
         $testPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
         $root = realpath($testPath);
-        $helper = new PathHelper($pah);
+        $helper = new PathHelper($path);
         static::assertEquals(
-            $root . DIRECTORY_SEPARATOR . $pah,
+            $root . DIRECTORY_SEPARATOR . $path,
             $helper->toAbsolutePath($testPath)
                 ->getNormalizedPath()
         );

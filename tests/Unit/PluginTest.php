@@ -24,9 +24,7 @@ use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Repository\RepositoryManager;
 use Composer\Script\ScriptEvents;
-use Composer\Util\Filesystem;
 use Composer\Util\Loop;
-use ComposerLink\Actions\LinkPackages;
 use ComposerLink\CommandProvider;
 use ComposerLink\Plugin;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -139,17 +137,5 @@ class PluginTest extends TestCase
         self::expectException(RuntimeException::class);
         $plugin = new Plugin();
         $plugin->getRepository();
-    }
-
-    public function test_plugin_link_linked_packages(): void
-    {
-        $linkPackages = $this->createMock(LinkPackages::class);
-        $linkPackages->expects(static::once())->method('execute');
-        $plugin = new Plugin($this->createMock(Filesystem::class), $linkPackages);
-        $plugin->linkLinkedPackages();
-
-        static::expectException(RuntimeException::class);
-        $plugin = new Plugin($this->createMock(Filesystem::class));
-        $plugin->linkLinkedPackages();
     }
 }

@@ -19,6 +19,7 @@ use Composer\Package\CompletePackage;
 use Composer\Package\Dumper\ArrayDumper;
 use Composer\Package\Loader\ArrayLoader;
 use ComposerLink\LinkedPackage;
+use ComposerLink\Package\LinkedCompletePackage;
 
 class Transformer
 {
@@ -41,15 +42,17 @@ class Transformer
     {
         /** @var CompletePackage $newPackage */
         $newPackage = $this->composerLoader->load($data['package']);
+
+        $linkedPackage = new LinkedCompletePackage($newPackage, $data['path']);
+
         $originalPackage = isset($data['originalPackage']) ?
             $this->composerLoader->load($data['originalPackage']) : null;
 
         return new LinkedPackage(
             $data['path'],
-            $newPackage,
+            $linkedPackage,
             $originalPackage,
-            $data['installationPath'],
-            $data['withDependencies'] ?? false,
+            $data['installationPath']
         );
     }
 
@@ -67,7 +70,6 @@ class Transformer
         if (!is_null($package->getOriginalPackage())) {
             $data['originalPackage'] = $this->composerDumper->dump($package->getOriginalPackage());
         }
-        $data['withDependencies'] = $package->getWithDependencies();
 
         return $data;
     }
