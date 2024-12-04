@@ -15,7 +15,9 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
+use Composer\Installer;
 use Composer\Installer\InstallationManager;
+use Composer\IO\NullIO;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
@@ -50,6 +52,7 @@ class LinkManager
         if (!is_null($linkedPackage->getOriginalPackage())) {
             $this->uninstall($linkedPackage->getOriginalPackage());
         }
+
         $this->install($linkedPackage->getPackage());
     }
 

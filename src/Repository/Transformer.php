@@ -48,7 +48,8 @@ class Transformer
             $data['path'],
             $newPackage,
             $originalPackage,
-            $data['installationPath']
+            $data['installationPath'],
+            $data['withDependencies'] ?? false,
         );
     }
 
@@ -66,6 +67,7 @@ class Transformer
         if (!is_null($package->getOriginalPackage())) {
             $data['originalPackage'] = $this->composerDumper->dump($package->getOriginalPackage());
         }
+        $data['withDependencies'] = $package->getWithDependencies();
 
         return $data;
     }

@@ -57,7 +57,7 @@ class LinkedPackageFactory
         return $package;
     }
 
-    public function fromPath(string $path): LinkedPackage
+    public function fromPath(string $path, bool $withDependencies): LinkedPackage
     {
         $originalPackage = null;
         $newPackage = $this->loadFromJsonFile($path);
@@ -77,7 +77,8 @@ class LinkedPackageFactory
             $path,
             $newPackage,
             $originalPackage,
-            $destination
+            $destination,
+            $withDependencies
         );
     }
 }

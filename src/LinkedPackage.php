@@ -25,6 +25,7 @@ class LinkedPackage
         protected readonly CompletePackage $package,
         protected ?PackageInterface $originalPackage,
         protected readonly string $installationPath,
+        protected readonly bool $withDependencies = false,
     ) {
     }
 
@@ -56,5 +57,10 @@ class LinkedPackage
     public function setOriginalPackage(?PackageInterface $package): void
     {
         $this->originalPackage = $package;
+    }
+
+    public function getWithDependencies(): bool
+    {
+        return $this->withDependencies;
     }
 }
