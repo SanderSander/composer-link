@@ -2,3 +2,5 @@
  - --with-dependencies flag for current behavior
  - Replace requires of OriginalPackage to the linked packages if --with-dependencies is not defined
  - Tests
+ - Support `composer update --no-dev` at this moment when composer link is active it will install all dev dependencies
+ - Check possibility to merge LinkedPackage and LinkedCompletePackage
