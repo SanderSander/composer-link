@@ -18,8 +18,7 @@ namespace ComposerLink\Repository;
 use Composer\Package\CompletePackage;
 use Composer\Package\Dumper\ArrayDumper;
 use Composer\Package\Loader\ArrayLoader;
-use ComposerLink\LinkedPackage;
-use ComposerLink\Package\LinkedCompletePackage;
+use ComposerLink\Package\LinkedPackage;
 
 class Transformer
 {
@@ -40,20 +39,20 @@ class Transformer
      */
     public function load(array $data): LinkedPackage
     {
-        /** @var CompletePackage $newPackage */
-        $newPackage = $this->composerLoader->load($data['package']);
-
-        $linkedPackage = new LinkedCompletePackage($newPackage, $data['path']);
-
+        /** @var CompletePackage $completePackage */
+        $completePackage = $this->composerLoader->load($data['package']);
         $originalPackage = isset($data['originalPackage']) ?
             $this->composerLoader->load($data['originalPackage']) : null;
 
-        return new LinkedPackage(
+        $linkedPackage = new LinkedPackage(
+            $completePackage,
             $data['path'],
-            $linkedPackage,
+            $data['installationPath'],
             $originalPackage,
-            $data['installationPath']
         );
+        $linkedPackage->setWithoutDependencies($data['withoutDependencies'] ?? true);
+
+        return $linkedPackage;
     }
 
     /**
@@ -66,10 +65,11 @@ class Transformer
         $data = [];
         $data['path'] = $package->getPath();
         $data['installationPath'] = $package->getInstallationPath();
-        $data['package'] = $this->composerDumper->dump($package->getPackage());
+        $data['package'] = $this->composerDumper->dump($package->getLinkedPackage());
         if (!is_null($package->getOriginalPackage())) {
             $data['originalPackage'] = $this->composerDumper->dump($package->getOriginalPackage());
         }
+        $data['withoutDependencies'] = $package->isWithoutDependencies();
 
         return $data;
     }

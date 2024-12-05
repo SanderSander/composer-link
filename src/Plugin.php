@@ -21,8 +21,10 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
+use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\RepositoryFactory;
 use RuntimeException;
@@ -122,14 +124,14 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         ];
     }
 
-    public function relinkPackages(): void
+    public function relinkPackages(Event $event): void
     {
         if (is_null($this->linkManager)) {
             throw new RuntimeException('Link manager not initialized');
         }
 
         if ($this->linkManager->hasLinkedPackages()) {
-            $this->linkManager->linkPackages();
+            $this->linkManager->linkPackages($event->isDevMode());
         }
     }
 

@@ -1,6 +1,7 @@
  - Recover when linked-packages.json cannot be parsed.
- - --with-dependencies flag for current behavior
- - Replace requires of OriginalPackage to the linked packages if --with-dependencies is not defined
+ - Add --dependencies/--no-dependencies flag, and notify users change in behavior
  - Tests
- - Support `composer update --no-dev` at this moment when composer link is active it will install all dev dependencies
- - Check possibility to merge LinkedPackage and LinkedCompletePackage
+ - Update readme (--no-dev flag, --no-dependencies flag, minimal composer version)
+
+
+

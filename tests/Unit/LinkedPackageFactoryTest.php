@@ -18,7 +18,7 @@ namespace Tests\Unit;
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
-use ComposerLink\LinkedPackageFactory;
+use ComposerLink\Package\LinkedPackageFactory;
 use RuntimeException;
 
 class LinkedPackageFactoryTest extends TestCase

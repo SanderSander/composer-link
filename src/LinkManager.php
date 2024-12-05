@@ -23,6 +23,7 @@ use Composer\Package\RootPackageInterface;
 use Composer\Repository\ArrayRepository;
 use Composer\Repository\RepositoryManager;
 use Composer\Util\Filesystem;
+use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Repository\Repository;
 
 class LinkManager
@@ -47,7 +48,7 @@ class LinkManager
 
         // Load already linked packages
         foreach ($this->repository->all() as $package) {
-            $this->linkedRepository->addPackage($package->getPackage());
+            $this->linkedRepository->addPackage($package);
             $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
         }
     }
@@ -57,8 +58,8 @@ class LinkManager
         $this->repository->store($package);
         $this->repository->persist();
 
-        if (!$this->linkedRepository->hasPackage($package->getPackage())) {
-            $this->linkedRepository->addPackage($package->getPackage());
+        if (!$this->linkedRepository->hasPackage($package)) {
+            $this->linkedRepository->addPackage($package);
         }
 
         $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
@@ -66,7 +67,7 @@ class LinkManager
 
     public function remove(LinkedPackage $package): void
     {
-        $this->linkedRepository->removePackage($package->getPackage());
+        $this->linkedRepository->removePackage($package);
         unset($this->requires[$package->getName()]);
 
         $this->repository->remove($package);
@@ -78,7 +79,7 @@ class LinkManager
         return $this->linkedRepository->count() > 0;
     }
 
-    public function linkPackages(): void
+    public function linkPackages(bool $isDev): void
     {
         // Use the composer installer to install the linked packages with dependencies
         $this->repositoryManager->prependRepository($this->linkedRepository);
@@ -105,7 +106,7 @@ class LinkManager
             ->setRunScripts(false)
             ->setUpdateAllowList(array_keys($this->requires))
             // TODO we should be able to configure this
-            ->setDevMode(true)
+            ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
         $installer->run();
 

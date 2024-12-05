@@ -15,33 +15,30 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use Composer\Package\CompletePackageInterface;
 use Composer\Package\PackageInterface;
-use ComposerLink\LinkedPackage;
-use ComposerLink\Package\LinkedCompletePackage;
+use ComposerLink\Package\LinkedPackage;
 use PHPUnit\Framework\TestCase;
 
 class LinkedPackageTest extends TestCase
 {
     public function test_linked_package(): void
     {
-        $package = self::createStub(LinkedCompletePackage::class);
+        $package = self::createStub(CompletePackageInterface::class);
         $package->method('getName')->willReturn('test/package');
         $originalPackage = self::createStub(PackageInterface::class);
 
         $linkedPackage = new LinkedPackage(
-            '/test-path',
             $package,
+            '/test-path',
+            '/test-install-path',
             $originalPackage,
-            '/test-install-path'
         );
 
         static::assertSame('/test-install-path', $linkedPackage->getInstallationPath());
         static::assertSame('/test-path', $linkedPackage->getPath());
-        static::assertSame($package, $linkedPackage->getPackage());
+        static::assertSame($package, $linkedPackage->getLinkedPackage());
         static::assertSame($originalPackage, $linkedPackage->getOriginalPackage());
         static::assertSame('test/package', $linkedPackage->getName());
-        $newOriginalPackage = $this->createMock(PackageInterface::class);
-        $linkedPackage->setOriginalPackage($newOriginalPackage);
-        static::assertSame($newOriginalPackage, $linkedPackage->getOriginalPackage());
     }
 }

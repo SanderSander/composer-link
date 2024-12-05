@@ -20,8 +20,8 @@ use Composer\Installer\InstallerInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Filesystem;
 use Composer\Util\Loop;
-use ComposerLink\LinkedPackage;
 use ComposerLink\LinkManager;
+use ComposerLink\Package\LinkedPackage;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

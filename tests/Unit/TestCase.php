@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use Composer\Package\PackageInterface;
-use ComposerLink\LinkedPackage;
+use ComposerLink\Package\LinkedPackage;
 use Tests\TestCase as BaseTest;
 
 abstract class TestCase extends BaseTest

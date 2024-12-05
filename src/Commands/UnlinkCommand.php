@@ -17,6 +17,7 @@ namespace ComposerLink\Commands;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UnlinkCommand extends Command
@@ -26,6 +27,13 @@ class UnlinkCommand extends Command
         $this->setName('unlink');
         $this->setDescription('Unlink a linked package');
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
+        $this->addOption(
+            'no-dev',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Disables installation of require-dev packages.',
+            false
+        );
     }
 
     /**
@@ -47,7 +55,7 @@ class UnlinkCommand extends Command
             $manager->remove($linkedPackage);
         }
 
-        $manager->linkPackages();
+        $manager->linkPackages(!(bool) $input->getOption('no-dev'));
 
         return 0;
     }

@@ -13,14 +13,14 @@ declare(strict_types=1);
  * @link https://github.com/SanderSander/composer-link
  */
 
-namespace ComposerLink;
+namespace ComposerLink\Package;
 
 use Composer\Installer\InstallationManager;
 use Composer\Json\JsonFile;
+use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\InstalledRepositoryInterface;
-use ComposerLink\Package\LinkedCompletePackage;
 use RuntimeException;
 
 class LinkedPackageFactory
@@ -34,7 +34,7 @@ class LinkedPackageFactory
     /**
      * @param non-empty-string $path
      */
-    private function loadFromJsonFile(string $path): LinkedCompletePackage
+    private function loadFromJsonFile(string $path): CompletePackage
     {
         if (!file_exists($path . DIRECTORY_SEPARATOR . 'composer.json')) {
             throw new RuntimeException(sprintf('No composer.json file found in "%s".', $path));
@@ -46,16 +46,18 @@ class LinkedPackageFactory
             throw new RuntimeException(sprintf('Unable to read composer.json in "%s"', $path));
         }
 
-        $json['version'] = 'dev-linked';
+        // Version is required here
+        if (!isset($json['version'])) {
+            $json['version'] = 'dev-linked';
+        }
 
-        // branch alias won't work, otherwise the ArrayLoader::load won't return an instance of CompletePackage
-        unset($json['extra']['branch-alias']);
+        $package = (new ArrayLoader())->load($json);
 
-        $loader = new ArrayLoader();
-        /** @var CompletePackage $package */
-        $package = $loader->load($json);
+        if ($package instanceof CompleteAliasPackage) {
+            $package = $package->getAliasOf();
+        }
 
-        return new LinkedCompletePackage($package, $path);
+        return $package;
     }
 
     /**
@@ -64,10 +66,10 @@ class LinkedPackageFactory
     public function fromPath(string $path): LinkedPackage
     {
         $originalPackage = null;
-        $newPackage = $this->loadFromJsonFile($path);
+        $linkedPackage = $this->loadFromJsonFile($path);
         $packages = $this->installedRepository->getCanonicalPackages();
         foreach ($packages as $package) {
-            if ($package->getName() === $newPackage->getName()) {
+            if ($package->getName() === $linkedPackage->getName()) {
                 $originalPackage = $package;
             }
         }
@@ -75,13 +77,13 @@ class LinkedPackageFactory
         // TODO installation path exists only if package is installed
         //      we should add support when the package isn't required yet in composer.json
         /** @var string $destination */
-        $destination = $this->installationManager->getInstallPath($newPackage);
+        $destination = $this->installationManager->getInstallPath($linkedPackage);
 
         return new LinkedPackage(
+            $linkedPackage,
             $path,
-            $newPackage,
-            $originalPackage,
-            $destination
+            $destination,
+            $originalPackage
         );
     }
 }

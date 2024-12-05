@@ -16,24 +16,92 @@ declare(strict_types=1);
 namespace ComposerLink\Package;
 
 use Composer\Package\BasePackage;
-use Composer\Package\CompletePackage;
 use Composer\Package\CompletePackageInterface;
+use Composer\Package\Link;
+use Composer\Package\PackageInterface;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
+use Composer\Semver\Constraint\Constraint;
 use DateTimeInterface;
 
 /**
  * @SuppressWarnings(PHPMD)
  */
-class LinkedCompletePackage extends BasePackage implements CompletePackageInterface
+class LinkedPackage extends BasePackage implements CompletePackageInterface
 {
+    protected bool $withoutDependencies = true;
+
     /**
      * @param non-empty-string $path
      */
     public function __construct(
-        protected CompletePackage $package,
+        protected CompletePackageInterface $linkedPackage,
         protected string $path,
+        protected string $installationPath,  // What's this?
+        protected ?PackageInterface $original,          // Explain, it's the original package and not the linked package
     ) {
-        parent::__construct($this->package->getName());
+        parent::__construct($this->linkedPackage->getName());
+    }
+
+    /**
+     * Creates a Link to this package from the given root.
+     */
+    public function createLink(RootPackageInterface $root): Link
+    {
+        return new Link(
+            $root->getName(),
+            $this->getName(),
+            new Constraint('=', 'dev-linked'),
+            Link::TYPE_REQUIRE
+        );
+    }
+
+    public function getOriginalPackage(): ?PackageInterface
+    {
+        return $this->original;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function getInstallationPath(): string
+    {
+        return $this->installationPath;
+    }
+
+    public function setWithoutDependencies(bool $withoutDependencies): void
+    {
+        $this->withoutDependencies = $withoutDependencies;
+    }
+
+    public function isWithoutDependencies(): bool
+    {
+        return $this->withoutDependencies;
+    }
+
+    public function getRequires(): array
+    {
+        if ($this->withoutDependencies) {
+            return $this->original?->getRequires() ?? [];
+        }
+
+        return $this->linkedPackage->getRequires();
+    }
+
+    public function getDevRequires(): array
+    {
+        if ($this->withoutDependencies) {
+            return $this->original?->getDevRequires() ?? [];
+        }
+
+        return $this->linkedPackage->getDevRequires();
+    }
+
+    public function getLinkedPackage(): CompletePackageInterface
+    {
+        return $this->linkedPackage;
     }
 
     /**
@@ -79,371 +147,361 @@ class LinkedCompletePackage extends BasePackage implements CompletePackageInterf
 
     public function getScripts(): array
     {
-        return $this->package->getScripts();
+        return $this->linkedPackage->getScripts();
     }
 
     public function setScripts(array $scripts): void
     {
-        $this->package->setScripts($scripts);
+        $this->linkedPackage->setScripts($scripts);
     }
 
     public function getRepositories(): array
     {
-        return $this->package->getRepositories();
+        return $this->linkedPackage->getRepositories();
     }
 
     public function setRepositories(array $repositories): void
     {
-        $this->package->setRepositories($repositories);
+        $this->linkedPackage->setRepositories($repositories);
     }
 
     public function getLicense(): array
     {
-        return $this->package->getLicense();
+        return $this->linkedPackage->getLicense();
     }
 
     public function setLicense(array $license): void
     {
-        $this->package->setLicense($license);
+        $this->linkedPackage->setLicense($license);
     }
 
     public function getKeywords(): array
     {
-        return $this->package->getKeywords();
+        return $this->linkedPackage->getKeywords();
     }
 
     public function setKeywords(array $keywords): void
     {
-        $this->package->setKeywords($keywords);
+        $this->linkedPackage->setKeywords($keywords);
     }
 
     public function getDescription(): ?string
     {
-        return $this->package->getDescription();
+        return $this->linkedPackage->getDescription();
     }
 
     public function setDescription(string $description): void
     {
-        $this->package->setDescription($description);
+        $this->linkedPackage->setDescription($description);
     }
 
     public function getHomepage(): ?string
     {
-        return $this->package->getHomepage();
+        return $this->linkedPackage->getHomepage();
     }
 
     public function setHomepage(string $homepage): void
     {
-        $this->package->setHomepage($homepage);
+        $this->linkedPackage->setHomepage($homepage);
     }
 
     public function getAuthors(): array
     {
-        return $this->package->getAuthors();
+        return $this->linkedPackage->getAuthors();
     }
 
     public function setAuthors(array $authors): void
     {
-        $this->package->setAuthors($authors);
+        $this->linkedPackage->setAuthors($authors);
     }
 
     public function getSupport(): array
     {
-        return $this->package->getSupport();
+        return $this->linkedPackage->getSupport();
     }
 
     public function setSupport(array $support): void
     {
-        $this->package->setSupport($support);
+        $this->linkedPackage->setSupport($support);
     }
 
     public function getFunding(): array
     {
-        return $this->package->getFunding();
+        return $this->linkedPackage->getFunding();
     }
 
     public function setFunding(array $funding): void
     {
-        $this->package->setFunding($funding);
+        $this->linkedPackage->setFunding($funding);
     }
 
     public function isAbandoned(): bool
     {
-        return $this->package->isAbandoned();
+        return $this->linkedPackage->isAbandoned();
     }
 
     public function getReplacementPackage(): ?string
     {
-        return $this->package->getReplacementPackage();
+        return $this->linkedPackage->getReplacementPackage();
     }
 
     public function setAbandoned($abandoned): void
     {
-        $this->package->setAbandoned($abandoned);
+        $this->linkedPackage->setAbandoned($abandoned);
     }
 
     public function getArchiveName(): ?string
     {
-        return $this->package->getArchiveName();
+        return $this->linkedPackage->getArchiveName();
     }
 
     public function setArchiveName(string $name): void
     {
-        $this->package->setArchiveName($name);
+        $this->linkedPackage->setArchiveName($name);
     }
 
     public function getArchiveExcludes(): array
     {
-        return $this->package->getArchiveExcludes();
+        return $this->linkedPackage->getArchiveExcludes();
     }
 
     public function setArchiveExcludes(array $excludes): void
     {
-        $this->package->setArchiveExcludes($excludes);
+        $this->linkedPackage->setArchiveExcludes($excludes);
     }
 
     public function getName(): string
     {
-        return $this->package->getName();
+        return $this->linkedPackage->getName();
     }
 
     public function getPrettyName(): string
     {
-        return $this->package->getPrettyName();
+        return $this->linkedPackage->getPrettyName();
     }
 
     public function getNames($provides = true): array
     {
-        return $this->package->getNames($provides);
+        return $this->linkedPackage->getNames($provides);
     }
 
     public function setId(int $id): void
     {
-        $this->package->setId($id);
+        $this->linkedPackage->setId($id);
     }
 
     public function getId(): int
     {
-        return $this->package->getId();
+        return $this->linkedPackage->getId();
     }
 
     public function isDev(): bool
     {
-        return $this->package->isDev();
+        return $this->linkedPackage->isDev();
     }
 
     public function getType(): string
     {
-        return $this->package->getType();
+        return $this->linkedPackage->getType();
     }
 
     public function getTargetDir(): ?string
     {
-        return $this->package->getTargetDir();
+        return $this->linkedPackage->getTargetDir();
     }
 
     public function getExtra(): array
     {
-        return $this->package->getExtra();
+        return $this->linkedPackage->getExtra();
     }
 
     public function setInstallationSource(?string $type): void
     {
-        $this->package->setInstallationSource($type);
+        $this->linkedPackage->setInstallationSource($type);
     }
 
     public function getSourceType(): ?string
     {
-        return $this->package->getSourceType();
+        return $this->linkedPackage->getSourceType();
     }
 
     public function getSourceUrl(): ?string
     {
-        return $this->package->getSourceUrl();
+        return $this->linkedPackage->getSourceUrl();
     }
 
     public function getSourceUrls(): array
     {
-        return $this->package->getSourceUrls();
+        return $this->linkedPackage->getSourceUrls();
     }
 
     public function getSourceReference(): ?string
     {
-        return $this->package->getSourceReference();
+        return $this->linkedPackage->getSourceReference();
     }
 
     public function getSourceMirrors(): ?array
     {
-        return $this->package->getSourceMirrors();
+        return $this->linkedPackage->getSourceMirrors();
     }
 
     public function setSourceMirrors(?array $mirrors): void
     {
-        $this->package->setSourceMirrors($mirrors);
+        $this->linkedPackage->setSourceMirrors($mirrors);
     }
 
     public function getDistUrls(): array
     {
-        return $this->package->getDistUrls();
+        return $this->linkedPackage->getDistUrls();
     }
 
     public function getDistReference(): ?string
     {
-        return $this->package->getDistReference();
+        return $this->linkedPackage->getDistReference();
     }
 
     public function getDistSha1Checksum(): ?string
     {
-        return $this->package->getDistSha1Checksum();
+        return $this->linkedPackage->getDistSha1Checksum();
     }
 
     public function getDistMirrors(): ?array
     {
-        return $this->package->getDistMirrors();
+        return $this->linkedPackage->getDistMirrors();
     }
 
     public function setDistMirrors(?array $mirrors): void
     {
-        $this->package->setDistMirrors($mirrors);
+        $this->linkedPackage->setDistMirrors($mirrors);
     }
 
     public function getPrettyVersion(): string
     {
-        return $this->package->getPrettyVersion();
+        return $this->linkedPackage->getPrettyVersion();
     }
 
     public function getFullPrettyVersion(bool $truncate = true, int $displayMode = self::DISPLAY_SOURCE_REF_IF_DEV): string
     {
-        return $this->package->getFullPrettyVersion($truncate, $displayMode);
+        return $this->linkedPackage->getFullPrettyVersion($truncate, $displayMode);
     }
 
     public function getReleaseDate(): ?DateTimeInterface
     {
-        return $this->package->getReleaseDate();
-    }
-
-    public function getRequires(): array
-    {
-        return $this->package->getRequires();
+        return $this->linkedPackage->getReleaseDate();
     }
 
     public function getConflicts(): array
     {
-        return $this->package->getConflicts();
+        return $this->linkedPackage->getConflicts();
     }
 
     public function getProvides(): array
     {
-        return $this->package->getProvides();
+        return $this->linkedPackage->getProvides();
     }
 
     public function getReplaces(): array
     {
-        return $this->package->getReplaces();
-    }
-
-    public function getDevRequires(): array
-    {
-        return $this->package->getDevRequires();
+        return $this->linkedPackage->getReplaces();
     }
 
     public function getSuggests(): array
     {
-        return $this->package->getSuggests();
+        return $this->linkedPackage->getSuggests();
     }
 
     public function getAutoload(): array
     {
-        return $this->package->getAutoload();
+        return $this->linkedPackage->getAutoload();
     }
 
     public function getDevAutoload(): array
     {
-        return $this->package->getDevAutoload();
+        return $this->linkedPackage->getDevAutoload();
     }
 
     public function getIncludePaths(): array
     {
-        return $this->package->getIncludePaths();
+        return $this->linkedPackage->getIncludePaths();
     }
 
     public function getPhpExt(): ?array
     {
-        return $this->package->getPhpExt();
+        return $this->linkedPackage->getPhpExt();
     }
 
     public function setRepository(RepositoryInterface $repository): void
     {
-        $this->package->setRepository($repository);
+        $this->linkedPackage->setRepository($repository);
     }
 
     public function getRepository(): ?RepositoryInterface
     {
-        return $this->package->getRepository();
+        return $this->linkedPackage->getRepository();
     }
 
     public function getBinaries(): array
     {
-        return $this->package->getBinaries();
+        return $this->linkedPackage->getBinaries();
     }
 
     public function getUniqueName(): string
     {
-        return $this->package->getUniqueName();
+        return $this->linkedPackage->getUniqueName();
     }
 
     public function getNotificationUrl(): ?string
     {
-        return $this->package->getNotificationUrl();
+        return $this->linkedPackage->getNotificationUrl();
     }
 
     public function __toString(): string
     {
-        return $this->package->__toString();
+        return $this->linkedPackage->__toString();
     }
 
     public function getPrettyString(): string
     {
-        return $this->package->getPrettyString();
+        return $this->linkedPackage->getPrettyString();
     }
 
     public function isDefaultBranch(): bool
     {
-        return $this->package->isDefaultBranch();
+        return $this->linkedPackage->isDefaultBranch();
     }
 
     public function getTransportOptions(): array
     {
-        return $this->package->getTransportOptions();
+        return $this->linkedPackage->getTransportOptions();
     }
 
     public function setTransportOptions(array $options): void
     {
-        $this->package->setTransportOptions($options);
+        $this->linkedPackage->setTransportOptions($options);
     }
 
     public function setSourceReference(?string $reference): void
     {
-        $this->package->setSourceReference($reference);
+        $this->linkedPackage->setSourceReference($reference);
     }
 
     public function setDistUrl(?string $url): void
     {
-        $this->package->setDistUrl($url);
+        $this->linkedPackage->setDistUrl($url);
     }
 
     public function setDistType(?string $type): void
     {
-        $this->package->setDistType($type);
+        $this->linkedPackage->setDistType($type);
     }
 
     public function setDistReference(?string $reference): void
     {
-        $this->package->setDistReference($reference);
+        $this->linkedPackage->setDistReference($reference);
     }
 
     public function setSourceDistReferences(string $reference): void
     {
-        $this->package->setSourceDistReferences($reference);
+        $this->linkedPackage->setSourceDistReferences($reference);
     }
 }

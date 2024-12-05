@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
-use ComposerLink\LinkedPackage;
+use ComposerLink\Package\LinkedPackage;
 use ComposerLink\PathHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,6 +29,20 @@ class LinkCommand extends Command
         $this->setName('link');
         $this->setDescription('Link a package to a local directory');
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
+        $this->addOption(
+            'dependencies',
+            null,
+            InputOption::VALUE_NEGATABLE,
+            'Also install package dependencies',
+            false
+        );
+        $this->addOption(
+            'no-dev',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Disables installation of require-dev packages.',
+            false
+        );
         $this->addOption(
             'only-installed',
             null,
@@ -58,10 +72,11 @@ class LinkCommand extends Command
                 continue;
             }
 
+            $package->setWithoutDependencies(!(bool) $input->getOption('dependencies'));
             $manager->add($package);
         }
 
-        $manager->linkPackages();
+        $manager->linkPackages(!(bool) $input->getOption('no-dev'));
 
         return 0;
     }
