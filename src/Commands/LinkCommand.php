@@ -30,18 +30,16 @@ class LinkCommand extends Command
         $this->setDescription('Link a package to a local directory');
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
         $this->addOption(
-            'dependencies',
+            'without-dependencies',
             null,
-            InputOption::VALUE_NEGATABLE,
+            InputOption::VALUE_NONE,
             'Also install package dependencies',
-            false
         );
         $this->addOption(
             'no-dev',
             null,
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Disables installation of require-dev packages.',
-            false
         );
         $this->addOption(
             'only-installed',
@@ -72,7 +70,7 @@ class LinkCommand extends Command
                 continue;
             }
 
-            $package->setWithoutDependencies(!(bool) $input->getOption('dependencies'));
+            $package->setWithoutDependencies((bool) $input->getOption('without-dependencies'));
             $manager->add($package);
         }
 

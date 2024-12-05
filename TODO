@@ -1,7 +1,3 @@
  - Recover when linked-packages.json cannot be parsed.
- - Add --dependencies/--no-dependencies flag, and notify users change in behavior
  - Tests
- - Update readme (--no-dev flag, --no-dependencies flag, minimal composer version)
-
-
-
+ - Update readme (--no-dev flag, --without-dependencies flag)

@@ -30,9 +30,8 @@ class UnlinkCommand extends Command
         $this->addOption(
             'no-dev',
             null,
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Disables installation of require-dev packages.',
-            false
         );
     }
 

@@ -29,7 +29,7 @@ use DateTimeInterface;
  */
 class LinkedPackage extends BasePackage implements CompletePackageInterface
 {
-    protected bool $withoutDependencies = true;
+    protected bool $withoutDependencies = false;
 
     /**
      * @param non-empty-string $path
