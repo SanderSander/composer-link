@@ -21,6 +21,12 @@ namespace Tests\Integration;
  */
 class LinuxMacosBasicTest extends TestCase
 {
+    public function test_if_plugin_can_be_installed(): void
+    {
+        // TODO We need this because because when we run a `composer global update` the plugin old code is used
+        //      while also using newer code. The Plugin class should be able to handle this somehow to prevent these issues.
+    }
+
     /**
      * Test if we can link a package in a project while using relative paths.
      * The plugin is installed in project.

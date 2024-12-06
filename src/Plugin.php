@@ -16,8 +16,12 @@ declare(strict_types=1);
 namespace ComposerLink;
 
 use Composer\Composer;
+use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
+use Composer\Installer\PackageEvent;
+use Composer\Installer\PackageEvents;
 use Composer\IO\IOInterface;
+use Composer\Package\Package;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
@@ -44,6 +48,8 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected LinkManagerFactory $linkManagerFactory;
 
+    protected bool $isUpgrading = false;
+
     public function __construct(
         ?ComposerFileSystem $filesystem = null,
         ?RepositoryFactory $repositoryFactory = null,
@@ -59,7 +65,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
      */
     public function deactivate(Composer $composer, IOInterface $io): void
     {
-        $io->debug("[ComposerLink]\tPlugin is deactivated");
+        $io->debug('[ComposerLink] Plugin is deactivated.');
     }
 
     /**
@@ -67,7 +73,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
      */
     public function uninstall(Composer $composer, IOInterface $io): void
     {
-        $io->debug("[ComposerLink]\tPlugin uninstalling");
+        $io->debug('[ComposerLink] Plugin uninstalling');
     }
 
     /**
@@ -75,11 +81,41 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
      */
     public function activate(Composer $composer, IOInterface $io): void
     {
-        $io->debug("[ComposerLink]\tPlugin is activating");
+        $io->debug('[ComposerLink] Plugin activating');
+
         $this->composer = $composer;
+
+        if ($this->detectUpgradeAndReset()) {
+            $io->debug('[ComposerLink] Plugin just upgraded skipping initialization.');
+            $this->isUpgrading = true;
+
+            return;
+        }
+
         $this->repository = $this->initializeRepository();
         $this->packageFactory = $this->initializeLinkedPackageFactory();
         $this->linkManager = $this->initializeLinkManager($io);
+    }
+
+    /**
+     * This is a bit of a hack to detect upgrading.
+     */
+    protected function detectUpgradeAndReset(): bool
+    {
+        /** @var Package $thisPackage */
+        $thisPackage = $this->composer
+            ->getRepositoryManager()
+            ->getLocalRepository()
+            ->findPackage('sandersander/composer-link', '*');
+
+        $extra = $thisPackage->getExtra();
+        $upgrading = isset($extra['upgrading']);
+        if ($upgrading) {
+            unset($extra['upgrading']);
+            $thisPackage->setExtra($extra);
+        }
+
+        return $upgrading;
     }
 
     protected function initializeRepository(): Repository
@@ -117,7 +153,28 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             ScriptEvents::POST_INSTALL_CMD => [
                 ['postInstall'],
             ],
+            PackageEvents::PRE_PACKAGE_UPDATE => [
+                ['prePackageUpdate'],
+            ],
         ];
+    }
+
+    /**
+     * If this package is upgraded, only the Plugin class is run through eval() with a renamed class name and constructed again
+     * Since php doesn't have a way to remove defined classes in memory we have to solve this in a different way.
+     *
+     * For the moment we just set a flag in the extra section of this plugin
+     */
+    public function prePackageUpdate(PackageEvent $event): void
+    {
+        /** @var UpdateOperation $operation */
+        $operation = $event->getOperation();
+        /** @var Package $target */
+        $target = $operation->getTargetPackage();
+        if ($target->getName() === 'sandersander/composer-link') {
+            $event->getIO()->debug('[ComposerLink] Plugin upgrade detected.');
+            $target->setExtra(array_merge($target->getExtra(), ['upgrading' => true]));
+        }
     }
 
     public function postInstall(Event $event): void
@@ -130,6 +187,13 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function postUpdate(Event $event): void
     {
+        // We just upgraded, so we do nothing
+        if ($this->isUpgrading) {
+            $event->getIO()->debug('[ComposerLink] Plugin upgrade detected, skipping post-update-cmd event.');
+            $event->getIO()->warning('<warning>Composer link has just been updated, run `composer install` again to link packages</warning>');
+            return;
+        }
+
         $linkManager = $this->getLinkManager();
         $repository = $this->getRepository();
 
