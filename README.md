@@ -50,6 +50,12 @@ composer link ../packages/*
 composer link ../packages/* --only-installed
 ```
 
+Composer link will automatically install/update the required packages from the linked package, 
+you can prevent this behavior by adding the `--without-dependencies` flag.
+
+When the `composer link` or `composer unlink` are used all packages defined in `require-dev` of the root package are 
+installed by default, this can be prevented by using the `--no-dev` flag
+
 To unlink the package you can use the `unlink` command
 ```
 composer unlink ../path/to/package
