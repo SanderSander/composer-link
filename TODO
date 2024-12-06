@@ -1,3 +1,2 @@
  - Recover when linked-packages.json cannot be parsed.
- - Tests
  - Update readme (--no-dev flag, --without-dependencies flag)
