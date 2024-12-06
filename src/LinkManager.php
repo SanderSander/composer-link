@@ -105,7 +105,6 @@ class LinkManager
             ->setWriteLock(false)
             ->setRunScripts(false)
             ->setUpdateAllowList(array_keys($this->requires))
-            // TODO we should be able to configure this
             ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
         $installer->run();
