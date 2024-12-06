@@ -13,7 +13,7 @@ declare(strict_types=1);
  * @link https://github.com/SanderSander/composer-link
  */
 
-namespace Tests\Unit;
+namespace Tests\Unit\Package;
 
 use Composer\Package\CompletePackageInterface;
 use Composer\Package\PackageInterface;

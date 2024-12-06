@@ -108,6 +108,7 @@ class LinkManager
             ->setUpdateAllowList(array_keys($this->requires))
             ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
+
         $installer->run();
 
         $eventDispatcher->setRunScripts();

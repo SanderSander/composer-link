@@ -15,35 +15,36 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use Composer\Installer\InstallationManager;
-use Composer\Installer\InstallerInterface;
-use Composer\Repository\InstalledRepositoryInterface;
-use Composer\Util\Filesystem;
-use Composer\Util\Loop;
+use Composer\Composer;
+use Composer\DependencyResolver\Request;
+use Composer\Installer;
+use Composer\IO\IOInterface;
+use ComposerLink\InstallerFactory;
 use ComposerLink\LinkManager;
-use ComposerLink\Package\LinkedPackage;
+use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
 class LinkManagerTest extends TestCase
 {
-    /** @var Filesystem&MockObject */
-    protected Filesystem $filesystem;
+    /**
+     * @var Repository&MockObject
+     */
+    protected Repository $repository;
 
-    /** @var InstallerInterface&MockObject */
-    protected InstallerInterface $installer;
+    /**
+     * @var Installer&MockObject
+     */
+    protected Installer $installer;
 
-    /** @var Loop&MockObject */
-    protected Loop $loop;
+    /**
+     * @var IOInterface&MockObject
+     */
+    protected IOInterface $io;
 
-    /** @var LinkedPackage&MockObject */
-    protected LinkedPackage $package;
-
-    /** @var InstallationManager|MockObject */
-    protected InstallationManager $installationManager;
-
-    /** @var InstalledRepositoryInterface|MockObject */
-    protected InstalledRepositoryInterface $installedRepository;
+    /**
+     * @var Composer&MockObject
+     */
+    protected Composer $composer;
 
     protected LinkManager $linkManager;
 
@@ -51,18 +52,76 @@ class LinkManagerTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem = $this->createMock(Filesystem::class);
-        $this->installer = $this->createMock(InstallerInterface::class);
-        $this->loop = $this->createMock(Loop::class);
-        $this->package = $this->createMock(LinkedPackage::class);
-        $this->installationManager = $this->createMock(InstallationManager::class);
-        $this->installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $this->repository = $this->createMock(Repository::class);
+        $installerFactory = $this->createMock(InstallerFactory::class);
+        $this->installer = $this->createMock(Installer::class);
+        $installerFactory->method('create')->willReturn($this->installer);
+        $this->io = $this->createMock(IOInterface::class);
+        $this->composer = $this->createMock(Composer::class);
 
-        $this->installationManager->method('getInstaller')->willReturn($this->installer);
+        $this->linkManager = new LinkManager(
+            $this->repository,
+            $installerFactory,
+            $this->io,
+            $this->composer,
+        );
     }
 
-    public function test_todo(): void
+    public function test_has_linked_packages(): void
     {
-        static::assertTrue(true);
+        static::assertFalse($this->linkManager->hasLinkedPackages());
+        $this->linkManager->add($this->mockPackage());
+        static::assertTrue($this->linkManager->hasLinkedPackages());
+    }
+
+    public function test_add_package(): void
+    {
+        $package = $this->mockPackage();
+
+        $this->repository->expects(static::once())->method('store')->with($package);
+        $this->repository->expects(static::once())->method('persist');
+
+        $this->linkManager->add($package);
+    }
+
+    public function test_remove_package(): void
+    {
+        $package = $this->mockPackage();
+
+        $this->repository->expects(static::once())->method('remove')->with($package);
+        $this->repository->expects(static::once())->method('persist');
+
+        $this->linkManager->remove($package);
+    }
+
+    public function test_link_packages_empty(): void
+    {
+        $this->installer->expects(static::once())->method('setUpdate')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowList')->with([])->willReturnSelf();
+        $this->installer->expects(static::once())->method('setDevMode')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
+        $this->installer->expects(static::once())->method('run');
+
+        $this->linkManager->linkPackages(false);
+    }
+
+    public function test_link_packages(): void
+    {
+        $package = $this->mockPackage();
+        $this->linkManager->add($package);
+
+        $this->installer->expects(static::once())->method('setUpdate')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowList')->with(['test/package'])->willReturnSelf();
+        $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
+        $this->installer->expects(static::once())->method('run');
+
+        $this->linkManager->linkPackages(true);
     }
 }
