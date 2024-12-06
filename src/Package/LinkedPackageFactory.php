@@ -17,7 +17,6 @@ namespace ComposerLink\Package;
 
 use Composer\Installer\InstallationManager;
 use Composer\Json\JsonFile;
-use Composer\Package\CompleteAliasPackage;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
 use Composer\Repository\InstalledRepositoryInterface;
@@ -46,16 +45,13 @@ class LinkedPackageFactory
             throw new RuntimeException(sprintf('Unable to read composer.json in "%s"', $path));
         }
 
-        // Version is required here
+        // Version is required here because we load it from a directory
         if (!isset($json['version'])) {
             $json['version'] = 'dev-linked';
         }
 
+        /** @var CompletePackage $package */
         $package = (new ArrayLoader())->load($json);
-
-        if ($package instanceof CompleteAliasPackage) {
-            $package = $package->getAliasOf();
-        }
 
         return $package;
     }

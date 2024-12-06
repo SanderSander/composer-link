@@ -19,6 +19,8 @@ use Composer\Composer;
 use Composer\DependencyResolver\Request;
 use Composer\Installer;
 use Composer\IO\IOInterface;
+use Composer\Package\Link;
+use Composer\Package\RootPackageInterface;
 use ComposerLink\InstallerFactory;
 use ComposerLink\LinkManager;
 use ComposerLink\Repository\Repository;
@@ -46,6 +48,11 @@ class LinkManagerTest extends TestCase
      */
     protected Composer $composer;
 
+    /**
+     * @var RootPackageInterface&MockObject
+     */
+    protected RootPackageInterface $rootPackage;
+
     protected LinkManager $linkManager;
 
     protected function setUp(): void
@@ -58,6 +65,8 @@ class LinkManagerTest extends TestCase
         $installerFactory->method('create')->willReturn($this->installer);
         $this->io = $this->createMock(IOInterface::class);
         $this->composer = $this->createMock(Composer::class);
+        $this->rootPackage = $this->createMock(RootPackageInterface::class);
+        $this->composer->method('getPackage')->willReturn($this->rootPackage);
 
         $this->linkManager = new LinkManager(
             $this->repository,
@@ -111,8 +120,12 @@ class LinkManagerTest extends TestCase
     public function test_link_packages(): void
     {
         $package = $this->mockPackage();
+        $link = $this->createMock(Link::class);
+        $package->method('createLink')->willReturn($link);
         $this->linkManager->add($package);
 
+        $this->rootPackage->expects(static::once())->method('setRequires')->with(['test/package' => $link]);
+        $this->rootPackage->expects(static::once())->method('setDevRequires')->with([]);
         $this->installer->expects(static::once())->method('setUpdate')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
@@ -121,6 +134,20 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
         $this->installer->expects(static::once())->method('run');
+
+        $this->linkManager->linkPackages(true);
+    }
+
+    public function test_override_from_dev_requirements(): void
+    {
+        $package = $this->mockPackage();
+        $link = $this->createMock(Link::class);
+        $package->method('createLink')->willReturn($link);
+        $this->linkManager->add($package);
+
+        $this->rootPackage->method('getDevRequires')->willReturn(['test/package' => $link]);
+        $this->rootPackage->expects(static::once())->method('setRequires')->with(['test/package' => $link]);
+        $this->rootPackage->expects(static::once())->method('setDevRequires')->with([]);
 
         $this->linkManager->linkPackages(true);
     }
