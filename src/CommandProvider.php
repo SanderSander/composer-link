@@ -20,6 +20,7 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use ComposerLink\Commands\LinkCommand;
 use ComposerLink\Commands\LinkedCommand;
+use ComposerLink\Commands\UnlinkAllCommand;
 use ComposerLink\Commands\UnlinkCommand;
 
 class CommandProvider implements ComposerCommandProvider
@@ -48,6 +49,7 @@ class CommandProvider implements ComposerCommandProvider
             new LinkCommand($this->plugin),
             new UnlinkCommand($this->plugin),
             new LinkedCommand($this->plugin),
+            new UnlinkAllCommand($this->plugin),
         ];
     }
 }
