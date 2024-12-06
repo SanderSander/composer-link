@@ -32,6 +32,8 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           tools: composer:${{ matrix.composer-versions }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate composer.json
         run: composer validate --strict
