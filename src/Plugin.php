@@ -116,21 +116,43 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         return [
             ScriptEvents::POST_UPDATE_CMD => [
-                ['relinkPackages'],
+                ['postUpdate'],
             ],
             ScriptEvents::POST_INSTALL_CMD => [
-                ['relinkPackages'],
+                ['postInstall'],
             ],
         ];
     }
 
-    public function relinkPackages(Event $event): void
+    public function postInstall(Event $event): void
     {
         if (is_null($this->linkManager)) {
             throw new RuntimeException('Link manager not initialized');
         }
 
         if ($this->linkManager->hasLinkedPackages()) {
+            $this->linkManager->linkPackages($event->isDevMode());
+        }
+    }
+
+    public function postUpdate(Event $event): void
+    {
+        if (is_null($this->linkManager) || is_null($this->repository)) {
+            throw new RuntimeException('Plugin not initialized');
+        }
+
+        if ($this->linkManager->hasLinkedPackages()) {
+
+            $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
+
+            //  It can happen that a original package is updated,
+            //  in those cases we need to update the state of the linked package by setting the original package
+            foreach ($this->repository->all() as $package) {
+                $original = $localRepository->findPackage($package->getName(), '*');
+                $package->setOriginalPackage($original);
+            }
+            $this->repository->persist();
+
             $this->linkManager->linkPackages($event->isDevMode());
         }
     }

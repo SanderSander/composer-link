@@ -61,6 +61,11 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         return $this->original;
     }
 
+    public function setOriginalPackage(?PackageInterface $package): void
+    {
+        $this->original = $package;
+    }
+
     public function getPath(): string
     {
         return $this->path;
