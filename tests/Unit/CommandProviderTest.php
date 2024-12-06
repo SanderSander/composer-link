@@ -39,6 +39,6 @@ class CommandProviderTest extends TestCase
         static::assertInstanceOf(LinkCommand::class, $commands[0]);
         static::assertInstanceOf(UnlinkCommand::class, $commands[1]);
         static::assertInstanceOf(LinkedCommand::class, $commands[2]);
-        static::assertInstanceOf(UnlinkAllCommand::class, $commands[4]);
+        static::assertInstanceOf(UnlinkAllCommand::class, $commands[3]);
     }
 }
