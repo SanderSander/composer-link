@@ -17,12 +17,17 @@ namespace Tests\Unit;
 
 use Composer\Package\PackageInterface;
 use ComposerLink\Package\LinkedPackage;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\TestCase as BaseTest;
 
 abstract class TestCase extends BaseTest
 {
-    /** @SuppressWarnings(PHPMD.BooleanArgumentFlag) */
-    protected function mockPackage(string $name = 'package', bool $withOriginalPackage = true): LinkedPackage
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     *
+     * @return LinkedPackage&MockObject
+     */
+    protected function mockPackage(string $name = 'package', bool $withOriginalPackage = true): MockObject
     {
         $package = $this->createMock(LinkedPackage::class);
         $package->method('getName')->willReturn('test/' . $name);

@@ -34,18 +34,24 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     protected ?Repository $repository = null;
 
     protected ComposerFileSystem $filesystem;
-
-    protected ?LinkManager $linkManager = null;
-
     protected ?LinkedPackageFactory $packageFactory = null;
 
     protected Composer $composer;
 
+    protected ?LinkManager $linkManager = null;
+
+    protected RepositoryFactory $repositoryFactory;
+
+    protected LinkManagerFactory $linkManagerFactory;
+
     public function __construct(
         ?ComposerFileSystem $filesystem = null,
-        protected ?RepositoryFactory $repositoryFactory = null,
+        ?RepositoryFactory $repositoryFactory = null,
+        ?LinkManagerFactory $linkManagerFactory = null,
     ) {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
+        $this->repositoryFactory = $repositoryFactory ?? new RepositoryFactory();
+        $this->linkManagerFactory = $linkManagerFactory ?? new LinkManagerFactory();
     }
 
     /**
@@ -72,19 +78,17 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
 
-        $this->initializeRepository();
+        $this->repository = $repository = $this->initializeRepository();
         $this->initializeLinkedPackageFactory();
-        $this->initializeLinkManager($io);
+        $this->initializeLinkManager($io, $repository);
     }
 
-    protected function initializeRepository(): void
+    protected function initializeRepository(): Repository
     {
         $storageFile = $this->composer->getConfig()
                 ->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
-        if (is_null($this->repositoryFactory)) {
-            $this->repositoryFactory = new RepositoryFactory();
-        }
-        $this->repository = $this->repositoryFactory->create($storageFile);
+
+        return $this->repositoryFactory->create($storageFile);
     }
 
     protected function initializeLinkedPackageFactory(): void
@@ -95,15 +99,11 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         );
     }
 
-    protected function initializeLinkManager(IOInterface $io): void
+    protected function initializeLinkManager(IOInterface $io, Repository $repository): void
     {
-        if (is_null($this->repository)) {
-            throw new RuntimeException('Repository not initialized');
-        }
-
-        $this->linkManager = new LinkManager(
+        $this->linkManager = $this->linkManagerFactory->create(
             $this->filesystem,
-            $this->repository,
+            $repository,
             new InstallerFactory($io, $this->composer),
             $io,
             $this->composer->getEventDispatcher(),
@@ -126,34 +126,28 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function postInstall(Event $event): void
     {
-        if (is_null($this->linkManager)) {
-            throw new RuntimeException('Link manager not initialized');
-        }
-
-        if ($this->linkManager->hasLinkedPackages()) {
-            $this->linkManager->linkPackages($event->isDevMode());
+        $linkManager = $this->getLinkManager();
+        if ($linkManager->hasLinkedPackages()) {
+            $linkManager->linkPackages($event->isDevMode());
         }
     }
 
     public function postUpdate(Event $event): void
     {
-        if (is_null($this->linkManager) || is_null($this->repository)) {
-            throw new RuntimeException('Plugin not initialized');
-        }
+        $linkManager = $this->getLinkManager();
+        $repository = $this->getRepository();
 
-        if ($this->linkManager->hasLinkedPackages()) {
-
+        if ($linkManager->hasLinkedPackages()) {
             $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
-
             //  It can happen that a original package is updated,
             //  in those cases we need to update the state of the linked package by setting the original package
-            foreach ($this->repository->all() as $package) {
+            foreach ($repository->all() as $package) {
                 $original = $localRepository->findPackage($package->getName(), '*');
                 $package->setOriginalPackage($original);
             }
-            $this->repository->persist();
+            $repository->persist();
 
-            $this->linkManager->linkPackages($event->isDevMode());
+            $linkManager->linkPackages($event->isDevMode());
         }
     }
 
