@@ -18,7 +18,9 @@ namespace Tests\Unit\Package;
 use Composer\Package\CompletePackageInterface;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
+use Composer\Semver\Constraint\Constraint;
 use ComposerLink\Package\LinkedPackage;
 use PHPUnit\Framework\TestCase;
 
@@ -60,6 +62,7 @@ class LinkedPackageTest extends TestCase
         $package = self::createStub(CompletePackageInterface::class);
         $package->method('getRequires')->willReturn(['test' => $link]);
         $package->method('getDevRequires')->willReturn(['dev-test' => $link]);
+        $package->method('getName')->willReturn('test/package');
         $originalPackage = self::createStub(PackageInterface::class);
         $originalPackage->method('getRequires')->willReturn(['orig-test' => $link]);
         $originalPackage->method('getDevRequires')->willReturn(['orig-dev-test' => $link]);
@@ -88,6 +91,11 @@ class LinkedPackageTest extends TestCase
         $linkedPackage->setWithoutDependencies(false);
         static::assertSame(['test' => $link], $linkedPackage->getRequires());
         static::assertSame(['dev-test' => $link], $linkedPackage->getDevRequires());
+
+        $root = $this->createMock(RootPackageInterface::class);
+        $root->method('getName')->willReturn('root/package');
+        $link = new Link('root/package', 'test/package', new Constraint('=', 'dev-linked'), Link::TYPE_REQUIRE);
+        static::assertEquals($link, $linkedPackage->createLink($root));
     }
 
     public function test_decorated_methods(): void

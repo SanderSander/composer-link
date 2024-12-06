@@ -1,2 +1,2 @@
- - Recover when linked-packages.json cannot be parsed.
  - Update readme (--no-dev flag, --without-dependencies flag)
+ - Integration tests

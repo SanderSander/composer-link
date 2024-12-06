@@ -83,6 +83,21 @@ class LinkManagerTest extends TestCase
         static::assertTrue($this->linkManager->hasLinkedPackages());
     }
 
+    public function test_loads_active_linked_packages(): void
+    {
+        $installerFactory = $this->createMock(InstallerFactory::class);
+        $installerFactory->method('create')->willReturn($this->installer);
+        $this->repository->method('all')->willReturn([$this->mockPackage()]);
+
+        $linkManager = new LinkManager(
+            $this->repository,
+            $installerFactory,
+            $this->io,
+            $this->composer,
+        );
+        static::assertTrue($linkManager->hasLinkedPackages());
+    }
+
     public function test_add_package(): void
     {
         $package = $this->mockPackage();
