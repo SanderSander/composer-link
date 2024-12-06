@@ -15,14 +15,11 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
+use Composer\Composer;
 use Composer\DependencyResolver\Request;
-use Composer\EventDispatcher\EventDispatcher;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
-use Composer\Package\RootPackageInterface;
 use Composer\Repository\ArrayRepository;
-use Composer\Repository\RepositoryManager;
-use Composer\Util\Filesystem;
 use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Repository\Repository;
 
@@ -36,25 +33,25 @@ class LinkManager
     protected array $requires = [];
 
     public function __construct(
-        protected readonly Filesystem $filesystem,
         protected readonly Repository $repository,
         protected readonly InstallerFactory $installerFactory,
         protected readonly IOInterface $io,
-        protected readonly EventDispatcher $eventDispatcher,
-        protected readonly RootPackageInterface $rootPackage,
-        protected readonly RepositoryManager $repositoryManager,
+        protected readonly Composer $composer,
     ) {
         $this->linkedRepository = new ArrayRepository();
+        $rootPackage = $this->composer->getPackage();
 
         // Load already linked packages
         foreach ($this->repository->all() as $package) {
             $this->linkedRepository->addPackage($package);
-            $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
+            $this->requires[$package->getName()] = $package->createLink($rootPackage);
         }
     }
 
     public function add(LinkedPackage $package): void
     {
+        $rootPackage = $this->composer->getPackage();
+
         $this->repository->store($package);
         $this->repository->persist();
 
@@ -62,7 +59,7 @@ class LinkManager
             $this->linkedRepository->addPackage($package);
         }
 
-        $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
+        $this->requires[$package->getName()] = $package->createLink($rootPackage);
     }
 
     public function remove(LinkedPackage $package): void
@@ -81,23 +78,27 @@ class LinkManager
 
     public function linkPackages(bool $isDev): void
     {
+        $repositoryManager = $this->composer->getRepositoryManager();
+        $eventDispatcher = $this->composer->getEventDispatcher();
+        $rootPackage = $this->composer->getPackage();
+
         // Use the composer installer to install the linked packages with dependencies
-        $this->repositoryManager->prependRepository($this->linkedRepository);
+        $repositoryManager->prependRepository($this->linkedRepository);
 
         // Add requirement to the current/loaded composer.json
-        $this->rootPackage->setRequires(array_merge($this->rootPackage->getRequires(), $this->requires));
+        $rootPackage->setRequires(array_merge($rootPackage->getRequires(), $this->requires));
         $this->io->warning('<warning>Linking packages, Lock file will be generated in memory but not written to disk.</warning>');
 
         // We need to remove dev-requires from the list of packages that are linked
-        $devRequires = $this->rootPackage->getDevRequires();
+        $devRequires = $rootPackage->getDevRequires();
         foreach ($this->linkedRepository->getPackages() as $package) {
             unset($devRequires[$package->getName()]);
         }
-        $this->rootPackage->setDevRequires($devRequires);
+        $rootPackage->setDevRequires($devRequires);
 
         // Prevent circular call to script handler 'post-update-cmd' by creating a new composer instance
         // We also need to set this on the Installer while it's deprecated
-        $this->eventDispatcher->setRunScripts(false);
+        $eventDispatcher->setRunScripts(false);
 
         $installer = $this->installerFactory->create() /* @phpstan-ignore method.deprecated */
             ->setUpdate(true)
@@ -109,7 +110,7 @@ class LinkManager
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
         $installer->run();
 
-        $this->eventDispatcher->setRunScripts();
+        $eventDispatcher->setRunScripts();
         $this->io->warning('<warning>Linking packages finished!</warning>');
     }
 }

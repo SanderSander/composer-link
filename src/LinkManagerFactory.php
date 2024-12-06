@@ -15,31 +15,23 @@ declare(strict_types=1);
 
 namespace ComposerLink;
 
-use Composer\EventDispatcher\EventDispatcher;
+use Composer\Composer;
 use Composer\IO\IOInterface;
-use Composer\Package\RootPackageInterface;
-use Composer\Repository\RepositoryManager;
-use Composer\Util\Filesystem;
 use ComposerLink\Repository\Repository;
 
 class LinkManagerFactory
 {
-    public function create(Filesystem $filesystem,
+    public function create(
         Repository $repository,
         InstallerFactory $installerFactory,
         IOInterface $io,
-        EventDispatcher $eventDispatcher,
-        RootPackageInterface $rootPackage,
-        RepositoryManager $repositoryManager, ): LinkManager
+        Composer $composer): LinkManager
     {
         return new LinkManager(
-            $filesystem,
             $repository,
             $installerFactory,
             $io,
-            $eventDispatcher,
-            $rootPackage,
-            $repositoryManager,
+            $composer
         );
     }
 }

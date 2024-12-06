@@ -77,10 +77,9 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
-
-        $this->repository = $repository = $this->initializeRepository();
-        $this->initializeLinkedPackageFactory();
-        $this->initializeLinkManager($io, $repository);
+        $this->repository = $this->initializeRepository();
+        $this->packageFactory = $this->initializeLinkedPackageFactory();
+        $this->linkManager = $this->initializeLinkManager($io);
     }
 
     protected function initializeRepository(): Repository
@@ -91,24 +90,21 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         return $this->repositoryFactory->create($storageFile);
     }
 
-    protected function initializeLinkedPackageFactory(): void
+    protected function initializeLinkedPackageFactory(): LinkedPackageFactory
     {
-        $this->packageFactory = new LinkedPackageFactory(
+        return new LinkedPackageFactory(
             $this->composer->getInstallationManager(),
             $this->composer->getRepositoryManager()->getLocalRepository()
         );
     }
 
-    protected function initializeLinkManager(IOInterface $io, Repository $repository): void
+    protected function initializeLinkManager(IOInterface $io): LinkManager
     {
-        $this->linkManager = $this->linkManagerFactory->create(
-            $this->filesystem,
-            $repository,
+        return $this->linkManagerFactory->create(
+            $this->getRepository(),
             new InstallerFactory($io, $this->composer),
             $io,
-            $this->composer->getEventDispatcher(),
-            $this->composer->getPackage(),
-            $this->composer->getRepositoryManager(),
+            $this->composer
         );
     }
 
