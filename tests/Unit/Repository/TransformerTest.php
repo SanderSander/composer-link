@@ -37,6 +37,7 @@ class TransformerTest extends TestCase
                     'name' => 'test/package',
                     'version' => 'dev-master',
                 ],
+                'withoutDependencies' => true,
             ]
         );
 
@@ -44,6 +45,7 @@ class TransformerTest extends TestCase
         static::assertEquals('test/package', $package->getName());
         static::assertEquals('../path', $package->getPath());
         static::assertEquals('install-path/', $package->getInstallationPath());
+        static::assertTrue($package->isWithoutDependencies());
 
         $package = $transformer->load(
             [
@@ -54,9 +56,11 @@ class TransformerTest extends TestCase
                     'name' => 'test/package',
                     'version' => 'dev-master',
                 ],
+                'withoutDependencies' => false,
             ]
         );
         static::assertNull($package->getOriginalPackage());
+        static::assertFalse($package->isWithoutDependencies());
     }
 
     public function test_export(): void
@@ -79,6 +83,7 @@ class TransformerTest extends TestCase
                 'version_normalized' => '',
                 'type' => '',
             ],
+            'withoutDependencies' => false,
         ], $data);
 
         $data = $transformer->export($this->mockPackage('package', false));
@@ -91,6 +96,7 @@ class TransformerTest extends TestCase
                 'version_normalized' => '',
                 'type' => '',
             ],
+            'withoutDependencies' => false,
         ], $data);
     }
 }

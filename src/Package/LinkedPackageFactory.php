@@ -13,7 +13,7 @@ declare(strict_types=1);
  * @link https://github.com/SanderSander/composer-link
  */
 
-namespace ComposerLink;
+namespace ComposerLink\Package;
 
 use Composer\Installer\InstallationManager;
 use Composer\Json\JsonFile;
@@ -30,6 +30,9 @@ class LinkedPackageFactory
     ) {
     }
 
+    /**
+     * @param non-empty-string $path
+     */
     private function loadFromJsonFile(string $path): CompletePackage
     {
         if (!file_exists($path . DIRECTORY_SEPARATOR . 'composer.json')) {
@@ -42,28 +45,27 @@ class LinkedPackageFactory
             throw new RuntimeException(sprintf('Unable to read composer.json in "%s"', $path));
         }
 
-        $json['version'] = 'dev-master';
+        // Version is required here because we load it from a directory
+        if (!isset($json['version'])) {
+            $json['version'] = 'dev-linked';
+        }
 
-        // branch alias won't work, otherwise the ArrayLoader::load won't return an instance of CompletePackage
-        unset($json['extra']['branch-alias']);
-
-        $loader = new ArrayLoader();
         /** @var CompletePackage $package */
-        $package = $loader->load($json);
-        $package->setDistUrl($path);
-        $package->setInstallationSource('dist');
-        $package->setDistType('path');
+        $package = (new ArrayLoader())->load($json);
 
         return $package;
     }
 
+    /**
+     * @param non-empty-string $path
+     */
     public function fromPath(string $path): LinkedPackage
     {
         $originalPackage = null;
-        $newPackage = $this->loadFromJsonFile($path);
+        $linkedPackage = $this->loadFromJsonFile($path);
         $packages = $this->installedRepository->getCanonicalPackages();
         foreach ($packages as $package) {
-            if ($package->getName() === $newPackage->getName()) {
+            if ($package->getName() === $linkedPackage->getName()) {
                 $originalPackage = $package;
             }
         }
@@ -71,13 +73,13 @@ class LinkedPackageFactory
         // TODO installation path exists only if package is installed
         //      we should add support when the package isn't required yet in composer.json
         /** @var string $destination */
-        $destination = $this->installationManager->getInstallPath($newPackage);
+        $destination = $this->installationManager->getInstallPath($linkedPackage);
 
         return new LinkedPackage(
+            $linkedPackage,
             $path,
-            $newPackage,
-            $originalPackage,
-            $destination
+            $destination,
+            $originalPackage
         );
     }
 }

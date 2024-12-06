@@ -21,9 +21,10 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
-use ComposerLink\Actions\LinkPackages;
+use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\RepositoryFactory;
 use RuntimeException;
@@ -33,19 +34,24 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     protected ?Repository $repository = null;
 
     protected ComposerFileSystem $filesystem;
-
-    protected ?LinkManager $linkManager = null;
-
     protected ?LinkedPackageFactory $packageFactory = null;
 
     protected Composer $composer;
 
+    protected ?LinkManager $linkManager = null;
+
+    protected RepositoryFactory $repositoryFactory;
+
+    protected LinkManagerFactory $linkManagerFactory;
+
     public function __construct(
         ?ComposerFileSystem $filesystem = null,
-        protected ?LinkPackages $linkPackages = null,
-        protected ?RepositoryFactory $repositoryFactory = null,
+        ?RepositoryFactory $repositoryFactory = null,
+        ?LinkManagerFactory $linkManagerFactory = null,
     ) {
         $this->filesystem = $filesystem ?? new ComposerFileSystem();
+        $this->repositoryFactory = $repositoryFactory ?? new RepositoryFactory();
+        $this->linkManagerFactory = $linkManagerFactory ?? new LinkManagerFactory();
     }
 
     /**
@@ -61,7 +67,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
      */
     public function uninstall(Composer $composer, IOInterface $io): void
     {
-        // TODO remove repository file and restore all packages
         $io->debug("[ComposerLink]\tPlugin uninstalling");
     }
 
@@ -72,59 +77,74 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
-
-        $this->initializeRepository();
-        $this->initializeLinkedPackageFactory();
-        $this->initializeLinkManager();
-        $this->initializeLinkPackages();
+        $this->repository = $this->initializeRepository();
+        $this->packageFactory = $this->initializeLinkedPackageFactory();
+        $this->linkManager = $this->initializeLinkManager($io);
     }
 
-    protected function initializeRepository(): void
+    protected function initializeRepository(): Repository
     {
         $storageFile = $this->composer->getConfig()
                 ->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
-        if (is_null($this->repositoryFactory)) {
-            $this->repositoryFactory = new RepositoryFactory();
-        }
-        $this->repository = $this->repositoryFactory->create($storageFile);
+
+        return $this->repositoryFactory->create($storageFile);
     }
 
-    protected function initializeLinkedPackageFactory(): void
+    protected function initializeLinkedPackageFactory(): LinkedPackageFactory
     {
-        $this->packageFactory = new LinkedPackageFactory(
+        return new LinkedPackageFactory(
             $this->composer->getInstallationManager(),
             $this->composer->getRepositoryManager()->getLocalRepository()
         );
     }
 
-    protected function initializeLinkManager(): void
+    protected function initializeLinkManager(IOInterface $io): LinkManager
     {
-        $this->linkManager = new LinkManager(
-            $this->filesystem,
-            $this->composer->getLoop(),
-            $this->composer->getInstallationManager(),
-            $this->composer->getRepositoryManager()->getLocalRepository()
+        return $this->linkManagerFactory->create(
+            $this->getRepository(),
+            new InstallerFactory($io, $this->composer),
+            $io,
+            $this->composer
         );
-    }
-
-    protected function initializeLinkPackages(): void
-    {
-        if (is_null($this->linkPackages)) {
-            $this->linkPackages = new LinkPackages(
-                $this->getLinkManager(),
-                $this->getRepository(),
-                $this->composer->getRepositoryManager()
-            );
-        }
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             ScriptEvents::POST_UPDATE_CMD => [
-                ['linkLinkedPackages'],
+                ['postUpdate'],
+            ],
+            ScriptEvents::POST_INSTALL_CMD => [
+                ['postInstall'],
             ],
         ];
+    }
+
+    public function postInstall(Event $event): void
+    {
+        $linkManager = $this->getLinkManager();
+        if ($linkManager->hasLinkedPackages()) {
+            $linkManager->linkPackages($event->isDevMode());
+        }
+    }
+
+    public function postUpdate(Event $event): void
+    {
+        $linkManager = $this->getLinkManager();
+        $repository = $this->getRepository();
+
+        if ($linkManager->hasLinkedPackages()) {
+            $localRepository = $this->composer->getRepositoryManager()->getLocalRepository();
+            //  It can happen that a original package is updated,
+            //  in those cases we need to update the state of the linked package by setting the original package
+            foreach ($repository->all() as $package) {
+                $original = $localRepository->findPackage($package->getName(), '*');
+                $package->setOriginalPackage($original);
+            }
+            $repository->persist();
+
+            $linkManager->linkPackages($event->isDevMode());
+        }
     }
 
     public function getLinkManager(): LinkManager
@@ -134,14 +154,6 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         }
 
         return $this->linkManager;
-    }
-
-    public function linkLinkedPackages(): void
-    {
-        if (is_null($this->linkPackages)) {
-            throw new RuntimeException('Plugin not activated');
-        }
-        $this->linkPackages->execute();
     }
 
     public function getCapabilities(): array

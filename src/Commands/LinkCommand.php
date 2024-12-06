@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
-use ComposerLink\LinkedPackage;
+use ComposerLink\Package\LinkedPackage;
 use ComposerLink\PathHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,6 +29,18 @@ class LinkCommand extends Command
         $this->setName('link');
         $this->setDescription('Link a package to a local directory');
         $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
+        $this->addOption(
+            'without-dependencies',
+            null,
+            InputOption::VALUE_NONE,
+            'Also install package dependencies',
+        );
+        $this->addOption(
+            'no-dev',
+            null,
+            InputOption::VALUE_NONE,
+            'Disables installation of require-dev packages.',
+        );
         $this->addOption(
             'only-installed',
             null,
@@ -45,6 +57,7 @@ class LinkCommand extends Command
         /** @var bool $onlyInstalled */
         $onlyInstalled = $input->getOption('only-installed');
         $paths = $this->getPaths($input);
+        $manager = $this->plugin->getLinkManager();
 
         foreach ($paths as $path) {
             $package = $this->getPackage($path, $output);
@@ -57,13 +70,11 @@ class LinkCommand extends Command
                 continue;
             }
 
-            $this->plugin->getRepository()->store($package);
-            $this->plugin->getLinkManager()->linkPackage($package);
-
-            // Could be optimized, but for now we persist every package,
-            // so we know what we have done when a package fails
-            $this->plugin->getRepository()->persist();
+            $package->setWithoutDependencies((bool) $input->getOption('without-dependencies'));
+            $manager->add($package);
         }
+
+        $manager->linkPackages(!(bool) $input->getOption('no-dev'));
 
         return 0;
     }

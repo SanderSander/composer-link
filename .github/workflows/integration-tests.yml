@@ -22,16 +22,18 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        php-versions: [ '8.1', '8.2', '8.3', '8.4' ]
-        composer-versions: [ '2.2', 'v2' ]
+        # First is php version, second composer version
+        versions: [['8.1', '2.6'], ['8.4', '2.6'], ['8.4', 'v2']]
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
-          tools: composer:${{ matrix.composer-versions }}
+          php-version: ${{ matrix.versions[0] }}
+          tools: composer:${{ matrix.versions[1] }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate composer.json
         run: composer validate --strict

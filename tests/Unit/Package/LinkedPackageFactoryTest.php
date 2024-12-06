@@ -13,13 +13,14 @@ declare(strict_types=1);
  * @link https://github.com/SanderSander/composer-link
  */
 
-namespace Tests\Unit;
+namespace Tests\Unit\Package;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
-use ComposerLink\LinkedPackageFactory;
+use ComposerLink\Package\LinkedPackageFactory;
 use RuntimeException;
+use Tests\Unit\TestCase;
 
 class LinkedPackageFactoryTest extends TestCase
 {

@@ -17,18 +17,19 @@ namespace Tests\Unit;
 
 use Composer\Composer;
 use Composer\Config;
-use Composer\Downloader\DownloadManager;
 use Composer\Installer\InstallationManager;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Repository\RepositoryManager;
+use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
-use Composer\Util\Filesystem;
-use Composer\Util\Loop;
-use ComposerLink\Actions\LinkPackages;
 use ComposerLink\CommandProvider;
+use ComposerLink\LinkManager;
+use ComposerLink\LinkManagerFactory;
 use ComposerLink\Plugin;
+use ComposerLink\Repository\Repository;
+use ComposerLink\Repository\RepositoryFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
 
@@ -52,26 +53,51 @@ class PluginTest extends TestCase
      */
     protected IOInterface $io;
 
+    /**
+     * @var InstalledRepositoryInterface&MockObject
+     */
+    protected InstalledRepositoryInterface $localRepository;
+
+    /**
+     * @var Repository&MockObject
+     */
+    protected Repository $repository;
+
+    /**
+     * @var LinkManager&MockObject
+     */
+    protected LinkManager $linkManager;
+
+    protected Plugin $plugin;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->io = $this->createMock(IOInterface::class);
-
-        $downloader = $this->createMock(DownloadManager::class);
         $installationManager = $this->createMock(InstallationManager::class);
-        $loop = $this->createMock(Loop::class);
         $this->config = $this->createMock(Config::class);
         $repositoryManager = $this->createMock(RepositoryManager::class);
-        $localRepository = $this->createMock(InstalledRepositoryInterface::class);
-        $repositoryManager->method('getLocalRepository')->willReturn($localRepository);
+        $this->localRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $repositoryManager->method('getLocalRepository')->willReturn($this->localRepository);
+        $repositoryFactory = $this->createMock(RepositoryFactory::class);
+        $this->repository = $this->createMock(Repository::class);
+        $repositoryFactory->method('create')->willReturn($this->repository);
 
         $this->composer = $this->createMock(Composer::class);
-        $this->composer->method('getDownloadManager')->willReturn($downloader);
         $this->composer->method('getInstallationManager')->willReturn($installationManager);
         $this->composer->method('getConfig')->willReturn($this->config);
-        $this->composer->method('getLoop')->willReturn($loop);
         $this->composer->method('getRepositoryManager')->willReturn($repositoryManager);
+
+        $this->linkManager = $this->createMock(LinkManager::class);
+        $linkManagerFactory = $this->createMock(LinkManagerFactory::class);
+        $linkManagerFactory->method('create')->willReturn($this->linkManager);
+
+        $this->plugin = new Plugin(
+            $this->filesystem,
+            $repositoryFactory,
+            $linkManagerFactory,
+        );
     }
 
     /** @SuppressWarnings(PHPMD.StaticAccess) */
@@ -85,22 +111,22 @@ class PluginTest extends TestCase
                 };
             });
 
-        $plugin = new Plugin();
-        $plugin->activate($this->composer, $this->io);
+        $this->plugin->activate($this->composer, $this->io);
 
-        $capabilities = $plugin->getCapabilities();
+        $capabilities = $this->plugin->getCapabilities();
         $events = Plugin::getSubscribedEvents();
 
         static::assertArrayHasKey(ComposerCommandProvider::class, $capabilities);
         static::assertContains(CommandProvider::class, $capabilities);
         static::assertArrayHasKey(ScriptEvents::POST_UPDATE_CMD, $events);
-        static::assertFalse($plugin->isGlobal());
+        static::assertArrayHasKey(ScriptEvents::POST_INSTALL_CMD, $events);
+        static::assertFalse($this->plugin->isGlobal());
 
-        $plugin->getPackageFactory();
-        $plugin->getLinkManager();
-        $plugin->getRepository();
-        $plugin->deactivate($this->composer, $this->io);
-        $plugin->uninstall($this->composer, $this->io);
+        $this->plugin->getPackageFactory();
+        $this->plugin->getLinkManager();
+        $this->plugin->getRepository();
+        $this->plugin->deactivate($this->composer, $this->io);
+        $this->plugin->uninstall($this->composer, $this->io);
     }
 
     public function test_is_global(): void
@@ -114,10 +140,36 @@ class PluginTest extends TestCase
                 };
             });
 
-        $plugin = new Plugin();
-        $plugin->activate($this->composer, $this->io);
+        $this->plugin->activate($this->composer, $this->io);
 
-        static::assertTrue($plugin->isGlobal());
+        static::assertTrue($this->plugin->isGlobal());
+    }
+
+    public function test_post_install(): void
+    {
+        $this->plugin->activate($this->composer, $this->io);
+        $event = $this->createMock(Event::class);
+
+        $this->linkManager->method('hasLinkedPackages')->willReturn(true);
+        $this->linkManager->expects(static::once())->method('linkPackages');
+        $this->plugin->postInstall($event);
+    }
+
+    public function test_post_update(): void
+    {
+        $this->plugin->activate($this->composer, $this->io);
+        $event = $this->createMock(Event::class);
+        $package = $this->mockPackage();
+        $original = $this->mockPackage('original');
+
+        $this->localRepository->method('findPackage')->willReturn($original);
+        $this->linkManager->method('hasLinkedPackages')->willReturn(true);
+
+        $this->repository->method('all')->willReturn([$package]);
+        $package->expects(static::once())->method('setOriginalPackage')->with($original);
+
+        $this->linkManager->expects(static::once())->method('linkPackages');
+        $this->plugin->postUpdate($event);
     }
 
     public function test_plugin_throws_exception_package_factory(): void
@@ -141,15 +193,10 @@ class PluginTest extends TestCase
         $plugin->getRepository();
     }
 
-    public function test_plugin_link_linked_packages(): void
+    public function test_plugin_throws_exception_initialize_manager(): void
     {
-        $linkPackages = $this->createMock(LinkPackages::class);
-        $linkPackages->expects(static::once())->method('execute');
-        $plugin = new Plugin($this->createMock(Filesystem::class), $linkPackages);
-        $plugin->linkLinkedPackages();
-
-        static::expectException(RuntimeException::class);
-        $plugin = new Plugin($this->createMock(Filesystem::class));
-        $plugin->linkLinkedPackages();
+        self::expectException(RuntimeException::class);
+        $plugin = new Plugin();
+        $plugin->getLinkManager();
     }
 }

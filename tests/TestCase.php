@@ -20,8 +20,10 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 abstract class TestCase extends PHPUnitTestCase
 {
+    /** @var non-empty-string string */
     protected string $tmpAbsoluteDir;
 
+    /** @var non-empty-string string */
     protected string $tmpRelativeDir;
 
     protected Filesystem $filesystem;

@@ -17,7 +17,7 @@ namespace Tests\Unit\Commands;
 
 use Composer\Console\Application;
 use ComposerLink\Commands\LinkedCommand;
-use ComposerLink\LinkedPackage;
+use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Plugin;
 use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\MockObject\MockObject;

@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace ComposerLink\Repository;
 
-use ComposerLink\LinkedPackage;
+use ComposerLink\Package\LinkedPackage;
 use RuntimeException;
 
 class Repository

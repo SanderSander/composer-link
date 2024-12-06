@@ -11,7 +11,7 @@ while maintaining the composer abilities to manage/upgrade your packages.
 ## Requirements
 
 - PHP >= 8.1
-- Composer >= 2.2
+- Composer >= 2.6
 
 ## Installation
 
@@ -49,6 +49,12 @@ If you don't want to link all the packages but only the ones originally installe
 composer link ../packages/*
 composer link ../packages/* --only-installed
 ```
+
+Composer link will automatically install/update the required packages from the linked package, 
+you can prevent this behavior by adding the `--without-dependencies` flag.
+
+When the `composer link` or `composer unlink` are used all packages defined in `require-dev` of the root package are 
+installed by default, this can be prevented by using the `--no-dev` flag
 
 To unlink the package you can use the `unlink` command
 ```
