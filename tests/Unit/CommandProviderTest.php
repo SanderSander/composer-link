@@ -19,6 +19,7 @@ use Composer\IO\IOInterface;
 use ComposerLink\CommandProvider;
 use ComposerLink\Commands\LinkCommand;
 use ComposerLink\Commands\LinkedCommand;
+use ComposerLink\Commands\UnlinkAllCommand;
 use ComposerLink\Commands\UnlinkCommand;
 use ComposerLink\Plugin;
 use PHPUnit\Framework\TestCase;
@@ -34,9 +35,10 @@ class CommandProviderTest extends TestCase
         $provider = new CommandProvider($arguments);
         $commands = $provider->getCommands();
 
-        static::assertCount(3, $commands);
+        static::assertCount(4, $commands);
         static::assertInstanceOf(LinkCommand::class, $commands[0]);
         static::assertInstanceOf(UnlinkCommand::class, $commands[1]);
         static::assertInstanceOf(LinkedCommand::class, $commands[2]);
+        static::assertInstanceOf(UnlinkAllCommand::class, $commands[3]);
     }
 }

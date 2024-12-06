@@ -63,6 +63,13 @@ composer unlink ../packages/*
 composer global unlink ../path/to/package
 ```
 
+You can also unlink all package with the following command
+
+``` 
+composer unlink-all
+```
+
+
 To see all linked packages in your project you can use the `linked` command
 ```
 composer linked
