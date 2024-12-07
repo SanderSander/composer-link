@@ -88,8 +88,8 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
         try {
-            $this->repository = $this->initializeRepository();
             $this->packageFactory = $this->initializeLinkedPackageFactory();
+            $this->repository = $this->initializeRepository();
             $this->linkManager = $this->initializeLinkManager($io);
         } catch (Throwable $e) {
             $io->debug("[ComposerLink]\tException: " . $e->getMessage());
@@ -102,7 +102,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $storageFile = $this->composer->getConfig()
                 ->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
 
-        return $this->repositoryFactory->create($storageFile);
+        return $this->repositoryFactory->create($storageFile, $this->getPackageFactory());
     }
 
     protected function initializeLinkedPackageFactory(): LinkedPackageFactory
