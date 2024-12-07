@@ -46,6 +46,7 @@ class LinkedPackageTest extends TestCase
         static::assertSame('path', $linkedPackage->getDistType());
         static::assertSame('stable', $linkedPackage->getStability());
         static::assertSame('dev-linked', $linkedPackage->getVersion());
+        static::assertFalse($linkedPackage->isWithoutDependencies());
 
         static::assertSame($package, $linkedPackage->getLinkedPackage());
         static::assertSame($originalPackage, $linkedPackage->getOriginalPackage());
