@@ -23,14 +23,17 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Repository\RepositoryManager;
+use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem;
 use Composer\Util\Loop;
 use ComposerLink\Actions\LinkPackages;
 use ComposerLink\CommandProvider;
 use ComposerLink\Plugin;
+use ComposerLink\Repository\RepositoryFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
+use TypeError;
 
 /**
  *  @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -103,6 +106,30 @@ class PluginTest extends TestCase
         $plugin->uninstall($this->composer, $this->io);
     }
 
+    public function test_unable_to_activate_plugin(): void
+    {
+        $repositoryFactory = $this->createMock(RepositoryFactory::class);
+        $linkPackages = $this->createMock(LinkPackages::class);
+        $event = $this->createMock(Event::class);
+        $event->method('getIO')->willReturn($this->io);
+
+        $repositoryFactory->method('create')
+            ->willThrowException(new TypeError('test error'));
+
+        $plugin = new Plugin(
+            $this->filesystem,
+            $linkPackages,
+            $repositoryFactory,
+        );
+
+        $plugin->activate($this->composer, $this->io);
+
+        $this->io->expects(static::once())->method('warning')->with(
+            static::stringContains('Composer link couldn\'t be activated')
+        );
+        $plugin->linkLinkedPackages($event);
+    }
+
     public function test_is_global(): void
     {
         $this->config->method('get')
@@ -143,13 +170,14 @@ class PluginTest extends TestCase
 
     public function test_plugin_link_linked_packages(): void
     {
+        $event = $this->createMock(Event::class);
         $linkPackages = $this->createMock(LinkPackages::class);
         $linkPackages->expects(static::once())->method('execute');
         $plugin = new Plugin($this->createMock(Filesystem::class), $linkPackages);
-        $plugin->linkLinkedPackages();
+        $plugin->linkLinkedPackages($event);
 
         static::expectException(RuntimeException::class);
         $plugin = new Plugin($this->createMock(Filesystem::class));
-        $plugin->linkLinkedPackages();
+        $plugin->linkLinkedPackages($event);
     }
 }

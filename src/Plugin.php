@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace ComposerLink;
 
 use Composer\Composer;
+use Composer\EventDispatcher\Event;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
@@ -27,6 +28,7 @@ use ComposerLink\Actions\LinkPackages;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\RepositoryFactory;
 use RuntimeException;
+use Throwable;
 
 class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
@@ -39,6 +41,15 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     protected ?LinkedPackageFactory $packageFactory = null;
 
     protected Composer $composer;
+
+    /**
+     * It can happen that activation doesn't work, this happens when this plugin is upgraded.
+     * Composer runs this file through an eval() with renamed class names, but all other classes
+     * in this library are still the old ones loaded in memory.
+     *
+     * We try to detect this, and skip the event callbacks if it happens
+     */
+    protected bool $couldNotActivate = false;
 
     public function __construct(
         ?ComposerFileSystem $filesystem = null,
@@ -73,10 +84,15 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
 
-        $this->initializeRepository();
-        $this->initializeLinkedPackageFactory();
-        $this->initializeLinkManager();
-        $this->initializeLinkPackages();
+        try {
+            $this->initializeRepository();
+            $this->initializeLinkedPackageFactory();
+            $this->initializeLinkManager();
+            $this->initializeLinkPackages();
+        } catch (Throwable $e) {
+            $io->debug("[ComposerLink]\tException: " . $e->getMessage());
+            $this->couldNotActivate = true;
+        }
     }
 
     protected function initializeRepository(): void
@@ -136,8 +152,15 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         return $this->linkManager;
     }
 
-    public function linkLinkedPackages(): void
+    public function linkLinkedPackages(Event $event): void
     {
+        // Plugin couldn't be activated probably because the plugin was updated
+        if ($this->couldNotActivate) {
+            $event->getIO()->warning('<warning>Composer link couldn\'t be activated because it was probably upgraded, run `composer install` again to link packages</warning>');
+
+            return;
+        }
+
         if (is_null($this->linkPackages)) {
             throw new RuntimeException('Plugin not activated');
         }
