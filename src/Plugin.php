@@ -16,12 +16,12 @@ declare(strict_types=1);
 namespace ComposerLink;
 
 use Composer\Composer;
-use Composer\EventDispatcher\Event;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
 use Composer\Plugin\PluginInterface;
+use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem as ComposerFileSystem;
 use ComposerLink\Actions\LinkPackages;
