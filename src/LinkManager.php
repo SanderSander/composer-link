@@ -17,6 +17,7 @@ namespace ComposerLink;
 
 use Composer\Composer;
 use Composer\DependencyResolver\Request;
+use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
 use Composer\Repository\ArrayRepository;
@@ -105,6 +106,7 @@ class LinkManager
             ->setInstall(true)
             ->setWriteLock(false)
             ->setRunScripts(false)
+            ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setUpdateAllowList(array_keys($this->requires))
             ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
