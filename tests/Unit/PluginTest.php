@@ -32,6 +32,7 @@ use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\RepositoryFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
+use TypeError;
 
 /**
  *  @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -127,6 +128,30 @@ class PluginTest extends TestCase
         $this->plugin->getRepository();
         $this->plugin->deactivate($this->composer, $this->io);
         $this->plugin->uninstall($this->composer, $this->io);
+    }
+
+    public function test_unable_to_activate_plugin(): void
+    {
+        $repositoryFactory = $this->createMock(RepositoryFactory::class);
+        $linkManagerFactory = $this->createMock(LinkManagerFactory::class);
+        $event = $this->createMock(Event::class);
+        $event->method('getIO')->willReturn($this->io);
+
+        $repositoryFactory->method('create')
+            ->willThrowException(new TypeError('test error'));
+
+        $plugin = new Plugin(
+            $this->filesystem,
+            $repositoryFactory,
+            $linkManagerFactory,
+        );
+
+        $plugin->activate($this->composer, $this->io);
+
+        $this->io->expects(static::once())->method('warning')->with(
+            static::stringContains('Composer link couldn\'t be activated')
+        );
+        $plugin->postUpdate($event);
     }
 
     public function test_is_global(): void

@@ -28,6 +28,7 @@ use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
 use ComposerLink\Repository\RepositoryFactory;
 use RuntimeException;
+use Throwable;
 
 class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 {
@@ -43,6 +44,15 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     protected RepositoryFactory $repositoryFactory;
 
     protected LinkManagerFactory $linkManagerFactory;
+
+    /**
+     * It can happen that activation doesn't work, this happens when this plugin is upgraded.
+     * Composer runs this file through an eval() with renamed class names, but all other classes
+     * in this library are still the old ones loaded in memory.
+     *
+     * We try to detect this, and skip the event callbacks if it happens
+     */
+    protected bool $couldNotActivate = false;
 
     public function __construct(
         ?ComposerFileSystem $filesystem = null,
@@ -77,9 +87,14 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         $io->debug("[ComposerLink]\tPlugin is activating");
         $this->composer = $composer;
-        $this->repository = $this->initializeRepository();
-        $this->packageFactory = $this->initializeLinkedPackageFactory();
-        $this->linkManager = $this->initializeLinkManager($io);
+        try {
+            $this->repository = $this->initializeRepository();
+            $this->packageFactory = $this->initializeLinkedPackageFactory();
+            $this->linkManager = $this->initializeLinkManager($io);
+        } catch (Throwable $e) {
+            $io->debug("[ComposerLink]\tException: " . $e->getMessage());
+            $this->couldNotActivate = true;
+        }
     }
 
     protected function initializeRepository(): Repository
@@ -130,6 +145,13 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     public function postUpdate(Event $event): void
     {
+        // Plugin couldn't be activated probably because the plugin was updated
+        if ($this->couldNotActivate) {
+            $event->getIO()->warning('<warning>Composer link couldn\'t be activated because it was probably upgraded, run `composer install` again to link packages</warning>');
+
+            return;
+        }
+
         $linkManager = $this->getLinkManager();
         $repository = $this->getRepository();
 
