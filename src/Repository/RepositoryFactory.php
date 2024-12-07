@@ -15,13 +15,15 @@ declare(strict_types=1);
 
 namespace ComposerLink\Repository;
 
+use ComposerLink\Package\LinkedPackageFactory;
+
 class RepositoryFactory
 {
-    public function create(string $storageFile): Repository
+    public function create(string $storageFile, LinkedPackageFactory $linkedPackageFactory): Repository
     {
         return new Repository(
             new JsonStorage($storageFile),
-            new Transformer()
+            new Transformer($linkedPackageFactory)
         );
     }
 }
