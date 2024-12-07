@@ -107,8 +107,8 @@ class LinkManager
             ->setInstall(true)
             ->setWriteLock(false)
             ->setRunScripts(false)
-            ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setUpdateAllowList(array_keys($this->requires))
+            ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
 

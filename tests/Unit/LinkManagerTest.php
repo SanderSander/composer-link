@@ -17,6 +17,7 @@ namespace Tests\Unit;
 
 use Composer\Composer;
 use Composer\DependencyResolver\Request;
+use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\Installer;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
@@ -126,6 +127,7 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with([])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
         $this->installer->expects(static::once())->method('run');
 
@@ -147,6 +149,7 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with(['test/package'])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
         $this->installer->expects(static::once())->method('run');
 
