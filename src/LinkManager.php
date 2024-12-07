@@ -110,7 +110,7 @@ class LinkManager
             ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setUpdateAllowList(array_keys($this->requires))
             ->setDevMode($isDev)
-            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS_NO_ROOT_REQUIRE);
+            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
 
         $installer->run();
 
