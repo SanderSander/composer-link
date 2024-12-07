@@ -100,16 +100,17 @@ class LinkManager
         // Prevent circular call to script handler 'post-update-cmd' by creating a new composer instance
         // We also need to set this on the Installer while it's deprecated
         $eventDispatcher->setRunScripts(false);
+        $installer = $this->installerFactory->create();
 
-        $installer = $this->installerFactory->create() /* @phpstan-ignore method.deprecated */
-            ->setUpdate(true)
+        /* @phpstan-ignore method.deprecated */
+        $installer->setUpdate(true)
             ->setInstall(true)
             ->setWriteLock(false)
             ->setRunScripts(false)
             ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setUpdateAllowList(array_keys($this->requires))
             ->setDevMode($isDev)
-            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
+            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS_NO_ROOT_REQUIRE);
 
         $installer->run();
 
