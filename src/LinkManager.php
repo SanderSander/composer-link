@@ -17,6 +17,7 @@ namespace ComposerLink;
 
 use Composer\Composer;
 use Composer\DependencyResolver\Request;
+use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
 use Composer\Repository\ArrayRepository;
@@ -99,13 +100,15 @@ class LinkManager
         // Prevent circular call to script handler 'post-update-cmd' by creating a new composer instance
         // We also need to set this on the Installer while it's deprecated
         $eventDispatcher->setRunScripts(false);
+        $installer = $this->installerFactory->create();
 
-        $installer = $this->installerFactory->create() /* @phpstan-ignore method.deprecated */
-            ->setUpdate(true)
+        /* @phpstan-ignore method.deprecated */
+        $installer->setUpdate(true)
             ->setInstall(true)
             ->setWriteLock(false)
             ->setRunScripts(false)
             ->setUpdateAllowList(array_keys($this->requires))
+            ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
 
