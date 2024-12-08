@@ -42,4 +42,6 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run unit tests
-        run: PHPUNIT_INTEGRATION=1 ./vendor/bin/phpunit --testsuite=Integration --group=${{ matrix.operating-system }}
+        env:
+          PHPUNIT_INTEGRATION: 1
+        run: ./vendor/bin/phpunit --testsuite=Integration --group=${{ matrix.operating-system }}
