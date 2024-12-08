@@ -68,6 +68,7 @@ abstract class TestCase extends BaseCase
     {
         /** @var string $content */
         $content = file_get_contents('composer.json');
+
         return json_decode($content, true);
     }
 
