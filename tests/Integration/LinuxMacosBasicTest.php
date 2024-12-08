@@ -29,7 +29,7 @@ class LinuxMacosBasicTest extends TestCase
 
         // Alter composer file so that we update from the current version
         $composerFile = $this->getCurrentComposeFile();
-        $composerFile['require']['sandersander/composer-link'] = 'dev-master';
+        $composerFile['require']['sandersander/composer-link'] = '@dev';
         $composerFile['repositories'] = [[
             'type' => 'path',
             'url' => $this->getThisPackagePath(),
