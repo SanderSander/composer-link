@@ -21,6 +21,8 @@ use Tests\TestCase as BaseCase;
 
 abstract class TestCase extends BaseCase
 {
+    public const RELATIVE_PATH_MOCK = '../composer-link/tests/mock';
+
     protected Application $application;
 
     private string $thisPackagePath;
@@ -37,15 +39,6 @@ abstract class TestCase extends BaseCase
         $this->composerGlobalDir = (string) realpath((string) exec('composer config --global home'));
 
         chdir($this->tmpAbsoluteDir);
-    }
-
-    public function getRelativePathToMockDirectory(): string
-    {
-        if (!$this->containerized) {
-            return '../mock';
-        }
-
-        return '../../app/tests/mock';
     }
 
     public function getMockDirectory(): string

@@ -34,8 +34,8 @@ abstract class TestCase extends PHPUnitTestCase
     {
         parent::setUp();
 
-        $this->containerized = getenv('PHPUNIT_CONTAINERIZED') !== false;
-        $tmp = $this->containerized ? '/tmp/test' : 'tests' . DIRECTORY_SEPARATOR . 'tmp';
+        $this->containerized = getenv('PHPUNIT_INTEGRATION') !== false;
+        $tmp = $this->containerized ? '../tmp-test' : 'tests' . DIRECTORY_SEPARATOR . 'tmp';
 
         $this->filesystem = new Filesystem();
         $this->filesystem->emptyDirectory($tmp);

@@ -18,12 +18,12 @@ namespace Tests\Integration;
 /**
  * @group ubuntu-latest
  */
-class LinuxWithDependenciesTest extends TestCase
+class LinuxExtraTest extends TestCase
 {
     public function test_link_with_dependencies(): void
     {
         $this->useComposerLinkLocal();
-        $output = $this->runComposerCommand('link ' . $this->getRelativePathToMockDirectory() . '/package-2');
+        $output = $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-2');
 
         static::assertStringContainsString(
             'Installing psr/container (2.0.1): Extracting archive',

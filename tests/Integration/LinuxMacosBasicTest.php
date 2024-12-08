@@ -15,8 +15,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use Composer\Package\Package;
-
 /**
  * @group ubuntu-latest
  * @group macos-latest
@@ -55,16 +53,16 @@ class LinuxMacosBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Symlinking from ' . $this->getRelativePathToMockDirectory() . '/package-1',
-            $this->runComposerCommand('link ' . $this->getRelativePathToMockDirectory() . '/package-1')
+            '  - Installing test/package-1 (dev-linked): Symlinking from ' . self::RELATIVE_PATH_MOCK . '/package-1',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . $this->getRelativePathToMockDirectory() . '/package-1',
+            'test/package-1	' . self::RELATIVE_PATH_MOCK . '/package-1',
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-linked)',
-            $this->runComposerCommand('unlink ' . $this->getRelativePathToMockDirectory() . '/package-1')
+            $this->runComposerCommand('unlink ' . self::RELATIVE_PATH_MOCK . '/package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
@@ -115,16 +113,16 @@ class LinuxMacosBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Symlinking from ' . $this->getRelativePathToMockDirectory() . '/package-1',
-            $this->runComposerCommand('link ' . $this->getRelativePathToMockDirectory() . '/package-1')
+            '  - Installing test/package-1 (dev-linked): Symlinking from ' . self::RELATIVE_PATH_MOCK . '/package-1',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . $this->getRelativePathToMockDirectory() . '/package-1',
+            'test/package-1	' . self::RELATIVE_PATH_MOCK . '/package-1',
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-linked)',
-            $this->runComposerCommand('unlink ' . $this->getRelativePathToMockDirectory() . '/package-1')
+            $this->runComposerCommand('unlink ' . self::RELATIVE_PATH_MOCK . '/package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
@@ -176,7 +174,7 @@ class LinuxMacosBasicTest extends TestCase
         );
         static::assertStringContainsString(
             '  - Installing test/package-1 (dev-linked): Symlinking from ' . $this->getMockDirectory() . '/package-1',
-            $this->runComposerCommand('global link ' . $this->getRelativePathToMockDirectory() . '/package-1')
+            $this->runComposerCommand('global link ' . self::RELATIVE_PATH_MOCK . '/package-1')
         );
         static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '/package-1',
@@ -184,7 +182,7 @@ class LinuxMacosBasicTest extends TestCase
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-linked)',
-            $this->runComposerCommand('global unlink ' . $this->getRelativePathToMockDirectory() . '/package-1')
+            $this->runComposerCommand('global unlink ' . self::RELATIVE_PATH_MOCK . '/package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',

@@ -41,7 +41,7 @@
         "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml",
         "test": "./vendor/bin/phpunit --testsuite=Unit",
         "test-integration": [
-            "docker build -t composer-link-test ./support && docker run --rm -v $PWD:/app composer-link-test"
+            "docker build -t composer-link-test ./support && docker run --rm -v $PWD:/composer-link composer-link-test"
         ],
         "phpstan": "./vendor/bin/phpstan",
         "lint": "./vendor/bin/php-cs-fixer fix"
