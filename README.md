@@ -69,9 +69,21 @@ You can also unlink all package with the following command
 composer unlink-all
 ```
 
-
 To see all linked packages in your project you can use the `linked` command
 ```
 composer linked
 composer global linked
+```
+
+## Development
+
+The following tools are available for development.
+It's also possible to link this package to your global for testing changes.
+
+```
+composer run lint               # Lints all files 
+composer run test               # Runs unit tests
+composer run phpmd              # Runs phpmd
+composer run phpstan            # Runs phpstan
+composer run test-integration   # Runs integration tests for linux, this requires docker
 ```

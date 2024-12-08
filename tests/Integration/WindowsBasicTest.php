@@ -30,23 +30,23 @@ class WindowsBasicTest extends TestCase
 
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Junctioning from ..\mock\package-1',
-            $this->runLinkCommand('link ..\mock\package-1')
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . self::RELATIVE_PATH_MOCK . '\package-1',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	..\mock\package-1',
-            $this->runLinkCommand('linked')
+            'test/package-1	' . self::RELATIVE_PATH_MOCK . '\package-1',
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
-            $this->runLinkCommand('unlink ..\mock\package-1')
+            $this->runComposerCommand('unlink ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
     }
 
@@ -60,23 +60,23 @@ class WindowsBasicTest extends TestCase
 
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '\package-1',
-            $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
+            $this->runComposerCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '\package-1',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
-            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
+            $this->runComposerCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
     }
 
@@ -90,23 +90,23 @@ class WindowsBasicTest extends TestCase
 
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Junctioning from ..\mock\package-1',
-            $this->runLinkCommand('link ..\mock\package-1')
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . self::RELATIVE_PATH_MOCK . '\package-1',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	..\mock\package-1',
-            $this->runLinkCommand('linked')
+            'test/package-1	' . self::RELATIVE_PATH_MOCK . '\package-1',
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
-            $this->runLinkCommand('unlink ..\mock\package-1')
+            $this->runComposerCommand('unlink ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
     }
 
@@ -120,23 +120,23 @@ class WindowsBasicTest extends TestCase
 
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '\package-1',
-            $this->runLinkCommand('link ' . $this->getMockDirectory() . '\package-1')
+            $this->runComposerCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
             'test/package-1	' . $this->getMockDirectory() . '\package-1',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
             '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
-            $this->runLinkCommand('unlink ' . $this->getMockDirectory() . '\package-1')
+            $this->runComposerCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
             'No packages are linked',
-            $this->runLinkCommand('linked')
+            $this->runComposerCommand('linked')
         );
     }
 }
