@@ -28,11 +28,15 @@ abstract class TestCase extends PHPUnitTestCase
 
     protected Filesystem $filesystem;
 
+    protected bool $containerized;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $tmp = 'tests' . DIRECTORY_SEPARATOR . 'tmp';
+        $this->containerized = getenv('PHPUNIT_CONTAINERIZED') !== false;
+        $tmp = $this->containerized ? '/tmp/test' : 'tests' . DIRECTORY_SEPARATOR . 'tmp';
+
         $this->filesystem = new Filesystem();
         $this->filesystem->emptyDirectory($tmp);
 

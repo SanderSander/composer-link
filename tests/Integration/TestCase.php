@@ -23,7 +23,7 @@ abstract class TestCase extends BaseCase
 {
     protected Application $application;
 
-    private string $initialDirectory;
+    private string $thisPackagePath;
 
     protected string $composerGlobalDir;
 
@@ -33,23 +33,71 @@ abstract class TestCase extends BaseCase
         if (getcwd() === false) {
             throw new RuntimeException('Unable to get CMD');
         }
-        $this->initialDirectory = getcwd();
+        $this->thisPackagePath = getcwd();
         $this->composerGlobalDir = (string) realpath((string) exec('composer config --global home'));
 
         chdir($this->tmpAbsoluteDir);
     }
 
-    public function getMockDirectory(): string
+    public function getRelativePathToMockDirectory(): string
     {
-        return $this->initialDirectory . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
+        if (!$this->containerized) {
+            return '../mock';
+        }
+
+        return '../../app/tests/mock';
     }
 
-    protected function runLinkCommand(string $command): string
+    public function getMockDirectory(): string
+    {
+        return $this->thisPackagePath . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
+    }
+
+    protected function runComposerCommand(string $command): string
     {
         $output = [];
         exec('composer ' . $command . ' 2>&1', $output);
 
         return implode(PHP_EOL, $output);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getCurrentComposeFile(): array
+    {
+        /** @var string $content */
+        $content = file_get_contents('composer.json');
+        return json_decode($content, true);
+    }
+
+    /**
+     * @param array<string, mixed> $composeFile
+     */
+    protected function setCurrentComposeFile(array $composeFile): void
+    {
+        file_put_contents('composer.json', json_encode($composeFile, JSON_PRETTY_PRINT));
+    }
+
+    public function getThisPackagePath(): string
+    {
+        return $this->thisPackagePath;
+    }
+
+    /**
+     * Loads an older version with upgrade protection.
+     */
+    protected function useComposerLinkLocalOld(): void
+    {
+        file_put_contents('composer.json', '{
+            "config": {
+                "allow-plugins": {
+                    "sandersander/composer-link": true
+                }
+            }
+        }');
+
+        shell_exec('composer require sandersander/composer-link 0.4.1  2>&1');
     }
 
     protected function useComposerLinkLocal(): void
@@ -58,7 +106,7 @@ abstract class TestCase extends BaseCase
             "repositories": [
                 {
                     "type": "path",
-                    "url": "' . addslashes($this->initialDirectory) . '"
+                    "url": "' . addslashes($this->thisPackagePath) . '"
                 }
             ],
             "config": {
@@ -77,7 +125,7 @@ abstract class TestCase extends BaseCase
             "repositories": [
                 {
                     "type": "path",
-                    "url": "' . addslashes($this->initialDirectory) . '"
+                    "url": "' . addslashes($this->thisPackagePath) . '"
                 }
             ],
             "config": {
@@ -94,7 +142,7 @@ abstract class TestCase extends BaseCase
     {
         // We have to change directory, before parent class remove the directory.
         // Windows has problems with removing directories when they are open in console
-        chdir($this->initialDirectory);
+        chdir($this->thisPackagePath);
         parent::tearDown();
     }
 }
