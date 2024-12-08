@@ -21,25 +21,6 @@ namespace Tests\Integration;
  */
 class LinuxMacosBasicTest extends TestCase
 {
-    public function test_upgrade_safety_mechanism(): void
-    {
-        $this->useComposerLinkLocalOld();
-
-        // Alter composer file so that we update from the current version
-        $composerFile = $this->getCurrentComposeFile();
-        $composerFile['require']['sandersander/composer-link'] = '@dev';
-        $composerFile['repositories'] = [[
-            'type' => 'path',
-            'url' => $this->getThisPackagePath(),
-        ]];
-        $this->setCurrentComposeFile($composerFile);
-
-        static::assertStringContainsString(
-            'Composer link couldn\'t be activated because it was probably upgraded',
-            $this->runComposerCommand('update'),
-        );
-    }
-
     /**
      * Test if we can link a package in a project while using relative paths.
      * The plugin is installed in project.

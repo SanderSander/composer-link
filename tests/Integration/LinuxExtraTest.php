@@ -20,6 +20,25 @@ namespace Tests\Integration;
  */
 class LinuxExtraTest extends TestCase
 {
+    public function test_upgrade_safety_mechanism(): void
+    {
+        $this->useComposerLinkLocalOld();
+
+        // Alter composer file so that we update from the current version
+        $composerFile = $this->getCurrentComposeFile();
+        $composerFile['require']['sandersander/composer-link'] = '@dev';
+        $composerFile['repositories'] = [[
+            'type' => 'path',
+            'url' => $this->getThisPackagePath(),
+        ]];
+        $this->setCurrentComposeFile($composerFile);
+
+        static::assertStringContainsString(
+            'Composer link couldn\'t be activated because it was probably upgraded',
+            $this->runComposerCommand('update'),
+        );
+    }
+
     public function test_link_with_dependencies(): void
     {
         $this->useComposerLinkLocal();
