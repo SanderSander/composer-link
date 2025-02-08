@@ -1,0 +1,5 @@
+{
+  "name": "test/package-4",
+  "description": "Package with version defined, and targeted by test/package-3",
+  "version": "1.0.0"
+}

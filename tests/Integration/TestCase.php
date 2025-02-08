@@ -46,10 +46,10 @@ abstract class TestCase extends BaseCase
         return $this->thisPackagePath . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
     }
 
-    protected function runComposerCommand(string $command): string
+    protected function runComposerCommand(string $command, int &$result = 0): string
     {
         $output = [];
-        exec('composer ' . $command . ' 2>&1', $output);
+        exec('composer ' . $command . ' 2>&1', $output, $result);
 
         return implode(PHP_EOL, $output);
     }
@@ -71,6 +71,32 @@ abstract class TestCase extends BaseCase
     protected function setCurrentComposeFile(array $composeFile): void
     {
         file_put_contents('composer.json', json_encode($composeFile, JSON_PRETTY_PRINT));
+    }
+
+    public function addTestPackage(string $packageName): void
+    {
+        $this->addTestPackageRepository($packageName);
+
+        $exit = 0;
+        $output = $this->runComposerCommand('require test/' . $packageName, $exit);
+
+        if ($exit !== 0) {
+            throw new RuntimeException(sprintf(
+                'Unable to install mock package "%s": %s',
+                $packageName,
+                $output,
+            ));
+        }
+    }
+
+    public function addTestPackageRepository(string $packageName): void
+    {
+        $package = $this->getCurrentComposeFile();
+        $package['repositories'][] = [
+            'type' => 'path',
+            'url' => $this->getMockDirectory() . DIRECTORY_SEPARATOR . $packageName,
+        ];
+        $this->setCurrentComposeFile($package);
     }
 
     public function getThisPackagePath(): string

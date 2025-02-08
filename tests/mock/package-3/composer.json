@@ -1,0 +1,14 @@
+{
+  "name": "test/package-3",
+  "description": "Stable package with dependency to package-4 used for transitive dependencies testing",
+  "version": "1.0.0",
+  "require": {
+      "test/package-4": "1.0.0"
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../package-4"
+    }
+  ]
+}

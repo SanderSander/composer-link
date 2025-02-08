@@ -53,4 +53,15 @@ class LinuxExtraTest extends TestCase
             $output
         );
     }
+
+    public function test_link_with_transitive_dependencies(): void
+    {
+        $this->useComposerLinkLocal();
+        // Package-3 has a dependency to package-4, so we need to add package-4 as repository to our root
+        $this->addTestPackageRepository('package-4');
+        $this->addTestPackage('package-3');
+
+        $output = $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-4');
+        var_dump($output);
+    }
 }
