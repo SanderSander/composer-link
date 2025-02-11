@@ -25,6 +25,20 @@ class Repository
      */
     protected array $linkedPackages = [];
 
+    /**
+     * Extra paths defined in composer.json to auto link packages.
+     *
+     * @var non-empty-string[]
+     */
+    protected array $extraPaths = [];
+
+    /**
+     * Contains paths of unlinked packages, that are also defined in $extra.
+     *
+     * @var non-empty-string[]
+     */
+    protected array $unlinkedFromExtra = [];
+
     public function __construct(
         protected readonly StorageInterface $storage,
         protected readonly Transformer $transformer,
@@ -43,6 +57,27 @@ class Repository
         }
 
         $this->linkedPackages[$index] = clone $linkedPackage;
+    }
+
+    /**
+     * @param non-empty-string[] $paths
+     */
+    public function setExtraPaths(array $paths): void
+    {
+        $this->extraPaths = $paths;
+    }
+
+    public function getExtraPaths(): array
+    {
+        return $this->extraPaths;
+    }
+
+    /**
+     * @return non-empty-string[]
+     */
+    public function getUnlinkedFromExtra(): array
+    {
+        return $this->unlinkedFromExtra;
     }
 
     /**
@@ -95,6 +130,7 @@ class Repository
     {
         $data = [
             'packages' => [],
+            'extra_paths' => $this->extraPaths,
         ];
         foreach ($this->linkedPackages as $package) {
             $data['packages'][] = $this->transformer->export($package);
@@ -111,6 +147,7 @@ class Repository
 
         $data = $this->storage->read();
 
+        $this->extraPaths = $data['extra_paths'] ?? [];
         foreach ($data['packages'] as $package) {
             $this->linkedPackages[] = $this->transformer->load($package);
         }

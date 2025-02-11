@@ -20,9 +20,12 @@ use Composer\DependencyResolver\Request;
 use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
+use Composer\Package\RootPackageInterface;
 use Composer\Repository\ArrayRepository;
 use ComposerLink\Package\LinkedPackage;
+use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
+use RuntimeException;
 
 class LinkManager
 {
@@ -33,19 +36,43 @@ class LinkManager
      */
     protected array $requires = [];
 
+    /**
+     * @var non-empty-string[]
+     */
+    protected array $extraPaths = [];
+
+    protected RootPackageInterface $rootPackage;
+
     public function __construct(
         protected readonly Repository $repository,
         protected readonly InstallerFactory $installerFactory,
         protected readonly IOInterface $io,
         protected readonly Composer $composer,
+        protected readonly LinkedPackageFactory $packageFactory,
     ) {
         $this->linkedRepository = new ArrayRepository();
-        $rootPackage = $this->composer->getPackage();
+        $this->rootPackage = $this->composer->getPackage();
+
+        // Process data defined in the extra section of composer.json
+        // We also store it in the repository, so that we know what was defined and if something was changes.
+        if (isset($this->rootPackage->getExtra()['composer-link'])) {
+            $extra = $this->rootPackage->getExtra()['composer-link'];
+
+            if (isset($extra['paths'])) {
+                foreach ($extra['paths'] as $path) {
+                    $this->loadPackageFromExtra($path);
+                }
+            }
+
+            // TODO maybe optimize this a bit and only save when dirty
+            $this->repository->setExtraPaths($this->extraPaths);
+            $this->repository->persist();
+        }
 
         // Load already linked packages
         foreach ($this->repository->all() as $package) {
             $this->linkedRepository->addPackage($package);
-            $this->requires[$package->getName()] = $package->createLink($rootPackage);
+            $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
         }
     }
 
@@ -65,6 +92,13 @@ class LinkManager
 
     public function remove(LinkedPackage $package): void
     {
+        // Check if package was linked from the extra section.
+        // If so we register that the package was unlinked
+        // This so that it isn't linked automatically again
+        if (in_array($package->getPath(), $this->extraPaths, true)) {
+            $this->repository->addUnlinkedPathFromExtra($package->getPath());
+        }
+
         $this->linkedRepository->removePackage($package);
         unset($this->requires[$package->getName()]);
 
@@ -116,5 +150,41 @@ class LinkManager
 
         $eventDispatcher->setRunScripts();
         $this->io->warning('<warning>Linking packages finished!</warning>');
+    }
+
+    /**
+     * Load packages from the extra section, we add those as linked packages.
+     * When these packages are unlinked, while defined in the extra section,
+     * it will be registered and we skip those.
+     *
+     * @param non-empty-string $path
+     */
+    private function loadPackageFromExtra(string $path): void
+    {
+        $unlinked = $this->repository->getUnlinkedFromExtra();
+
+        $helper = new PathHelper($path);
+        $this->extraPaths[] = $helper->getNormalizedPath();
+
+        // Package was manually unlinked, so we ignore it
+        if (in_array($helper->getNormalizedPath(), $unlinked, true)) {
+            return;
+        }
+
+        try {
+            $package = $this->packageFactory->fromPath($helper->getNormalizedPath());
+        } catch (RuntimeException) {
+            // Unable to load package, but we will continue and warn the user.
+            $this->io->writeError(sprintf(
+                '<warning>Could not load linked package from "%s" defined in the extra section of composer.json.</warning>',
+                $path
+            ));
+
+            return;
+        }
+
+        // TODO with if --no-dev is set, but composer-link is installed globally
+        $this->linkedRepository->addPackage($package);
+        $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
     }
 }

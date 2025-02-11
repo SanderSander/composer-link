@@ -17,6 +17,7 @@ namespace ComposerLink;
 
 use Composer\Composer;
 use Composer\IO\IOInterface;
+use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
 
 class LinkManagerFactory
@@ -25,13 +26,15 @@ class LinkManagerFactory
         Repository $repository,
         InstallerFactory $installerFactory,
         IOInterface $io,
-        Composer $composer): LinkManager
-    {
+        Composer $composer,
+        LinkedPackageFactory $packageFactory,
+    ): LinkManager {
         return new LinkManager(
             $repository,
             $installerFactory,
             $io,
-            $composer
+            $composer,
+            $packageFactory
         );
     }
 }

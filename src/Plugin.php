@@ -119,7 +119,8 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
             $this->getRepository(),
             new InstallerFactory($io, $this->composer),
             $io,
-            $this->composer
+            $this->composer,
+            $this->packageFactory
         );
     }
 

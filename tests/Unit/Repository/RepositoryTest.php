@@ -140,4 +140,13 @@ class RepositoryTest extends TestCase
 
         static::assertCount(1, $repository->all());
     }
+
+    public function test_if_extra_is_loaded_from_file(): void
+    {
+        $extra = ['paths' => ['../test-path-package']];
+
+        $this->storage->method('hasData')->willReturn(true);
+        $this->storage->method('read')
+            ->willReturn(['extra' => $extra]);
+    }
 }
