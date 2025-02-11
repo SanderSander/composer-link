@@ -52,7 +52,8 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
             $root->getName(),
             $this->getName(),
             new Constraint('=', 'dev-linked'),
-            Link::TYPE_REQUIRE
+            Link::TYPE_REQUIRE,
+            'dev-linked',
         );
     }
 

@@ -20,6 +20,7 @@ use Composer\DependencyResolver\Request;
 use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
+use Composer\Package\Package;
 use Composer\Repository\ArrayRepository;
 use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Repository\Repository;
@@ -112,9 +113,43 @@ class LinkManager
             ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
 
+        // Before we run the installer, we need to adjust our composer.lock data, to prevent conflicted versions.
+        // We only update the locked data in-memory, but we do not write it the .lock file
+        $this->updateTransitiveDependencies();
         $installer->run();
 
         $eventDispatcher->setRunScripts();
         $this->io->warning('<warning>Linking packages finished!</warning>');
+    }
+
+    /**
+     * Update all transitive dependencies, so that their requirements match our linked packages.
+     */
+    private function updateTransitiveDependencies(): void
+    {
+        $packages = $this->composer->getLocker()->getLockedRepository()->getPackages();
+
+        // Update all transitive requires and dev-requires of that point to one of the linked packages
+        foreach ($packages as $package) {
+            if (!$package instanceof Package) {
+                continue;
+            }
+            // Do the same for both dev-require and require
+            $requires = $package->getRequires();
+            foreach (array_keys($requires) as $name) {
+                if (isset($this->requires[$name])) {
+                    $requires[$name] = $this->requires[$name];
+                }
+            }
+            $package->setRequires($requires);
+
+            $requires = $package->getDevRequires();
+            foreach (array_keys($requires) as $name) {
+                if (isset($this->requires[$name])) {
+                    $requires[$name] = $this->requires[$name];
+                }
+            }
+            $package->setDevRequires($requires);
+        }
     }
 }
