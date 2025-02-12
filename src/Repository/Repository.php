@@ -28,14 +28,15 @@ class Repository
     /**
      * Extra paths defined in composer.json to auto link packages.
      *
-     * @var non-empty-string[]
+     * @var array<string, LinkedPackage>
      */
-    protected array $extraPaths = [];
+    protected array $linkedFromExtra = [];
 
     /**
-     * Contains paths of unlinked packages, that are also defined in $extra.
+     * Contains package names that were unlinked manually by the user,
+     * but are defined in extra section of composer.json.
      *
-     * @var non-empty-string[]
+     * @var array<string, LinkedPackage>
      */
     protected array $unlinkedFromExtra = [];
 
@@ -48,6 +49,12 @@ class Repository
 
     public function store(LinkedPackage $linkedPackage): void
     {
+        // Package is defined in the extra section of composer.json
+        if (isset($this->unlinkedFromExtra[$linkedPackage->getName()])) {
+            unset($this->unlinkedFromExtra[$linkedPackage->getName()]);
+            return;
+        }
+
         $index = $this->findIndex($linkedPackage);
 
         if (is_null($index)) {
@@ -59,25 +66,19 @@ class Repository
         $this->linkedPackages[$index] = clone $linkedPackage;
     }
 
-    /**
-     * @param non-empty-string[] $paths
-     */
-    public function setExtraPaths(array $paths): void
+    public function hasUnlinkedFromExtra(LinkedPackage $linkedPackage): bool
     {
-        $this->extraPaths = $paths;
+        return isset($this->unlinkedFromExtra[$linkedPackage->getName()]);
     }
 
-    public function getExtraPaths(): array
+    public function addLinkedFromExtra(LinkedPackage $linkedPackage): void
     {
-        return $this->extraPaths;
+        $this->linkedFromExtra[$linkedPackage->getName()] = $linkedPackage;
     }
 
-    /**
-     * @return non-empty-string[]
-     */
-    public function getUnlinkedFromExtra(): array
+    public function addUnlinkedFromExtra(LinkedPackage $package): void
     {
-        return $this->unlinkedFromExtra;
+        $this->unlinkedFromExtra[$package->getName()] = $package;
     }
 
     /**
@@ -117,6 +118,13 @@ class Repository
 
     public function remove(LinkedPackage $linkedPackage): void
     {
+        // Package was linked from extra, so remove the unlinked entry
+        // This is need so that the package isn't linked automatically again
+        if (isset($this->linkedFromExtra[$linkedPackage->getName()])) {
+            $this->unlinkedFromExtra[$linkedPackage->getName()] = $this->linkedFromExtra[$linkedPackage->getName()];
+            return;
+        }
+
         $index = $this->findIndex($linkedPackage);
 
         if (is_null($index)) {
@@ -130,10 +138,18 @@ class Repository
     {
         $data = [
             'packages' => [],
-            'extra_paths' => $this->extraPaths,
+            'linked_from_extra' => [],
+            'unlinked_from_extra' => [],
         ];
+
         foreach ($this->linkedPackages as $package) {
             $data['packages'][] = $this->transformer->export($package);
+        }
+        foreach ($this->linkedFromExtra as $package) {
+            $data['linked_from_extra'][] = $this->transformer->export($package);
+        }
+        foreach ($this->unlinkedFromExtra as $package) {
+            $data['unlinked_from_extra'][] = $this->transformer->export($package);
         }
 
         $this->storage->write($data);
@@ -147,9 +163,20 @@ class Repository
 
         $data = $this->storage->read();
 
-        $this->extraPaths = $data['extra_paths'] ?? [];
         foreach ($data['packages'] as $package) {
             $this->linkedPackages[] = $this->transformer->load($package);
+        }
+        if (isset($data['linked_from_extra'])) {
+            foreach ($data['linked_from_extra'] as $record) {
+                $package = $this->transformer->load($record);
+                $this->linkedFromExtra[$package->getName()] = $package;
+            }
+        }
+        if (isset($data['unlinked_from_extra'])) {
+            foreach ($data['unlinked_from_extra'] as $record) {
+                $package = $this->transformer->load($record);
+                $this->unlinkedFromExtra[$package->getName()] = $package;
+            }
         }
     }
 

@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace ComposerLink\Commands;
 
+use ComposerLink\Package\LinkedPackageFactory;
+use ComposerLink\Plugin;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,6 +24,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UnlinkCommand extends Command
 {
+    protected LinkedPackageFactory $packageFactory;
+
+    public function __construct(Plugin $plugin)
+    {
+        $this->packageFactory = $plugin->getPackageFactory();
+        parent::__construct($plugin);
+    }
+
     protected function configure(): void
     {
         $this->setName('unlink');
@@ -44,14 +54,9 @@ class UnlinkCommand extends Command
         $manager = $this->plugin->getLinkManager();
 
         foreach ($paths as $path) {
-            $repository = $this->plugin->getRepository();
-            $linkedPackage = $repository->findByPath($path->getNormalizedPath());
-
-            if ($linkedPackage === null) {
-                continue;
-            }
-
-            $manager->remove($linkedPackage);
+            $manager->remove(
+                $this->packageFactory->fromPath($path->getNormalizedPath())
+            );
         }
 
         $manager->linkPackages(!(bool) $input->getOption('no-dev'));

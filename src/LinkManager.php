@@ -22,9 +22,12 @@ use Composer\IO\IOInterface;
 use Composer\Package\Link;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\ArrayRepository;
+use Composer\Semver\Constraint\MatchAllConstraint;
+use ComposerLink\Exceptions\PackageAlreadyLinked;
 use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
+use Exception;
 use RuntimeException;
 
 class LinkManager
@@ -65,7 +68,7 @@ class LinkManager
             }
 
             // TODO maybe optimize this a bit and only save when dirty
-            $this->repository->setExtraPaths($this->extraPaths);
+            //$this->repository->setExtraPaths($this->extraPaths);
             $this->repository->persist();
         }
 
@@ -78,25 +81,31 @@ class LinkManager
 
     public function add(LinkedPackage $package): void
     {
-        $rootPackage = $this->composer->getPackage();
+        // Check if package is already linked
+        /** @var LinkedPackage|null $existing */
+        $existing = $this->linkedRepository->findPackage($package->getName(), new MatchAllConstraint());
+        if (!is_null($existing)) {
+            throw new PackageAlreadyLinked($package, $existing);
+        }
 
+        // Store package in our linked-packages.json
         $this->repository->store($package);
         $this->repository->persist();
 
-        if (!$this->linkedRepository->hasPackage($package)) {
-            $this->linkedRepository->addPackage($package);
-        }
+        // Add to the in memory repository
+        $this->linkedRepository->addPackage($package);
 
+        // Add require
+        // TODO really needed? we can build this on linking
+        $rootPackage = $this->composer->getPackage();
         $this->requires[$package->getName()] = $package->createLink($rootPackage);
     }
 
     public function remove(LinkedPackage $package): void
     {
-        // Check if package was linked from the extra section.
-        // If so we register that the package was unlinked
-        // This so that it isn't linked automatically again
-        if (in_array($package->getPath(), $this->extraPaths, true)) {
-            $this->repository->addUnlinkedPathFromExtra($package->getPath());
+        if (!$this->linkedRepository->hasPackage($package)) {
+            // TODO create exception
+            throw new Exception('Not linked todo');
         }
 
         $this->linkedRepository->removePackage($package);
@@ -161,15 +170,7 @@ class LinkManager
      */
     private function loadPackageFromExtra(string $path): void
     {
-        $unlinked = $this->repository->getUnlinkedFromExtra();
-
         $helper = new PathHelper($path);
-        $this->extraPaths[] = $helper->getNormalizedPath();
-
-        // Package was manually unlinked, so we ignore it
-        if (in_array($helper->getNormalizedPath(), $unlinked, true)) {
-            return;
-        }
 
         try {
             $package = $this->packageFactory->fromPath($helper->getNormalizedPath());
@@ -183,8 +184,16 @@ class LinkManager
             return;
         }
 
+        // Package was manually unlinked, so we ignore it
+        if ($this->repository->hasUnlinkedFromExtra($package)) {
+            // TODO should we inform the user?
+            return;
+        }
+
+
         // TODO with if --no-dev is set, but composer-link is installed globally
         $this->linkedRepository->addPackage($package);
         $this->requires[$package->getName()] = $package->createLink($this->rootPackage);
+        $this->repository->addLinkedFromExtra($package);
     }
 }
