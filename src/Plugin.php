@@ -115,12 +115,15 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
 
     protected function initializeLinkManager(IOInterface $io): LinkManager
     {
+        /** @var LinkedPackageFactory $packageFactory */
+        $packageFactory = $this->packageFactory;
+
         return $this->linkManagerFactory->create(
             $this->getRepository(),
             new InstallerFactory($io, $this->composer),
             $io,
             $this->composer,
-            $this->packageFactory
+            $packageFactory
         );
     }
 

@@ -85,35 +85,32 @@ class LinkCommand extends Command
         return 0;
     }
 
-    protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
-    {
-        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
-        /*
-        $repository = $this->plugin->getRepository();
-
-        if (!is_null($repository->findByPath($helper->getNormalizedPath()))) {
-            $output->writeln(
-                sprintf('<warning>Package in path "%s" already linked</warning>', $helper->getNormalizedPath())
-            );
-
-            return null;
-        }
-
-        $currentLinked = $repository->findByName($linkedPackage->getName());
-        if (!is_null($currentLinked)) {
-            $output->writeln(
-                sprintf(
-                    '<warning>Package "%s" in "%s" already linked from path "%s"</warning>',
-                    $linkedPackage->getName(),
-                    $linkedPackage->getPath(),
-                    $currentLinked->getPath()
-                )
-            );
-
-            return null;
-        }
-        */
-
-        return $linkedPackage;
-    }
+//    protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
+//    {
+//        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
+//        $repository = $this->plugin->getRepository();
+//
+//        if (!is_null($repository->findByPath($helper->getNormalizedPath()))) {
+//            $output->writeln(
+//                sprintf('<warning>Package in path "%s" already linked</warning>', $helper->getNormalizedPath())
+//            );
+//
+//            return null;
+//        }
+//
+//        $currentLinked = $repository->findByName($linkedPackage->getName());
+//        if (!is_null($currentLinked)) {
+//            $output->writeln(
+//                sprintf(
+//                    '<warning>Package "%s" in "%s" already linked from path "%s"</warning>',
+//                    $linkedPackage->getName(),
+//                    $linkedPackage->getPath(),
+//                    $currentLinked->getPath()
+//                )
+//            );
+//
+//            return null;
+//        }
+//        return $linkedPackage;
+//    }
 }

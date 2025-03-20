@@ -24,6 +24,7 @@ use Composer\Package\Link;
 use Composer\Package\RootPackageInterface;
 use ComposerLink\InstallerFactory;
 use ComposerLink\LinkManager;
+use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -85,6 +86,7 @@ class LinkManagerTest extends TestCase
             $installerFactory,
             $this->io,
             $this->composer,
+            $this->createMock(LinkedPackageFactory::class)
         );
         static::assertTrue($linkManager->hasLinkedPackages());
     }
@@ -195,6 +197,7 @@ class LinkManagerTest extends TestCase
             $installerFactory,
             $this->io,
             $this->composer,
+            $this->createMock(LinkedPackageFactory::class)
         );
     }
 }
