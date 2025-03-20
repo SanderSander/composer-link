@@ -19,6 +19,7 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use ComposerLink\InstallerFactory;
 use ComposerLink\LinkManagerFactory;
+use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\Repository;
 
 class LinkManagerFactoryTest extends TestCase
@@ -31,6 +32,7 @@ class LinkManagerFactoryTest extends TestCase
             $this->createMock(InstallerFactory::class),
             $this->createMock(IOInterface::class),
             $this->createMock(Composer::class),
+            $this->createMock(LinkedPackageFactory::class)
         );
 
         self::expectNotToPerformAssertions();

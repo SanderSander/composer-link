@@ -16,7 +16,9 @@ declare(strict_types=1);
 namespace ComposerLink\Commands;
 
 use ComposerLink\Package\LinkedPackage;
+use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\PathHelper;
+use ComposerLink\Plugin;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,6 +26,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class LinkCommand extends Command
 {
+    protected LinkedPackageFactory $packageFactory;
+
+    public function __construct(Plugin $plugin)
+    {
+        $this->packageFactory = $plugin->getPackageFactory();
+        parent::__construct($plugin);
+    }
+
     protected function configure(): void
     {
         $this->setName('link');
@@ -60,11 +70,7 @@ class LinkCommand extends Command
         $manager = $this->plugin->getLinkManager();
 
         foreach ($paths as $path) {
-            $package = $this->getPackage($path, $output);
-
-            if (is_null($package)) {
-                continue;
-            }
+            $package = $this->packageFactory->fromPath($path->getNormalizedPath());
 
             if ($onlyInstalled && is_null($package->getOriginalPackage())) {
                 continue;
@@ -79,33 +85,32 @@ class LinkCommand extends Command
         return 0;
     }
 
-    protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
-    {
-        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
-        $repository = $this->plugin->getRepository();
-
-        if (!is_null($repository->findByPath($helper->getNormalizedPath()))) {
-            $output->writeln(
-                sprintf('<warning>Package in path "%s" already linked</warning>', $helper->getNormalizedPath())
-            );
-
-            return null;
-        }
-
-        $currentLinked = $repository->findByName($linkedPackage->getName());
-        if (!is_null($currentLinked)) {
-            $output->writeln(
-                sprintf(
-                    '<warning>Package "%s" in "%s" already linked from path "%s"</warning>',
-                    $linkedPackage->getName(),
-                    $linkedPackage->getPath(),
-                    $currentLinked->getPath()
-                )
-            );
-
-            return null;
-        }
-
-        return $linkedPackage;
-    }
+//    protected function getPackage(PathHelper $helper, OutputInterface $output): ?LinkedPackage
+//    {
+//        $linkedPackage = $this->plugin->getPackageFactory()->fromPath($helper->getNormalizedPath());
+//        $repository = $this->plugin->getRepository();
+//
+//        if (!is_null($repository->findByPath($helper->getNormalizedPath()))) {
+//            $output->writeln(
+//                sprintf('<warning>Package in path "%s" already linked</warning>', $helper->getNormalizedPath())
+//            );
+//
+//            return null;
+//        }
+//
+//        $currentLinked = $repository->findByName($linkedPackage->getName());
+//        if (!is_null($currentLinked)) {
+//            $output->writeln(
+//                sprintf(
+//                    '<warning>Package "%s" in "%s" already linked from path "%s"</warning>',
+//                    $linkedPackage->getName(),
+//                    $linkedPackage->getPath(),
+//                    $currentLinked->getPath()
+//                )
+//            );
+//
+//            return null;
+//        }
+//        return $linkedPackage;
+//    }
 }
