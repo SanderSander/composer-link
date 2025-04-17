@@ -22,6 +22,7 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\MultiConstraint;
 use DateTimeInterface;
 
 /**
@@ -46,12 +47,20 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     /**
      * Creates a Link to this package from the given root.
      */
-    public function createLink(RootPackageInterface $root): Link
+    public function createLink(RootPackageInterface $root, ?Link $original = null): Link
     {
+        $constraint = new Constraint('==', 'dev-linked');
+
+        // We use an inline alias as documented in https://getcomposer.org/doc/articles/aliases.md#require-inline-alias
+        // This will prevent version conflicts with transitive dependencies to this package
+        if (!is_null($original)) {
+            $constraint = new MultiConstraint([$constraint, $original->getConstraint()], false);
+        }
+
         return new Link(
             $root->getName(),
             $this->getName(),
-            new Constraint('=', 'dev-linked'),
+            $constraint,
             Link::TYPE_REQUIRE
         );
     }
@@ -138,6 +147,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
      */
     public function getStability(): string
     {
+        // TODO I think the inline alias require
         return 'stable';
     }
 

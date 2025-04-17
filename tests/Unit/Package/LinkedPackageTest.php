@@ -28,9 +28,9 @@ class LinkedPackageTest extends TestCase
 {
     public function test_linked_package(): void
     {
-        $package = self::createStub(CompletePackageInterface::class);
+        $package = static::createStub(CompletePackageInterface::class);
         $package->method('getName')->willReturn('test/package');
-        $originalPackage = self::createStub(PackageInterface::class);
+        $originalPackage = static::createStub(PackageInterface::class);
 
         $linkedPackage = new LinkedPackage(
             $package,
@@ -60,11 +60,11 @@ class LinkedPackageTest extends TestCase
     public function test_requires(): void
     {
         $link = $this->createMock(Link::class);
-        $package = self::createStub(CompletePackageInterface::class);
+        $package = static::createStub(CompletePackageInterface::class);
         $package->method('getRequires')->willReturn(['test' => $link]);
         $package->method('getDevRequires')->willReturn(['dev-test' => $link]);
         $package->method('getName')->willReturn('test/package');
-        $originalPackage = self::createStub(PackageInterface::class);
+        $originalPackage = static::createStub(PackageInterface::class);
         $originalPackage->method('getRequires')->willReturn(['orig-test' => $link]);
         $originalPackage->method('getDevRequires')->willReturn(['orig-dev-test' => $link]);
         $linkedPackage = new LinkedPackage(
@@ -101,7 +101,7 @@ class LinkedPackageTest extends TestCase
 
     public function test_decorated_methods(): void
     {
-        $package = self::createStub(CompletePackageInterface::class);
+        $package = static::createStub(CompletePackageInterface::class);
         $linkedPackage = new LinkedPackage(
             $package,
             '/test-path',
