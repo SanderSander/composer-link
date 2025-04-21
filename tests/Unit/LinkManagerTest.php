@@ -21,7 +21,10 @@ use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter
 use Composer\Installer;
 use Composer\IO\IOInterface;
 use Composer\Package\Link;
+use Composer\Package\Locker;
+use Composer\Package\Package;
 use Composer\Package\RootPackageInterface;
+use Composer\Repository\LockArrayRepository;
 use ComposerLink\InstallerFactory;
 use ComposerLink\LinkManager;
 use ComposerLink\Repository\Repository;
@@ -54,6 +57,11 @@ class LinkManagerTest extends TestCase
      */
     protected RootPackageInterface $rootPackage;
 
+    /**
+     * @var LockArrayRepository&MockObject
+     */
+    protected LockArrayRepository $lockArrayRepository;
+
     protected LinkManager $linkManager;
 
     protected function setUp(): void
@@ -68,6 +76,11 @@ class LinkManagerTest extends TestCase
         $this->composer = $this->createMock(Composer::class);
         $this->rootPackage = $this->createMock(RootPackageInterface::class);
         $this->composer->method('getPackage')->willReturn($this->rootPackage);
+
+        $locker = $this->createMock(Locker::class);
+        $this->lockArrayRepository = $this->createMock(LockArrayRepository::class);
+        $locker->method('getLockedRepository')->willReturn($this->lockArrayRepository);
+        $this->composer->method('getLocker')->willReturn($locker);
 
         $this->linkManager = new LinkManager(
             $this->repository,
@@ -168,5 +181,25 @@ class LinkManagerTest extends TestCase
         $this->rootPackage->expects(static::once())->method('setDevRequires')->with([]);
 
         $this->linkManager->linkPackages(true);
+    }
+
+    public function test_creates_alias_package(): void
+    {
+        $package = $this->mockPackage();
+        $locked = $this->createMock(Package::class);
+
+        $this->lockArrayRepository->expects(static::once())
+            ->method('findPackage')
+            ->with($package->getName())
+            ->willReturn($locked);
+
+        $this->repository->expects(static::once())->method('store')->with($package);
+        $this->repository->expects(static::exactly(2))->method('persist');
+
+        // Add package and remove again
+        $this->linkManager->add($package);
+        static::assertTrue($this->linkManager->hasLinkedPackages());
+        $this->linkManager->remove($package);
+        static::assertFalse($this->linkManager->hasLinkedPackages());
     }
 }
