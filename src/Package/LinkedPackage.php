@@ -39,8 +39,8 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function __construct(
         protected CompletePackageInterface $linkedPackage,
         protected string $path,
-        protected string $installationPath,  // What's this?
-        protected ?PackageInterface $original,          // Explain, it's the original package and not the linked package
+        protected string $installationPath,
+        protected ?PackageInterface $original,
     ) {
         parent::__construct($this->linkedPackage->getName());
     }
@@ -48,7 +48,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     /**
      * Creates a Link to this package from the given root.
      */
-    public function createLink(RootPackageInterface $root, ?string $lockedVersion = null): Link
+    public function createLink(RootPackageInterface $root): Link
     {
         return new Link(
             $root->getName(),
@@ -140,21 +140,13 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
      */
     public function getStability(): string
     {
-        // TODO I think the inline alias require
         return 'stable';
     }
 
     public function getVersion(): string
     {
-        //return $this->original?->getVersion() ?? 'dev-linked';
         return 'dev-linked';
     }
-
-    public function getReplaces(): array
-    {
-        return $this->linkedPackage->getReplaces();
-    }
-
 
     //
     // Decorated functions, move altered function above this line
@@ -413,6 +405,11 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function getProvides(): array
     {
         return $this->linkedPackage->getProvides();
+    }
+
+    public function getReplaces(): array
+    {
+        return $this->linkedPackage->getReplaces();
     }
 
     public function getSuggests(): array
