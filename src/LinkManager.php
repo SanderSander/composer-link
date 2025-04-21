@@ -98,7 +98,6 @@ class LinkManager
         $rootPackage = $this->composer->getPackage();
 
         // Use the composer installer to install the linked packages with dependencies
-        var_dump($this->linkedRepository->count());
         $repositoryManager->prependRepository($this->linkedRepository);
 
         // Add requirement to the current/loaded composer.json
