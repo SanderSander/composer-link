@@ -37,8 +37,8 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function __construct(
         protected CompletePackageInterface $linkedPackage,
         protected string $path,
-        protected string $installationPath,  // What's this?
-        protected ?PackageInterface $original,          // Explain, it's the original package and not the linked package
+        protected string $installationPath,
+        protected ?PackageInterface $original,
     ) {
         parent::__construct($this->linkedPackage->getName());
     }

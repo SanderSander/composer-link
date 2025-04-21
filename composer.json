@@ -43,7 +43,7 @@
         "test-integration": [
             "docker build -t composer-link-test ./support && docker run --rm -v $PWD:/composer-link composer-link-test"
         ],
-        "phpstan": "./vendor/bin/phpstan",
+        "phpstan": "./vendor/bin/phpstan --memory-limit=512M",
         "lint": "./vendor/bin/php-cs-fixer fix"
     },
     "config": {

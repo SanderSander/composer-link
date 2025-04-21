@@ -35,7 +35,7 @@ abstract class TestCase extends BaseCase
         if (getcwd() === false) {
             throw new RuntimeException('Unable to get CMD');
         }
-        $this->thisPackagePath = getcwd();
+        $this->thisPackagePath = (string) getcwd();
         $this->composerGlobalDir = (string) realpath((string) exec('composer config --global home'));
 
         chdir($this->tmpAbsoluteDir);

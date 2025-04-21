@@ -19,8 +19,10 @@ use Composer\Composer;
 use Composer\DependencyResolver\Request;
 use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
+use Composer\Package\AliasPackage;
 use Composer\Package\Link;
 use Composer\Repository\ArrayRepository;
+use Composer\Semver\Constraint\MatchAllConstraint;
 use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Repository\Repository;
 
@@ -40,32 +42,44 @@ class LinkManager
         protected readonly Composer $composer,
     ) {
         $this->linkedRepository = new ArrayRepository();
-        $rootPackage = $this->composer->getPackage();
 
-        // Load already linked packages
+        // Load linked packages
         foreach ($this->repository->all() as $package) {
-            $this->linkedRepository->addPackage($package);
-            $this->requires[$package->getName()] = $package->createLink($rootPackage);
+            $this->registerPackage($package);
         }
     }
 
     public function add(LinkedPackage $package): void
     {
-        $rootPackage = $this->composer->getPackage();
-
         $this->repository->store($package);
         $this->repository->persist();
 
-        if (!$this->linkedRepository->hasPackage($package)) {
-            $this->linkedRepository->addPackage($package);
+        $this->registerPackage($package);
+    }
+
+    private function registerPackage(LinkedPackage $package): void
+    {
+        $rootPackage = $this->composer->getPackage();
+        $locked = $this->composer->getLocker()->getLockedRepository()->findPackage($package->getName(), new MatchAllConstraint());
+
+        // If we have installed version in the lock file, we will add the specific version as alias to the linked package.
+        // This way we prevent conflicts with transitive dependencies.
+        if (!is_null($locked)) {
+            $aliasPackage = new AliasPackage($package, $locked->getVersion(), $rootPackage->getPrettyVersion());
         }
 
+        $this->linkedRepository->addPackage($aliasPackage ?? $package);
         $this->requires[$package->getName()] = $package->createLink($rootPackage);
     }
 
     public function remove(LinkedPackage $package): void
     {
         $this->linkedRepository->removePackage($package);
+        $internalPackages = $this->linkedRepository->findPackages($package->getName());
+        foreach ($internalPackages as $internalPackage) {
+            $this->linkedRepository->removePackage($internalPackage);
+        }
+
         unset($this->requires[$package->getName()]);
 
         $this->repository->remove($package);
