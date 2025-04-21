@@ -23,6 +23,7 @@ use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\MultiConstraint;
+use Composer\Semver\VersionParser;
 use DateTimeInterface;
 
 /**
@@ -47,20 +48,12 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     /**
      * Creates a Link to this package from the given root.
      */
-    public function createLink(RootPackageInterface $root, ?Link $original = null): Link
+    public function createLink(RootPackageInterface $root, ?string $lockedVersion = null): Link
     {
-        $constraint = new Constraint('==', 'dev-linked');
-
-        // We use an inline alias as documented in https://getcomposer.org/doc/articles/aliases.md#require-inline-alias
-        // This will prevent version conflicts with transitive dependencies to this package
-        if (!is_null($original)) {
-            $constraint = new MultiConstraint([$constraint, $original->getConstraint()], false);
-        }
-
         return new Link(
             $root->getName(),
             $this->getName(),
-            $constraint,
+            new Constraint('=', 'dev-linked'),
             Link::TYPE_REQUIRE
         );
     }
@@ -153,8 +146,15 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
 
     public function getVersion(): string
     {
+        //return $this->original?->getVersion() ?? 'dev-linked';
         return 'dev-linked';
     }
+
+    public function getReplaces(): array
+    {
+        return $this->linkedPackage->getReplaces();
+    }
+
 
     //
     // Decorated functions, move altered function above this line
@@ -413,11 +413,6 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function getProvides(): array
     {
         return $this->linkedPackage->getProvides();
-    }
-
-    public function getReplaces(): array
-    {
-        return $this->linkedPackage->getReplaces();
     }
 
     public function getSuggests(): array

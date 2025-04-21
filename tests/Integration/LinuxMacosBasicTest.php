@@ -200,4 +200,37 @@ class LinuxMacosBasicTest extends TestCase
             $this->runComposerCommand('global linked')
         );
     }
+
+    public function test_link_with_transitive_dependencies(): void
+    {
+        $this->useComposerLinkGlobal();
+
+        // Add package-2 directory as repository
+        $composerFile = [
+            'repositories' => [
+                [
+                    'type' => 'path',
+                    'url' => $this->getMockDirectory() . '/package-2',
+                ]
+            ]
+        ];
+        $this->setCurrentComposeFile($composerFile);
+
+        // Require test/package-2 with dependency to psr/container 2.0.1
+        static::assertStringContainsString(
+            'Installing psr/container (2.0.1): Extracting archive',
+            $this->runComposerCommand('require test/package-2 @dev')
+        );
+
+        static::assertStringContainsString(
+            'Installing psr/container (dev-linked): Symlinking from',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/psr-container'),
+        );
+
+        // Unlink and test if 2.0.1 is installed again
+        static::assertStringContainsString(
+            'Installing psr/container (2.0.1): Extracting archive',
+            $this->runComposerCommand('unlink ' . self::RELATIVE_PATH_MOCK . '/psr-container'),
+        );
+    }
 }
