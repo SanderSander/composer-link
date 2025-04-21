@@ -211,8 +211,8 @@ class LinuxMacosBasicTest extends TestCase
                 [
                     'type' => 'path',
                     'url' => $this->getMockDirectory() . '/package-2',
-                ]
-            ]
+                ],
+            ],
         ];
         $this->setCurrentComposeFile($composerFile);
 

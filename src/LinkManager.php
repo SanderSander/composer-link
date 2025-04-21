@@ -72,7 +72,6 @@ class LinkManager
         $this->requires[$package->getName()] = $package->createLink($rootPackage);
     }
 
-
     public function remove(LinkedPackage $package): void
     {
         $this->linkedRepository->removePackage($package);

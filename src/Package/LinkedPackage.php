@@ -22,8 +22,6 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
-use Composer\Semver\Constraint\MultiConstraint;
-use Composer\Semver\VersionParser;
 use DateTimeInterface;
 
 /**
