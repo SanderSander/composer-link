@@ -79,7 +79,8 @@ class LinkedPackageFactory
             $linkedPackage,
             $path,
             $destination,
-            $originalPackage
+            $originalPackage,
+            null // lockedPackage will be set later in LinkManager if available
         );
     }
 }

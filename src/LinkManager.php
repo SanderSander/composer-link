@@ -19,7 +19,7 @@ use Composer\Composer;
 use Composer\DependencyResolver\Request;
 use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
-use Composer\Package\AliasPackage;
+
 use Composer\Package\Link;
 use Composer\Repository\ArrayRepository;
 use Composer\Semver\Constraint\MatchAllConstraint;
@@ -62,13 +62,16 @@ class LinkManager
         $rootPackage = $this->composer->getPackage();
         $locked = $this->composer->getLocker()->getLockedRepository()->findPackage($package->getName(), new MatchAllConstraint());
 
-        // If we have installed version in the lock file, we will add the specific version as alias to the linked package.
-        // This way we prevent conflicts with transitive dependencies.
+
+
+        // If we have installed version in the lock file, set it on the package
+        // The LinkedPackage will return the locked version directly
         if (!is_null($locked)) {
-            $aliasPackage = new AliasPackage($package, $locked->getVersion(), $rootPackage->getPrettyVersion());
+            $package->setLockedPackage($locked);
         }
 
-        $this->linkedRepository->addPackage($aliasPackage ?? $package);
+        $this->linkedRepository->addPackage($package);
+
         $this->requires[$package->getName()] = $package->createLink($rootPackage);
     }
 
@@ -97,8 +100,11 @@ class LinkManager
         $eventDispatcher = $this->composer->getEventDispatcher();
         $rootPackage = $this->composer->getPackage();
 
-        // Use the composer installer to install the linked packages with dependencies
+                // Use the composer installer to install the linked packages with dependencies  
+        // Add our repository first to give it highest priority
         $repositoryManager->prependRepository($this->linkedRepository);
+
+
 
         // Add requirement to the current/loaded composer.json
         $rootPackage->setRequires(array_merge($rootPackage->getRequires(), $this->requires));

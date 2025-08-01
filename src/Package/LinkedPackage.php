@@ -39,19 +39,22 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         protected string $path,
         protected string $installationPath,
         protected ?PackageInterface $original,
+        protected ?PackageInterface $lockedPackage = null,
     ) {
         parent::__construct($this->linkedPackage->getName());
     }
 
-    /**
+        /**
      * Creates a Link to this package from the given root.
      */
     public function createLink(RootPackageInterface $root): Link
     {
+        // Use the actual version of this package (which may be the locked version)
+        // This ensures the constraint matches what the package actually provides
         return new Link(
             $root->getName(),
             $this->getName(),
-            new Constraint('=', 'dev-linked'),
+            new Constraint('=', $this->getVersion()),
             Link::TYPE_REQUIRE
         );
     }
@@ -64,6 +67,16 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function setOriginalPackage(?PackageInterface $package): void
     {
         $this->original = $package;
+    }
+
+    public function getLockedPackage(): ?PackageInterface
+    {
+        return $this->lockedPackage;
+    }
+
+    public function setLockedPackage(?PackageInterface $package): void
+    {
+        $this->lockedPackage = $package;
     }
 
     public function getPath(): string
@@ -143,6 +156,11 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
 
     public function getVersion(): string
     {
+        // If we have a locked package, return that version instead of dev-linked
+        // This way we appear as the expected version directly
+        if ($this->lockedPackage !== null) {
+            return $this->lockedPackage->getVersion();
+        }
         return 'dev-linked';
     }
 
@@ -382,6 +400,10 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
 
     public function getPrettyVersion(): string
     {
+        // If we have a locked package, return that pretty version instead
+        if ($this->lockedPackage !== null) {
+            return $this->lockedPackage->getPrettyVersion();
+        }
         return $this->linkedPackage->getPrettyVersion();
     }
 
