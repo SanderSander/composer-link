@@ -20,6 +20,7 @@ use Composer\DependencyResolver\Request;
 use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
 use Composer\Package\AliasPackage;
+use Composer\Package\CompleteAliasPackage;
 use Composer\Package\Link;
 use Composer\Repository\ArrayRepository;
 use Composer\Semver\Constraint\MatchAllConstraint;
@@ -62,10 +63,13 @@ class LinkManager
         $rootPackage = $this->composer->getPackage();
         $locked = $this->composer->getLocker()->getLockedRepository()->findPackage($package->getName(), new MatchAllConstraint());
 
-        // If we have installed version in the lock file, we will add the specific version as alias to the linked package.
+        // If we have an installed version in the lock file, we will add the specific version as an alias to the linked package.
         // This way we prevent conflicts with transitive dependencies.
         if (!is_null($locked)) {
-            $aliasPackage = new AliasPackage($package, $locked->getVersion(), $rootPackage->getPrettyVersion());
+            // dev-* package can be locked as CompleteAliasPackage in those cases we should take the AliasOf to register the correct alias.
+            $aliasPackage = $locked instanceof CompleteAliasPackage ?
+                new AliasPackage($package, $locked->getAliasOf()->getVersion(), $rootPackage->getPrettyVersion()) :
+                new AliasPackage($package, $locked->getVersion(), $rootPackage->getPrettyVersion());
         }
 
         $this->linkedRepository->addPackage($aliasPackage ?? $package);
