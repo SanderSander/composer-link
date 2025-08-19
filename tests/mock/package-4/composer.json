@@ -1,0 +1,6 @@
+{
+  "name": "test/package-4",
+  "require": {
+    "psr/container": "dev-master"
+  }
+}
