@@ -18,7 +18,6 @@ namespace ComposerLink\Commands;
 use Composer\Command\BaseCommand;
 use ComposerLink\PathHelper;
 use ComposerLink\Plugin;
-use Symfony\Component\Console\Input\InputInterface;
 
 abstract class Command extends BaseCommand
 {
@@ -29,13 +28,15 @@ abstract class Command extends BaseCommand
     }
 
     /**
+     * @param non-empty-string $path
+     *
      * @return PathHelper[]
      */
-    protected function getPaths(InputInterface $input): array
+    protected function getPaths(string $path): array
     {
-        $helper = new PathHelper($input->getArgument('path'));
+        $helper = new PathHelper($path);
 
-        // When run in global we should transform path to absolute path
+        // When run in global, we should transform the path to an absolute path
         if ($this->plugin->isGlobal()) {
             /** @var string $working */
             $working = $this->getApplication()->getInitialWorkingDirectory();

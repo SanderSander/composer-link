@@ -56,7 +56,9 @@ class LinkCommand extends Command
     {
         /** @var bool $onlyInstalled */
         $onlyInstalled = $input->getOption('only-installed');
-        $paths = $this->getPaths($input);
+        /** @var non-empty-string $pathArgument */
+        $pathArgument = $input->getArgument('path');
+        $paths = $this->getPaths($pathArgument);
         $manager = $this->plugin->getLinkManager();
 
         foreach ($paths as $path) {

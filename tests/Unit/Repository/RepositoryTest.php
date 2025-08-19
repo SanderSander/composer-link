@@ -55,16 +55,21 @@ class RepositoryTest extends TestCase
         static::assertCount(1, $repository->all());
         static::assertEquals($package, $repository->all()[0]);
         static::assertNotSame($package, $repository->findByName('test/package'));
-        $this->transformer->method('export')->willReturn(['test' => 'exists']);
+        $this->transformer->method('export')->willReturn(['path' => 'exists']);
 
         $this->storage->expects(static::once())
             ->method('write')
-            ->with(static::callback(function (array $data) {
-                self::assertCount(1, $data['packages']);
-                self::assertSame(['test' => 'exists'], $data['packages'][0]);
+            ->with(static::callback(
+                function (array $data) {
+                    /** @var list<array{path: non-empty-string, withoutDependencies?: bool}> $packages */
+                    $packages = $data['packages'];
 
-                return true;
-            }));
+                    self::assertCount(1, $packages);
+                    self::assertSame(['path' => 'exists'], $packages[0]);
+
+                    return true;
+                }
+            ));
 
         $repository->persist();
     }

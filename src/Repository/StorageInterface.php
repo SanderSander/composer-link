@@ -20,14 +20,18 @@ interface StorageInterface
     /**
      * Write data to storage.
      *
-     * @param array<string, mixed> $data
+     * @param array{
+     *              packages: list<array{path: non-empty-string, withoutDependencies?: bool}>
+     *        } $data
      */
     public function write(array $data): void;
 
     /**
      * Read data from storage.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *             packages: list<array{path: non-empty-string, withoutDependencies?: bool}>
+     *         }
      */
     public function read(): array;
 

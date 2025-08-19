@@ -36,11 +36,11 @@ class Transformer
     /**
      * Load a Linked package from array data.
      *
-     * @param array<string, mixed> $data
+     * @param array{path: non-empty-string, withoutDependencies?: bool} $data
      */
     public function load(array $data): LinkedPackage
     {
-        // Load from path again since the composer.json can be changed
+        // Load from the path again since the composer.json can be changed
         $linkedPackage = $this->linkedPackageFactory->fromPath($data['path']);
         $linkedPackage->setWithoutDependencies($data['withoutDependencies'] ?? true);
 
@@ -50,7 +50,10 @@ class Transformer
     /**
      * Export LinkedPackage to array data.
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     path: non-empty-string,
+     *     withoutDependencies: bool
+     * }
      */
     public function export(LinkedPackage $package): array
     {

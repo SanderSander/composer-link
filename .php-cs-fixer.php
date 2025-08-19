@@ -33,6 +33,7 @@ $config = new PhpCsFixer\Config();
 
 return $config
     ->setRiskyAllowed(true)
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setRules([
         '@PSR12' => true,
         '@PSR12:risky' => true,

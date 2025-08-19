@@ -26,7 +26,7 @@
     },
     "require-dev": {
         "composer/composer": "^2.6",
-        "friendsofphp/php-cs-fixer": "^v3.15.0",
+        "friendsofphp/php-cs-fixer": "^v3.80.0",
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^10.5.38",
         "phpstan/phpstan-phpunit": "^2.0",

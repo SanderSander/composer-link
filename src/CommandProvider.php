@@ -30,7 +30,7 @@ class CommandProvider implements ComposerCommandProvider
     protected Plugin $plugin;
 
     /**
-     * @param array<string, mixed> $arguments
+     * @param array{io: IOInterface, plugin: Plugin} $arguments
      */
     public function __construct(array $arguments)
     {

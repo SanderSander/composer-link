@@ -55,14 +55,23 @@ abstract class TestCase extends BaseCase
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array{
+     *     require: array<string, string>,
+     *     repositories: array<array{type: string, url: string}>
+     * }
      */
     protected function getCurrentComposeFile(): array
     {
         /** @var string $content */
         $content = file_get_contents('composer.json');
 
-        return json_decode($content, true);
+        /** @var array{
+         * require: array<string, string>,
+         * repositories: array<array{type: string, url: string}>
+         * } $json */
+        $json = json_decode($content, true);
+
+        return $json;
     }
 
     /**

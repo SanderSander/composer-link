@@ -33,7 +33,7 @@ class JsonStorageTest extends TestCase
     public function test_can_write_and_read(): void
     {
         $storage = new JsonStorage($this->tmpAbsoluteDir . 'test.json');
-        $storage->write(['test' => 'data']);
-        static::assertEquals(['test' => 'data'], $storage->read());
+        $storage->write(['packages' => []]);
+        static::assertEquals(['packages' => []], $storage->read());
     }
 }

@@ -40,7 +40,9 @@ class UnlinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $paths = $this->getPaths($input);
+        /** @var non-empty-string $pathArgument */
+        $pathArgument = $input->getArgument('path');
+        $paths = $this->getPaths($pathArgument);
         $manager = $this->plugin->getLinkManager();
 
         foreach ($paths as $path) {
