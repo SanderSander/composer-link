@@ -1,6 +1,5 @@
 {
   "name": "test/package-2",
-  "version": "1.0.0",
   "require": {
     "psr/container": "2.0.1"
   }

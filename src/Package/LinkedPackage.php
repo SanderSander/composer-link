@@ -44,7 +44,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         parent::__construct($this->linkedPackage->getName());
     }
 
-        /**
+    /**
      * Creates a Link to this package from the given root.
      */
     public function createLink(RootPackageInterface $root): Link
@@ -161,6 +161,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         if ($this->lockedPackage !== null) {
             return $this->lockedPackage->getVersion();
         }
+
         return 'dev-linked';
     }
 
@@ -404,6 +405,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         if ($this->lockedPackage !== null) {
             return $this->lockedPackage->getPrettyVersion();
         }
+
         return $this->linkedPackage->getPrettyVersion();
     }
 
