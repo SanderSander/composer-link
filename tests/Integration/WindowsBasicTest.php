@@ -101,7 +101,7 @@ class WindowsBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
+            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
             $this->runComposerCommand('unlink ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
@@ -131,7 +131,7 @@ class WindowsBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->composerGlobalDir . '\vendor/test/package-1',
+            '  - Removing test/package-1 (dev-linked), source is still present in ' . $this->tmpAbsoluteDir . 'vendor/test/package-1',
             $this->runComposerCommand('unlink ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
