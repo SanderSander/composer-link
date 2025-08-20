@@ -1,0 +1,7 @@
+{
+    "name": "test/package-5",
+    "version": "dev-main",
+    "require": {
+        "test/package-3": "dev-main"
+    }
+}

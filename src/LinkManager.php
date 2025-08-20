@@ -61,15 +61,42 @@ class LinkManager
     private function registerPackage(LinkedPackage $package): void
     {
         $rootPackage = $this->composer->getPackage();
-        $locked = $this->composer->getLocker()->getLockedRepository()->findPackage($package->getName(), new MatchAllConstraint());
+
+        $locker = $this->composer->getLocker();
+        $locked = $locker->isLocked() ?
+            $locker->getLockedRepository()->findPackage($package->getName(), new MatchAllConstraint()) :
+            null;
 
         // If we have an installed version in the lock file, we will add the specific version as an alias to the linked package.
         // This way we prevent conflicts with transitive dependencies.
+        // E.g.:
+        //    Installed:
+        //      package-1 -> requires (package-2:dev-main)
+        //    Linking:
+        //      package-2:dev-linked
+        //    Result
+        //      We add alias for `package-2:dev-main to package-2:dev-linked`
         if (!is_null($locked)) {
             // dev-* package can be locked as CompleteAliasPackage in those cases we should take the AliasOf to register the correct alias.
             $aliasPackage = $locked instanceof CompleteAliasPackage ?
                 new AliasPackage($package, $locked->getAliasOf()->getVersion(), $rootPackage->getPrettyVersion()) :
                 new AliasPackage($package, $locked->getVersion(), $rootPackage->getPrettyVersion());
+        }
+
+        // Case 2
+        // E.g.:
+        //  Installed:
+        //    package-1 (dev-linked)
+        //  Linking:
+        //    package-2:dev-linked -> requires (package-1:dev-main)
+        //  Result:
+        //    We do not have an alias to package-1:dev-main yet, so we need to scan the requirements and look for locked linked versions.
+        foreach ($package->getRequires() as $link) {
+            $locked = $this->linkedRepository->findPackage($link->getTarget(), new MatchAllConstraint());
+            $aliased = $this->linkedRepository->findPackage($link->getTarget(), $link->getConstraint());
+            if (!is_null($locked) && is_null($aliased)) {
+                $this->linkedRepository->addPackage(new AliasPackage($locked, $link->getPrettyConstraint(), $rootPackage->getPrettyVersion()));
+            }
         }
 
         $this->linkedRepository->addPackage($aliasPackage ?? $package);

@@ -1,6 +1,4 @@
 {
-  "name": "test/package-2",
-  "require": {
-    "psr/container": "2.0.1"
-  }
+  "name": "test/package-3",
+  "version": "dev-main"
 }

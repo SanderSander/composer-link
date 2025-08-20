@@ -78,6 +78,7 @@ class LinkManagerTest extends TestCase
         $this->composer->method('getPackage')->willReturn($this->rootPackage);
 
         $locker = $this->createMock(Locker::class);
+        $locker->method('isLocked')->willReturn(true);
         $this->lockArrayRepository = $this->createMock(LockArrayRepository::class);
         $locker->method('getLockedRepository')->willReturn($this->lockArrayRepository);
         $this->composer->method('getLocker')->willReturn($locker);

@@ -17,6 +17,7 @@ namespace Tests;
 
 use Composer\Util\Filesystem;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use RuntimeException;
 
 abstract class TestCase extends PHPUnitTestCase
 {
@@ -47,6 +48,8 @@ abstract class TestCase extends PHPUnitTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        $this->filesystem->removeDirectory($this->tmpAbsoluteDir);
+        if (!$this->filesystem->removeDirectory($this->tmpAbsoluteDir)) {
+            throw new RuntimeException('Failed to remove tmp directory.');
+        }
     }
 }

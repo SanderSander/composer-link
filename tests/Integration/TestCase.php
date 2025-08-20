@@ -39,6 +39,12 @@ abstract class TestCase extends BaseCase
         $this->composerGlobalDir = (string) realpath((string) exec('composer config --global home'));
 
         chdir($this->tmpAbsoluteDir);
+
+        // Make sure there is a composer.json file defined in the directory,
+        // We want this because otherwise composer could traverse up the directory tree to find the nearest composer.json
+        $this->setCurrentComposeFile(['name' => 'test/case']);
+        // Generate an empty lock file, which is required to run the link command
+        $this->runComposerCommand('update');
     }
 
     public function getMockDirectory(): string
@@ -143,8 +149,8 @@ abstract class TestCase extends BaseCase
 
     public function tearDown(): void
     {
-        // We have to change directory, before parent class remove the directory.
-        // Windows has problems with removing directories when they are open in console
+        // We have to change directory, before parent class removes the directory.
+        // Windows has problems with removing directories when they are open in the console
         chdir($this->thisPackagePath);
         parent::tearDown();
     }

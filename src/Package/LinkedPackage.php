@@ -149,6 +149,16 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         return 'dev-linked';
     }
 
+    public function getPrettyVersion(): string
+    {
+        return $this->getVersion();
+    }
+
+    public function getFullPrettyVersion(bool $truncate = true, int $displayMode = self::DISPLAY_SOURCE_REF_IF_DEV): string
+    {
+        return $this->getVersion();
+    }
+
     //
     // Decorated functions, move altered function above this line
     //
@@ -381,16 +391,6 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function setDistMirrors(?array $mirrors): void
     {
         $this->linkedPackage->setDistMirrors($mirrors);
-    }
-
-    public function getPrettyVersion(): string
-    {
-        return $this->linkedPackage->getPrettyVersion();
-    }
-
-    public function getFullPrettyVersion(bool $truncate = true, int $displayMode = self::DISPLAY_SOURCE_REF_IF_DEV): string
-    {
-        return $this->linkedPackage->getFullPrettyVersion($truncate, $displayMode);
     }
 
     public function getReleaseDate(): ?DateTimeInterface

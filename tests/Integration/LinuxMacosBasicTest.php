@@ -205,7 +205,6 @@ class LinuxMacosBasicTest extends TestCase
     {
         $this->useComposerLinkGlobal();
 
-        // Add package-2 directory as repository
         $composerFile = [
             'repositories' => [
                 [
@@ -234,11 +233,10 @@ class LinuxMacosBasicTest extends TestCase
         );
     }
 
-    public function test_link_with_transitive_dev_dependencies(): void
+    public function test_link_with_dev_dependencies(): void
     {
         $this->useComposerLinkGlobal();
 
-        // Add package-2 directory as repository
         $composerFile = [
             'repositories' => [
                 [
@@ -265,6 +263,36 @@ class LinuxMacosBasicTest extends TestCase
         static::assertStringContainsString(
             'Installing psr/container (dev-master',
             $this->runComposerCommand('unlink ' . self::RELATIVE_PATH_MOCK . '/psr-container'),
+        );
+    }
+
+    public function test_link_without_dependencies(): void
+    {
+        $this->useComposerLinkGlobal();
+
+        static::assertStringContainsString(
+            'Installing test/package-3 (dev-linked): Symlinking from',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-3'),
+        );
+
+        static::assertStringContainsString(
+            'Installing test/package-5 (dev-linked): Symlinking from',
+            $this->runComposerCommand('link --without-dependencies ' . self::RELATIVE_PATH_MOCK . '/package-5'),
+        );
+    }
+
+    public function test_link_with_transitive_dev_dependencies(): void
+    {
+        $this->useComposerLinkGlobal();
+
+        static::assertStringContainsString(
+            'Installing test/package-3 (dev-linked): Symlinking from',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-3'),
+        );
+
+        static::assertStringContainsString(
+            'Installing test/package-5 (dev-linked): Symlinking from',
+            $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-5'),
         );
     }
 }
