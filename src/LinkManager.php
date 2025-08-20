@@ -24,6 +24,7 @@ use Composer\Package\CompleteAliasPackage;
 use Composer\Package\Link;
 use Composer\Package\Version\VersionParser;
 use Composer\Repository\ArrayRepository;
+use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Constraint\MatchAllConstraint;
 use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Repository\Repository;
@@ -105,8 +106,6 @@ class LinkManager
      * Link => package-1:dev-linked
      * Link => package-2:dev-linked (requires package-1:dev-main)
      * We create an alias from package-1:dev-main to package-1:dev-linked
-     *
-     * @SuppressWarnings(PHPMD.StaticAccess)
      */
     private function createAliasesForRequiresInLinkedPackage(LinkedPackage $package): void
     {
@@ -114,11 +113,7 @@ class LinkManager
             $linked = $this->linkedRepository->findPackage($link->getTarget(), new MatchAllConstraint());
             $aliased = $this->linkedRepository->findPackage($link->getTarget(), $link->getConstraint());
             if (!is_null($linked) && is_null($aliased)) {
-                $stability = VersionParser::parseStability($link->getPrettyConstraint());
-                $version = $stability === 'dev' ?
-                    $link->getPrettyConstraint() :
-                    $link->getConstraint()->getLowerBound()->getVersion();
-
+                $version = $this->getVersionFromConstraint($link->getConstraint());
                 $this->linkedRepository->addPackage(new AliasPackage($linked, $version, $link->getPrettyConstraint()));
             }
         }
@@ -142,10 +137,25 @@ class LinkManager
                 }
 
                 if ($link->getTarget() === $toPackage->getName()) {
-                    $this->linkedRepository->addPackage(new AliasPackage($toPackage, $link->getPrettyConstraint(), $link->getPrettyConstraint()));
+                    $version = $this->getVersionFromConstraint($link->getConstraint());
+                    $this->linkedRepository->addPackage(new AliasPackage($toPackage, $version, $link->getPrettyConstraint()));
                 }
             }
         }
+    }
+
+    /**
+     * Transforms version constraints to usable version strings.
+     *
+     * @SuppressWarnings(PHPMD.StaticAccess)
+     */
+    private function getVersionFromConstraint(ConstraintInterface $constraint): string
+    {
+        $stability = VersionParser::parseStability($constraint->getPrettyString());
+
+        return $stability === 'dev' ?
+            (new VersionParser())->normalize($constraint->getPrettyString()) :
+            $constraint->getLowerBound()->getVersion();
     }
 
     public function remove(LinkedPackage $package): void
