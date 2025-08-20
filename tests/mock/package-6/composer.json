@@ -1,0 +1,7 @@
+{
+    "name": "test/package-6",
+    "version": "dev-main",
+    "require": {
+        "psr/http-factory": "^1.1.0"
+    }
+}

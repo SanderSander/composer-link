@@ -1,0 +1,6 @@
+{
+  "name": "psr/http-factory",
+  "require": {
+      "psr/http-message": "dev-master"
+  }
+}
