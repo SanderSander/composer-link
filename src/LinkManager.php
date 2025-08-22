@@ -65,6 +65,9 @@ class LinkManager
     {
         $rootPackage = $this->composer->getPackage();
         $aliasPackage = $this->createAliasForLockedPackage($package);
+        if ($aliasPackage === null) {
+            $aliasPackage = $this->createAliasForKnownPackage($package);
+        }
         $this->linkedRepository->addPackage($aliasPackage ?? $package);
 
         $this->createAliasesForRequiresInLinkedPackage($package);
@@ -97,6 +100,30 @@ class LinkManager
         return $locked instanceof CompleteAliasPackage ?
             new AliasPackage($package, $locked->getAliasOf()->getVersion(), $locked->getAliasOf()->getPrettyVersion()) :
             new AliasPackage($package, $locked->getVersion(), $locked->getPrettyVersion());
+    }
+
+    /**
+     * Sometimes when multiple packages are linked with their dependencies,
+     * it can happen that a transitive dependency of those dependencies points to the current linked packages.
+     * These packages are not registered in the lockfile, so we look those up in the repository manager.
+     *
+     *  E.g.,
+     *  Linked => package-1:dev-linked (requires package-2:dev-main requires package-3:dev-main)
+     *  Link => package-3:dev-linked
+     *
+     *  We create an alias from package-3:dev-main to package-3:dev-linked
+     */
+    private function createAliasForKnownPackage(LinkedPackage $package): ?AliasPackage
+    {
+        // Check if the package is already registered in the repository manager, if so make an alias to that variant
+        $known = $this->composer->getRepositoryManager()->findPackage($package->getName(), new MatchAllConstraint());
+        if (is_null($known)) {
+            return null;
+        }
+
+        return $known instanceof CompleteAliasPackage ?
+            new AliasPackage($package, $known->getAliasOf()->getVersion(), $known->getAliasOf()->getPrettyVersion()) :
+            new AliasPackage($package, $known->getVersion(), $known->getPrettyVersion());
     }
 
     /**
@@ -199,7 +226,7 @@ class LinkManager
             }
         }
 
-        // We need to remove dev-requires from the list of packages that are linked
+        // We need to remove linked packages from the dev-require because we placed them in the section require
         $devRequires = $rootPackage->getDevRequires();
         foreach ($this->linkedRepository->getPackages() as $package) {
             unset($devRequires[$package->getName()]);
