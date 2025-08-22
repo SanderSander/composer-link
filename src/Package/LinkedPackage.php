@@ -22,6 +22,7 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
+use Composer\Semver\Constraint\MatchAllConstraint;
 use DateTimeInterface;
 
 /**
@@ -105,6 +106,27 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         }
 
         return $this->linkedPackage->getDevRequires();
+    }
+
+    /**
+     * All replacements defined in the linked package are converted to a MatchALlConstraint.
+     * This is needed so that the linked package always matches when a replacement is required.
+     * We do this for now for the `self.version` replacements, otherwise the replacements will not match the requirements.
+     */
+    public function getReplaces(): array
+    {
+        $linkedReplaces = $this->linkedPackage->getReplaces();
+        $originalReplaces = $this->original?->getReplaces();
+
+        return array_map(function ($replace) {
+            if ($replace->getPrettyConstraint() === 'self.version') {
+                $constraint = $replace->getConstraint();
+
+                return new Link($replace->getSource(), $replace->getTarget(), $constraint, Link::TYPE_REPLACE, $constraint->getPrettyString());
+            }
+
+            return $replace;
+        }, $originalReplaces ?? $linkedReplaces);
     }
 
     public function getLinkedPackage(): CompletePackageInterface
@@ -406,11 +428,6 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function getProvides(): array
     {
         return $this->linkedPackage->getProvides();
-    }
-
-    public function getReplaces(): array
-    {
-        return $this->linkedPackage->getReplaces();
     }
 
     public function getSuggests(): array
