@@ -28,6 +28,7 @@ use Composer\Semver\Constraint\ConstraintInterface;
 use Composer\Semver\Constraint\MatchAllConstraint;
 use ComposerLink\Package\LinkedPackage;
 use ComposerLink\Repository\Repository;
+use ReflectionClass;
 
 class LinkManager
 {
@@ -64,11 +65,11 @@ class LinkManager
     {
         $rootPackage = $this->composer->getPackage();
         $aliasPackage = $this->createAliasForLockedPackage($package);
+        $this->linkedRepository->addPackage($aliasPackage ?? $package);
 
         $this->createAliasesForRequiresInLinkedPackage($package);
         $this->createAliasesForRequiresInLinkedPackages($package);
 
-        $this->linkedRepository->addPackage($aliasPackage ?? $package);
         $this->requires[$package->getName()] = $package->createLink($rootPackage);
     }
 
@@ -189,6 +190,14 @@ class LinkManager
         // Add requirement to the current/loaded composer.json
         $rootPackage->setRequires(array_merge($rootPackage->getRequires(), $this->requires));
         $this->io->warning('<warning>Linking packages, Lock file will be generated in memory but not written to disk.</warning>');
+
+        // Show extra added packages as information, this makes it a bit easier to debug
+        foreach ($this->linkedRepository->getPackages() as $package) {
+            $this->io->info((new ReflectionClass($package))->getShortName() . "\t\t" . $package->getName() . ':' . $package->getVersion());
+            if ($package instanceof AliasPackage) {
+                $this->io->info("\t\t\t" . $package->getAliasOf()->getName() . ':' . $package->getAliasOf()->getVersion());
+            }
+        }
 
         // We need to remove dev-requires from the list of packages that are linked
         $devRequires = $rootPackage->getDevRequires();
