@@ -64,11 +64,7 @@ class LinkManager
     private function registerPackage(LinkedPackage $package): void
     {
         $rootPackage = $this->composer->getPackage();
-        $aliasPackage = $this->createAliasForLockedPackage($package);
-        if ($aliasPackage === null) {
-            $aliasPackage = $this->createAliasForKnownPackage($package);
-        }
-        $this->linkedRepository->addPackage($aliasPackage ?? $package);
+        $this->linkedRepository->addPackage($package);
 
         $this->createAliasesForRequiresInLinkedPackage($package);
         $this->createAliasesForRequiresInLinkedPackages($package);
@@ -220,9 +216,9 @@ class LinkManager
 
         // Show extra added packages as information, this makes it a bit easier to debug
         foreach ($this->linkedRepository->getPackages() as $package) {
-            $this->io->info((new ReflectionClass($package))->getShortName() . "\t\t" . $package->getName() . ':' . $package->getVersion());
+            $this->io->info((new ReflectionClass($package))->getShortName() . "\t\t" . $package->getName() . ':' . $package->getVersion() . ' - ' . $package->getPrettyVersion());
             if ($package instanceof AliasPackage) {
-                $this->io->info("\t\t\t" . $package->getAliasOf()->getName() . ':' . $package->getAliasOf()->getVersion());
+                $this->io->info("\t\t\t" . $package->getAliasOf()->getName() . ':' . $package->getAliasOf()->getVersion() . ' - ' . $package->getAliasOf()->getPrettyVersion());
             }
         }
 

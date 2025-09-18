@@ -109,7 +109,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
     {
         return new LinkedPackageFactory(
             $this->composer->getInstallationManager(),
-            $this->composer->getRepositoryManager()->getLocalRepository()
+            $this->composer->getLocker()->getLockedRepository()
         );
     }
 
