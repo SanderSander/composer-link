@@ -34,16 +34,8 @@ jobs:
 
       - name: Run unit tests
         run: ./vendor/bin/phpunit --testsuite=Unit
-        if: (matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest') == false
+        if: (matrix.php-versions == '8.5' && matrix.operating-system == 'ubuntu-latest') == false
 
       - name: Run unit tests with coverage
         run: ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml --testsuite=Unit --coverage-text
-        if: matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest'
-
-      - name: Publish code coverage to codeclimate
-        uses: paambaati/codeclimate-action@v3.2.0
-        if: matrix.php-versions == '8.4' && matrix.operating-system == 'ubuntu-latest'
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
-        with:
-          coverageLocations: build/logs/clover.xml:clover
+        if: matrix.php-versions == '8.5' && matrix.operating-system == 'ubuntu-latest'

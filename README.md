@@ -1,6 +1,5 @@
 # composer-link
 ![phpunit](https://github.com/SanderSander/composer-link/actions/workflows/unit-tests.yml/badge.svg?branch=master)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/3815e6abf2ec0e1d4ac8/test_coverage)](https://codeclimate.com/github/SanderSander/composer-link/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/3815e6abf2ec0e1d4ac8/maintainability)](https://codeclimate.com/github/SanderSander/composer-link/maintainability)
 
 Adds ability to link local packages in composer for development. 
