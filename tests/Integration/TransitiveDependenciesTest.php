@@ -134,8 +134,8 @@ class TransitiveDependenciesTest extends TestCase
             $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-5'),
         );
 
-        static::assertStringContainsString(
-            'Upgrading test/package-3 (dev-main => dev-linked): Source already present',
+        static::assertMatchesRegularExpression(
+            '/Upgrading test\/package-3 \(dev-main([ ]{1}[a-f0-9]{7})? => dev-linked\): Source already present/',
             $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-3'),
         );
     }
