@@ -183,7 +183,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
 
     public function getFullPrettyVersion(bool $truncate = true, int $displayMode = self::DISPLAY_SOURCE_REF_IF_DEV): string
     {
-        return $this->getVersion();
+        return $this->getPrettyVersion();
     }
 
     //
