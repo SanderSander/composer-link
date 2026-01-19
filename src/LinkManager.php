@@ -184,7 +184,7 @@ class LinkManager
         $installer = $this->installerFactory->create();
 
         /* @phpstan-ignore method.deprecated */
-        $installer->setUpdate(! empty($this->requires))
+        $installer->setUpdate(count($this->requires) > 0)
             ->setInstall(true)
             ->setWriteLock(false)
             ->setRunScripts(false)

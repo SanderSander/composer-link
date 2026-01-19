@@ -134,7 +134,7 @@ class LinkManagerTest extends TestCase
 
     public function test_link_packages_empty(): void
     {
-        $this->installer->expects(static::once())->method('setUpdate')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdate')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
