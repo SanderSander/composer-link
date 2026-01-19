@@ -1,6 +1,6 @@
 # composer-link
 ![phpunit](https://github.com/SanderSander/composer-link/actions/workflows/unit-tests.yml/badge.svg?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3815e6abf2ec0e1d4ac8/maintainability)](https://codeclimate.com/github/SanderSander/composer-link/maintainability)
+![Packagist Downloads](https://img.shields.io/packagist/dt/SanderSander/composer-link)
 
 Adds ability to link local packages in composer for development. 
 
