@@ -168,7 +168,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
 
     public function getVersion(): string
     {
-        if ($this->original) {
+        if (!is_null($this->original)) {
             return $this->original->getVersion();
         }
 
