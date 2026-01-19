@@ -19,14 +19,14 @@ use Composer\Installer\InstallationManager;
 use Composer\Json\JsonFile;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
-use Composer\Repository\InstalledRepositoryInterface;
+use Composer\Repository\LockArrayRepository;
 use RuntimeException;
 
 class LinkedPackageFactory
 {
     public function __construct(
         protected readonly InstallationManager $installationManager,
-        protected readonly InstalledRepositoryInterface $installedRepository,
+        protected readonly LockArrayRepository $locked,
     ) {
     }
 
@@ -63,15 +63,14 @@ class LinkedPackageFactory
     {
         $originalPackage = null;
         $linkedPackage = $this->loadFromJsonFile($path);
-        $packages = $this->installedRepository->getCanonicalPackages();
+
+        $packages = $this->locked->getCanonicalPackages();
         foreach ($packages as $package) {
             if ($package->getName() === $linkedPackage->getName()) {
                 $originalPackage = $package;
             }
         }
 
-        // TODO installation path exists only if package is installed
-        //      we should add support when the package isn't required yet in composer.json
         /** @var string $destination */
         $destination = $this->installationManager->getInstallPath($linkedPackage);
 

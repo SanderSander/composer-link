@@ -17,7 +17,7 @@ namespace Tests\Unit\Package;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
-use Composer\Repository\InstalledRepositoryInterface;
+use Composer\Repository\LockArrayRepository;
 use ComposerLink\Package\LinkedPackageFactory;
 use RuntimeException;
 use Tests\Unit\TestCase;
@@ -27,7 +27,7 @@ class LinkedPackageFactoryTest extends TestCase
     public function test_factory(): void
     {
         $installationManager = $this->createMock(InstallationManager::class);
-        $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $installedRepository = $this->createMock(LockArrayRepository::class);
         $originalPackage = $this->createMock(PackageInterface::class);
         $originalPackage->method('getName')->willReturn('test/package');
         $installedRepository->method('getCanonicalPackages')->willReturn([$originalPackage]);
@@ -44,7 +44,7 @@ class LinkedPackageFactoryTest extends TestCase
     public function test_no_original_package(): void
     {
         $installationManager = $this->createMock(InstallationManager::class);
-        $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $installedRepository = $this->createMock(LockArrayRepository::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
         $installationManager->method('getInstallPath')->willReturn('vendor/test/package/');
         file_put_contents($this->tmpAbsoluteDir . 'composer.json', '{"name": "test/package"}');
@@ -57,7 +57,7 @@ class LinkedPackageFactoryTest extends TestCase
     public function test_invalid_package(): void
     {
         $installationManager = $this->createMock(InstallationManager::class);
-        $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $installedRepository = $this->createMock(LockArrayRepository::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
         file_put_contents($this->tmpAbsoluteDir . 'composer.json', 'null');
 
@@ -71,7 +71,7 @@ class LinkedPackageFactoryTest extends TestCase
     public function test_no_composer_file(): void
     {
         $installationManager = $this->createMock(InstallationManager::class);
-        $installedRepository = $this->createMock(InstalledRepositoryInterface::class);
+        $installedRepository = $this->createMock(LockArrayRepository::class);
         $installedRepository->method('getCanonicalPackages')->willReturn([]);
 
         $this->expectException(RuntimeException::class);

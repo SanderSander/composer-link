@@ -52,7 +52,7 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         return new Link(
             $root->getName(),
             $this->getName(),
-            new Constraint('=', 'dev-linked'),
+            new Constraint('=', $this->original?->getVersion() ?? 'dev-linked'),
             Link::TYPE_REQUIRE
         );
     }
@@ -168,17 +168,21 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
 
     public function getVersion(): string
     {
+        if (!is_null($this->original)) {
+            return $this->original->getVersion();
+        }
+
         return 'dev-linked';
     }
 
     public function getPrettyVersion(): string
     {
-        return $this->getVersion();
+        return 'dev-linked';
     }
 
     public function getFullPrettyVersion(bool $truncate = true, int $displayMode = self::DISPLAY_SOURCE_REF_IF_DEV): string
     {
-        return $this->getVersion();
+        return $this->getPrettyVersion();
     }
 
     //
