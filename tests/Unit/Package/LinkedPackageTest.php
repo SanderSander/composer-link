@@ -158,7 +158,6 @@ class LinkedPackageTest extends TestCase
         $linkedPackage->getDistSha1Checksum();
         $linkedPackage->getDistMirrors();
         $linkedPackage->setDistMirrors([]);
-        $linkedPackage->getPrettyVersion();
         $linkedPackage->getFullPrettyVersion(false, CompletePackageInterface::DISPLAY_DIST_REF);
         $linkedPackage->getReleaseDate();
         $linkedPackage->getConflicts();
