@@ -58,6 +58,7 @@ class LinkCommand extends Command
         $onlyInstalled = $input->getOption('only-installed');
         $paths = $this->getPaths($input);
         $manager = $this->plugin->getLinkManager();
+        $added = [];
 
         foreach ($paths as $path) {
             $package = $this->getPackage($path, $output);
@@ -72,9 +73,10 @@ class LinkCommand extends Command
 
             $package->setWithoutDependencies((bool) $input->getOption('without-dependencies'));
             $manager->add($package);
+            $added[] = $package;
         }
 
-        $manager->linkPackages(!(bool) $input->getOption('no-dev'));
+        $manager->linkPackages(!(bool) $input->getOption('no-dev'), $added);
 
         return 0;
     }
