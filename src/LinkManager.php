@@ -199,7 +199,6 @@ class LinkManager
         $exit = $installer->run();
         $this->io->debug('Installer exited with code ' . $exit);
         if ($exit !== 0) {
-            var_dump(count($recentAddedPackages));
             foreach ($recentAddedPackages as $package) {
                 $this->io->error('<error>Package ' . $package->getName() . ' is not linked.</error>');
                 $this->remove($package);
