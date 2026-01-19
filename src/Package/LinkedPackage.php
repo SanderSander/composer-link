@@ -23,7 +23,6 @@ use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
 use Composer\Semver\Constraint\MatchAllConstraint;
-use Composer\Semver\Constraint\MultiConstraint;
 use DateTimeInterface;
 
 /**

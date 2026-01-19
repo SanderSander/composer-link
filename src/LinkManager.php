@@ -20,7 +20,6 @@ use Composer\DependencyResolver\Request;
 use Composer\Filter\PlatformRequirementFilter\IgnoreAllPlatformRequirementFilter;
 use Composer\IO\IOInterface;
 use Composer\Package\AliasPackage;
-use Composer\Package\CompleteAliasPackage;
 use Composer\Package\Link;
 use Composer\Package\Version\VersionParser;
 use Composer\Repository\ArrayRepository;
@@ -70,56 +69,6 @@ class LinkManager
         $this->createAliasesForRequiresInLinkedPackages($package);
 
         $this->requires[$package->getName()] = $package->createLink($rootPackage);
-    }
-
-    /**
-     * The package that is linked could already exist in the lockfile because it was required by some dependency.
-     * In these cases we have to create an alias from that locked version to the "dev-linked" version.
-     *
-     * E.g.,
-     * Installed => package-1:1.0.2 (requires package-2:1.0.1)
-     * Link => package-2:dev-linked (we create an alias from package-2:1.0.1 to package-2:dev-linked)
-     */
-    private function createAliasForLockedPackage(LinkedPackage $package): ?AliasPackage
-    {
-        $locker = $this->composer->getLocker();
-        if (!$locker->isLocked()) {
-            return null;
-        }
-
-        $locked = $locker->getLockedRepository()->findPackage($package->getName(), new MatchAllConstraint());
-        if (is_null($locked)) {
-            return null;
-        }
-
-        // Could be an aliased package this is locked, in those cases we should take the AliasOf to register the correct alias.
-        return $locked instanceof CompleteAliasPackage ?
-            new AliasPackage($package, $locked->getAliasOf()->getVersion(), $locked->getAliasOf()->getPrettyVersion()) :
-            new AliasPackage($package, $locked->getVersion(), $locked->getPrettyVersion());
-    }
-
-    /**
-     * Sometimes when multiple packages are linked with their dependencies,
-     * it can happen that a transitive dependency of those dependencies points to the current linked packages.
-     * These packages are not registered in the lockfile, so we look those up in the repository manager.
-     *
-     *  E.g.,
-     *  Linked => package-1:dev-linked (requires package-2:dev-main requires package-3:dev-main)
-     *  Link => package-3:dev-linked
-     *
-     *  We create an alias from package-3:dev-main to package-3:dev-linked
-     */
-    private function createAliasForKnownPackage(LinkedPackage $package): ?AliasPackage
-    {
-        // Check if the package is already registered in the repository manager, if so make an alias to that variant
-        $known = $this->composer->getRepositoryManager()->findPackage($package->getName(), new MatchAllConstraint());
-        if (is_null($known)) {
-            return null;
-        }
-
-        return $known instanceof CompleteAliasPackage ?
-            new AliasPackage($package, $known->getAliasOf()->getVersion(), $known->getAliasOf()->getPrettyVersion()) :
-            new AliasPackage($package, $known->getVersion(), $known->getPrettyVersion());
     }
 
     /**

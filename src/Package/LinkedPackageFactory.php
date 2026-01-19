@@ -19,7 +19,6 @@ use Composer\Installer\InstallationManager;
 use Composer\Json\JsonFile;
 use Composer\Package\CompletePackage;
 use Composer\Package\Loader\ArrayLoader;
-use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Repository\LockArrayRepository;
 use RuntimeException;
 
