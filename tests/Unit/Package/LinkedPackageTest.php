@@ -31,6 +31,7 @@ class LinkedPackageTest extends TestCase
         $package = static::createStub(CompletePackageInterface::class);
         $package->method('getName')->willReturn('test/package');
         $originalPackage = static::createStub(PackageInterface::class);
+        $originalPackage->method('getVersion')->willReturn('1.0.0');
 
         $linkedPackage = new LinkedPackage(
             $package,
@@ -45,7 +46,8 @@ class LinkedPackageTest extends TestCase
         static::assertSame('dist', $linkedPackage->getInstallationSource());
         static::assertSame('path', $linkedPackage->getDistType());
         static::assertSame('stable', $linkedPackage->getStability());
-        static::assertSame('dev-linked', $linkedPackage->getVersion());
+        static::assertSame('dev-linked', $linkedPackage->getPrettyVersion());
+        static::assertSame('1.0.0', $linkedPackage->getVersion());
         static::assertFalse($linkedPackage->isWithoutDependencies());
 
         static::assertSame($package, $linkedPackage->getLinkedPackage());
@@ -67,6 +69,7 @@ class LinkedPackageTest extends TestCase
         $originalPackage = static::createStub(PackageInterface::class);
         $originalPackage->method('getRequires')->willReturn(['orig-test' => $link]);
         $originalPackage->method('getDevRequires')->willReturn(['orig-dev-test' => $link]);
+        $originalPackage->method('getVersion')->willReturn('1.0.1');
         $linkedPackage = new LinkedPackage(
             $package,
             '/test-path',
@@ -95,7 +98,7 @@ class LinkedPackageTest extends TestCase
 
         $root = $this->createMock(RootPackageInterface::class);
         $root->method('getName')->willReturn('root/package');
-        $link = new Link('root/package', 'test/package', new Constraint('=', 'dev-linked'), Link::TYPE_REQUIRE);
+        $link = new Link('root/package', 'test/package', new Constraint('=', '1.0.1'), Link::TYPE_REQUIRE);
         static::assertEquals($link, $linkedPackage->createLink($root));
     }
 
