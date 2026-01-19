@@ -169,6 +169,29 @@ class LinkManagerTest extends TestCase
         $this->linkManager->linkPackages(true);
     }
 
+    public function test_failed_link_packages(): void
+    {
+        $package = $this->mockPackage();
+        $link = $this->createMock(Link::class);
+        $package->method('createLink')->willReturn($link);
+        $this->linkManager->add($package);
+
+        $this->rootPackage->expects(static::once())->method('setRequires')->with(['test/package' => $link]);
+        $this->rootPackage->expects(static::once())->method('setDevRequires')->with([]);
+        $this->installer->expects(static::once())->method('setUpdate')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowList')->with(['test/package'])->willReturnSelf();
+        $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
+        $this->installer->expects(static::once())->method('run')->willReturn(2);
+        $this->repository->expects(static::once())->method('remove')->with($package);
+
+        $this->linkManager->linkPackages(true, [$package]);
+    }
+
     public function test_override_from_dev_requirements(): void
     {
         $package = $this->mockPackage();

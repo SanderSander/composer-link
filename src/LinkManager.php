@@ -150,7 +150,10 @@ class LinkManager
         return $this->linkedRepository->count() > 0;
     }
 
-    public function linkPackages(bool $isDev): void
+    /**
+     * @param LinkedPackage[] $recentAddedPackages
+     */
+    public function linkPackages(bool $isDev, array $recentAddedPackages = []): void
     {
         $repositoryManager = $this->composer->getRepositoryManager();
         $eventDispatcher = $this->composer->getEventDispatcher();
@@ -193,7 +196,14 @@ class LinkManager
             ->setDevMode($isDev)
             ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
 
-        $installer->run();
+        $exit = $installer->run();
+        $this->io->debug('Installer exited with code ' . $exit);
+        if ($exit !== 0) {
+            foreach ($recentAddedPackages as $package) {
+                $this->io->error('<error>Package ' . $package->getName() . ' is not linked.</error>');
+                $this->remove($package);
+            }
+        }
 
         $eventDispatcher->setRunScripts();
         $this->io->warning('<warning>Linking packages finished!</warning>');
