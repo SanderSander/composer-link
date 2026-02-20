@@ -25,9 +25,16 @@ class Repository
      */
     protected array $linkedPackages = [];
 
+    /**
+     * @var LinkedPackage[]
+     */
+    protected array $extraPackages = [];
+
     public function __construct(
         protected readonly StorageInterface $storage,
         protected readonly Transformer $transformer,
+        /** @var string[] */
+        protected readonly array $extra,
     ) {
         $this->load();
     }
@@ -51,7 +58,12 @@ class Repository
     public function all(): array
     {
         $all = [];
+        // TODO filter packages?
         foreach ($this->linkedPackages as $package) {
+            $all[] = clone $package;
+        }
+
+        foreach ($this->extraPackages as $package) {
             $all[] = clone $package;
         }
 
@@ -113,6 +125,11 @@ class Repository
 
         foreach ($data['packages'] as $package) {
             $this->linkedPackages[] = $this->transformer->load($package);
+        }
+
+        // Load extra packages
+        foreach ($this->extra as $extraPackage) {
+            $this->extraPackages[] = $this->transformer->load(['path' => $extraPackage, 'withoutDependencies' => false]);
         }
     }
 

@@ -102,7 +102,7 @@ class Plugin implements PluginInterface, Capable, EventSubscriberInterface
         $storageFile = $this->composer->getConfig()
                 ->get('vendor-dir') . DIRECTORY_SEPARATOR . 'linked-packages.json';
 
-        return $this->repositoryFactory->create($storageFile, $this->getPackageFactory());
+        return $this->repositoryFactory->create($storageFile, $this->getPackageFactory(), $this->composer);
     }
 
     protected function initializeLinkedPackageFactory(): LinkedPackageFactory
