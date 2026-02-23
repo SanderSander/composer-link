@@ -9,7 +9,7 @@ while maintaining the composer abilities to manage/upgrade your packages.
 
 ## Requirements
 
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer >= 2.6
 
 ## Installation
