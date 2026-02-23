@@ -23,6 +23,7 @@ class RepositoryFactory
 {
     public function create(string $storageFile, LinkedPackageFactory $linkedPackageFactory, Composer $composer): Repository
     {
+        /** @var array{composer-link?: array{paths?: list<non-empty-string>}} $extra */
         $extra = $composer->getPackage()->getExtra();
         $paths = $extra['composer-link']['paths'] ?? [];
         foreach ($paths as $index => $path) {

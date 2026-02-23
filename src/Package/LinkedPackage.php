@@ -314,8 +314,12 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
         $this->linkedPackage->setArchiveExcludes($excludes);
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getName(): string
     {
+        /* @phpstan-ignore-next-line */
         return $this->linkedPackage->getName();
     }
 

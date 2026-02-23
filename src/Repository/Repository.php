@@ -31,7 +31,7 @@ class Repository
     protected array $extraPackages = [];
 
     /**
-     * @var string[]
+     * @var list<non-empty-string>
      */
     protected array $unlinkedExtra = [];
 
@@ -49,8 +49,7 @@ class Repository
         if ($this->isFromExtra($linkedPackage)) {
             $index = array_search($linkedPackage->getName(), $this->unlinkedExtra, true);
             if ($index !== false) {
-                unset($this->unlinkedExtra[$index]);
-                $this->unlinkedExtra = array_values($this->unlinkedExtra);
+                array_splice($this->unlinkedExtra, $index, 1);
             }
 
             return;

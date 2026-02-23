@@ -21,7 +21,8 @@ interface StorageInterface
      * Write data to storage.
      *
      * @param array{
-     *              packages: list<array{path: non-empty-string, withoutDependencies?: bool}>
+     *              packages: list<array{path: non-empty-string, withoutDependencies?: bool}>,
+     *              unlinkedExtra: list<non-empty-string>
      *        } $data
      */
     public function write(array $data): void;
@@ -31,7 +32,7 @@ interface StorageInterface
      *
      * @return array{
      *             packages: list<array{path: non-empty-string, withoutDependencies?: bool}>,
-     *             unlinkedExtra: list<non-empty-string>
+     *             unlinkedExtra?: list<non-empty-string>
      *         }
      */
     public function read(): array;

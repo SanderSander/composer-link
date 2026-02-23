@@ -75,6 +75,9 @@ class PathHelper
         return new PathHelper($real);
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getNormalizedPath(): string
     {
         $path = $this->path;
@@ -84,6 +87,10 @@ class PathHelper
 
         if (str_ends_with($path, '/')) {
             $path = substr($path, 0, -1);
+        }
+
+        if ($path === '') {
+            throw new InvalidArgumentException('Path cannot be empty.');
         }
 
         return $path;
