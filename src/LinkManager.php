@@ -186,11 +186,9 @@ class LinkManager
         $eventDispatcher->setRunScripts(false);
         $installer = $this->installerFactory->create();
 
-        /* @phpstan-ignore method.deprecated */
         $installer->setUpdate(count($this->requires) > 0)
             ->setInstall(true)
             ->setWriteLock(false)
-            ->setRunScripts(false)
             ->setUpdateAllowList(array_keys($this->requires))
             ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setDevMode($isDev)

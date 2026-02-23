@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace ComposerLink;
 
 use Composer\Composer;
+use Composer\EventDispatcher\EventDispatcher;
 use Composer\Installer;
 use Composer\IO\IOInterface;
 
@@ -32,6 +33,21 @@ class InstallerFactory
      */
     public function create(): Installer
     {
-        return Installer::create($this->io, $this->composer);
+        $eventDispatcher = new EventDispatcher(
+            $this->composer, $this->io
+        );
+        $eventDispatcher->setRunScripts(false);
+
+        return new Installer(
+            $this->io,
+            $this->composer->getConfig(),
+            $this->composer->getPackage(),
+            $this->composer->getDownloadManager(),
+            $this->composer->getRepositoryManager(),
+            $this->composer->getLocker(),
+            $this->composer->getInstallationManager(),
+            $eventDispatcher,
+            $this->composer->getAutoloadGenerator()
+        );
     }
 }
