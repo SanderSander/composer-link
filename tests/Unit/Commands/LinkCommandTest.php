@@ -111,9 +111,14 @@ class LinkCommandTest extends TestCase
     public function test_link_command_from_global(): void
     {
         $this->plugin->method('isGlobal')->willReturn(true);
+        $realPath = realpath(__DIR__ . '/../..');
+        if (PHP_OS_FAMILY === 'Windows') {
+            $realPath = str_replace('\\', '/', $realPath);
+        }
+
         $this->packageFactory->expects(static::once())
             ->method('fromPath')
-            ->with(realpath(__DIR__ . '/../..'));
+            ->with($realPath);
 
         $this->linkManager->expects(static::once())->method('add');
 

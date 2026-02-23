@@ -31,7 +31,7 @@ class PathHelperTest extends TestCase
         $root = realpath($testPath);
         $helper = new PathHelper($path);
         static::assertEquals(
-            $root . DIRECTORY_SEPARATOR . $path,
+            $root . '/' . $path,
             $helper->toAbsolutePath($testPath)
                 ->getNormalizedPath()
         );
@@ -108,7 +108,7 @@ class PathHelperTest extends TestCase
     {
         return [
             ['tests'],
-            ['tests' . DIRECTORY_SEPARATOR . 'Unit' . DIRECTORY_SEPARATOR . 'TestCase.php'],
+            ['tests/Unit/TestCase.php'],
         ];
     }
 }
