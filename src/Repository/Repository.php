@@ -17,6 +17,7 @@ namespace ComposerLink\Repository;
 
 use ComposerLink\Package\LinkedPackage;
 use RuntimeException;
+use Throwable;
 
 class Repository
 {
@@ -151,7 +152,11 @@ class Repository
     {
         // Load extra packages
         foreach ($this->extra as $extraPackage) {
-            $this->extraPackages[] = $this->transformer->load(['path' => $extraPackage, 'withoutDependencies' => false]);
+            try {
+                $this->extraPackages[] = $this->transformer->load(['path' => $extraPackage, 'withoutDependencies' => false]);
+            } catch (Throwable) {
+                // Do nothing if the path is not found
+            }
         }
 
         if (!$this->storage->hasData()) {
