@@ -37,7 +37,7 @@ class WindowsBasicTest extends TestCase
             $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . self::RELATIVE_PATH_MOCK . '\package-1',
+            'test/package-1	' . self::RELATIVE_PATH_MOCK . '/package-1',
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
