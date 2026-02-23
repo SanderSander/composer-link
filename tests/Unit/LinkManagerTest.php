@@ -137,7 +137,6 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setUpdate')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
-        $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with([])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
@@ -159,7 +158,6 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setUpdate')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
-        $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with(['test/package'])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
@@ -181,7 +179,6 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setUpdate')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setInstall')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
-        $this->installer->expects(static::once())->method('setRunScripts')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with(['test/package'])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
         $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
