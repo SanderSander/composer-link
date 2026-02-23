@@ -147,7 +147,7 @@ class LinkManager
 
     public function hasLinkedPackages(): bool
     {
-        return $this->linkedRepository->count() > 0;
+        return count($this->repository->all()) > 0;
     }
 
     /**

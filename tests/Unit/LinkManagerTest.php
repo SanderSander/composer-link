@@ -93,7 +93,7 @@ class LinkManagerTest extends TestCase
     public function test_has_linked_packages(): void
     {
         static::assertFalse($this->linkManager->hasLinkedPackages());
-        $this->linkManager->add($this->mockPackage());
+        $this->repository->method('all')->willReturn([$this->mockPackage()]);
         static::assertTrue($this->linkManager->hasLinkedPackages());
     }
 
