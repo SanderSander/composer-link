@@ -17,12 +17,16 @@ namespace ComposerLink\Repository;
 
 use Composer\Composer;
 use ComposerLink\Package\LinkedPackageFactory;
+use ComposerLink\PathHelper;
 
 class RepositoryFactory
 {
     public function create(string $storageFile, LinkedPackageFactory $linkedPackageFactory, Composer $composer): Repository
     {
         $paths = $composer->getPackage()->getExtra()['composer-link']['paths'] ?? [];
+        foreach ($paths as $index => $path) {
+            $paths[$index] = (new PathHelper($path))->getNormalizedPath();
+        }
 
         return new Repository(
             new JsonStorage($storageFile),

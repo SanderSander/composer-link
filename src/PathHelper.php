@@ -80,14 +80,17 @@ class PathHelper
      */
     public function getNormalizedPath(): string
     {
-        if (substr($this->path, -1) === DIRECTORY_SEPARATOR) {
-            /** @var non-empty-string $path */
-            $path = substr($this->path, 0, -1);
-
-            return $path;
+        /** @var non-empty-string $path */
+        $path = $this->path;
+        if (PHP_OS_FAMILY === 'Windows') {
+            $path = str_replace('\\', '/', $path);
         }
 
-        return $this->path;
+        if (str_ends_with($path, '/')) {
+            return substr($path, 0, -1);
+        }
+
+        return $path;
     }
 
     public function isAbsolutePath(string $path): bool
