@@ -33,11 +33,11 @@ class WindowsBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Junctioning from ' . self::RELATIVE_PATH_MOCK . '\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . self::RELATIVE_PATH_MOCK . '/package-1',
             $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . self::RELATIVE_PATH_MOCK . '\package-1',
+            'test/package-1	' . self::RELATIVE_PATH_MOCK . '/package-1',
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
@@ -63,11 +63,11 @@ class WindowsBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '/package-1',
             $this->runComposerCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . $this->getMockDirectory() . '\package-1',
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
@@ -93,11 +93,11 @@ class WindowsBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Junctioning from ' . self::RELATIVE_PATH_MOCK . '\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . self::RELATIVE_PATH_MOCK . '/package-1',
             $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . self::RELATIVE_PATH_MOCK . '\package-1',
+            'test/package-1	' . self::RELATIVE_PATH_MOCK . '/package-1',
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
@@ -123,11 +123,11 @@ class WindowsBasicTest extends TestCase
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(
-            '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '\package-1',
+            '  - Installing test/package-1 (dev-linked): Junctioning from ' . $this->getMockDirectory() . '/package-1',
             $this->runComposerCommand('link ' . $this->getMockDirectory() . '\package-1')
         );
         static::assertStringContainsString(
-            'test/package-1	' . $this->getMockDirectory() . '\package-1',
+            'test/package-1	' . $this->getMockDirectory() . '/package-1',
             $this->runComposerCommand('linked')
         );
         static::assertStringContainsString(

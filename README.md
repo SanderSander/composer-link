@@ -74,6 +74,26 @@ composer linked
 composer global linked
 ```
 
+## Configuration
+
+It is also possible to predefine linked packages in your `composer.json` file. 
+This is useful for projects that always require certain local packages to be linked. 
+
+```json
+{
+    "extra": {
+        "composer-link": {
+            "paths": [
+                "../path-to-package"
+            ]
+        }
+    }
+}
+```
+
+The packages defined in `paths` will be automatically linked when running `composer install` or `composer update`. 
+You can still use the `composer unlink` command to temporarily unlink these packages.
+
 ## Development
 
 The following tools are available for development.

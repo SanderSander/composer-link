@@ -39,7 +39,8 @@ class JsonStorage implements StorageInterface
         /** @var string $data */
         $data = file_get_contents($this->file);
         /** @var array{
-         *     packages: list<array{path: non-empty-string, withoutDependencies?: bool}>
+         *     packages: list<array{path: non-empty-string, withoutDependencies?: bool}>,
+         *     unlinkedExtra?: list<non-empty-string>
          * } $json */
         $json = json_decode($data, true);
 

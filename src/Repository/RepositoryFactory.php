@@ -15,15 +15,25 @@ declare(strict_types=1);
 
 namespace ComposerLink\Repository;
 
+use Composer\Composer;
 use ComposerLink\Package\LinkedPackageFactory;
+use ComposerLink\PathHelper;
 
 class RepositoryFactory
 {
-    public function create(string $storageFile, LinkedPackageFactory $linkedPackageFactory): Repository
+    public function create(string $storageFile, LinkedPackageFactory $linkedPackageFactory, Composer $composer): Repository
     {
+        /** @var array{composer-link?: array{paths?: list<non-empty-string>}} $extra */
+        $extra = $composer->getPackage()->getExtra();
+        $paths = $extra['composer-link']['paths'] ?? [];
+        foreach ($paths as $index => $path) {
+            $paths[$index] = (new PathHelper($path))->getNormalizedPath();
+        }
+
         return new Repository(
             new JsonStorage($storageFile),
-            new Transformer($linkedPackageFactory)
+            new Transformer($linkedPackageFactory),
+            $paths,
         );
     }
 }

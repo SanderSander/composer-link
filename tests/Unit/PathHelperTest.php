@@ -29,9 +29,14 @@ class PathHelperTest extends TestCase
     {
         $testPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
         $root = realpath($testPath);
+        if (PHP_OS_FAMILY === 'Windows') {
+            /** @phpstan-ignore-next-line  */
+            $root = str_replace('\\', '/', $root);
+        }
+
         $helper = new PathHelper($path);
         static::assertEquals(
-            $root . DIRECTORY_SEPARATOR . $path,
+            $root . '/' . $path,
             $helper->toAbsolutePath($testPath)
                 ->getNormalizedPath()
         );
@@ -44,9 +49,14 @@ class PathHelperTest extends TestCase
         $pathWildcard = new PathHelper($this->tmpAbsoluteDir);
         $absolute = $pathWildcard->toAbsolutePath($cwd);
 
+        $expected = substr($this->tmpAbsoluteDir, 0, -1);
+        if (PHP_OS_FAMILY === 'Windows') {
+            $expected = str_replace('\\', '/', $expected);
+        }
+
         // We expect a normalized path, so we remove the trailing slash
         static::assertSame(
-            substr($this->tmpAbsoluteDir, 0, -1),
+            $expected,
             $absolute->getNormalizedPath()
         );
     }
@@ -97,8 +107,13 @@ class PathHelperTest extends TestCase
         $pathWildcard = new PathHelper($this->tmpRelativeDir . '*');
         $absolute = $pathWildcard->toAbsolutePath($cwd);
 
+        $absoluteExpected = $this->tmpAbsoluteDir;
+        if (PHP_OS_FAMILY === 'Windows') {
+            $absoluteExpected = str_replace('\\', '/', $absoluteExpected);
+        }
+
         static::assertTrue($absolute->isWildCard());
-        static::assertSame($this->tmpAbsoluteDir . '*', $absolute->getNormalizedPath());
+        static::assertSame($absoluteExpected . '*', $absolute->getNormalizedPath());
     }
 
     /**
@@ -108,7 +123,7 @@ class PathHelperTest extends TestCase
     {
         return [
             ['tests'],
-            ['tests' . DIRECTORY_SEPARATOR . 'Unit' . DIRECTORY_SEPARATOR . 'TestCase.php'],
+            ['tests/Unit/TestCase.php'],
         ];
     }
 }

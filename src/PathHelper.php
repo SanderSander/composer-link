@@ -29,7 +29,7 @@ class PathHelper
 
     public function isWildCard(): bool
     {
-        return substr($this->path, -2) === DIRECTORY_SEPARATOR . '*';
+        return str_ends_with($this->path, '*');
     }
 
     /**
@@ -80,14 +80,23 @@ class PathHelper
      */
     public function getNormalizedPath(): string
     {
-        if (substr($this->path, -1) === DIRECTORY_SEPARATOR) {
-            /** @var non-empty-string $path */
-            $path = substr($this->path, 0, -1);
+        $path = $this->path;
 
-            return $path;
+        // In windows a path like A/b\c\d/E\F is possible and even case-insensitive, so screw that
+        // We will just use / directory separator internally and not mixed random stuff.
+        if (PHP_OS_FAMILY === 'Windows') {
+            $path = str_replace('\\', '/', $path);
         }
 
-        return $this->path;
+        if (str_ends_with($path, '/')) {
+            $path = substr($path, 0, -1);
+        }
+
+        if ($path === '') {
+            throw new InvalidArgumentException('Path cannot be empty.');
+        }
+
+        return $path;
     }
 
     public function isAbsolutePath(string $path): bool

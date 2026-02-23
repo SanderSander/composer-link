@@ -43,6 +43,10 @@ abstract class TestCase extends PHPUnitTestCase
 
         $this->tmpAbsoluteDir = realpath($tmp) . DIRECTORY_SEPARATOR;
         $this->tmpRelativeDir = $tmp . DIRECTORY_SEPARATOR;
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $this->tmpRelativeDir = str_replace('\\', '/', $this->tmpRelativeDir);
+        }
     }
 
     protected function tearDown(): void
