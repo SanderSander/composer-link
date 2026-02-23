@@ -19,6 +19,8 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventDispatcher;
 use Composer\Installer;
 use Composer\IO\IOInterface;
+use Composer\Package\BasePackage;
+use Composer\Package\RootPackageInterface;
 
 class InstallerFactory
 {
@@ -38,10 +40,13 @@ class InstallerFactory
         );
         $eventDispatcher->setRunScripts(false);
 
+        /** @var RootPackageInterface&BasePackage $package */
+        $package = $this->composer->getPackage();
+
         return new Installer(
             $this->io,
             $this->composer->getConfig(),
-            $this->composer->getPackage(),
+            $package,
             $this->composer->getDownloadManager(),
             $this->composer->getRepositoryManager(),
             $this->composer->getLocker(),
