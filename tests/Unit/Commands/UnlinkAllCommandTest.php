@@ -61,7 +61,7 @@ class UnlinkAllCommandTest extends TestCase
         $this->application = new Application();
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(false);
-        $this->application->add(new UnlinkAllCommand($this->plugin));
+        $this->application->addCommand(new UnlinkAllCommand($this->plugin));
     }
 
     public function test_unlink_all_command(): void

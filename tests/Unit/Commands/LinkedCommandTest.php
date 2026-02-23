@@ -41,7 +41,7 @@ class LinkedCommandTest extends TestCase
         $this->application = new Application();
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(false);
-        $this->application->add(new LinkedCommand($this->plugin));
+        $this->application->addCommand(new LinkedCommand($this->plugin));
     }
 
     public function test_no_linked_packages(): void

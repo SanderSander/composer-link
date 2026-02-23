@@ -68,7 +68,7 @@ class LinkCommandTest extends TestCase
         $this->application = new Application();
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(false);
-        $this->application->add($command);
+        $this->application->addCommand($command);
     }
 
     public function test_link_command(): void

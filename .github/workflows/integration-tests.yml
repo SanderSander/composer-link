@@ -23,7 +23,7 @@ jobs:
       matrix:
         operating-system: ['ubuntu-latest', 'macos-latest', 'windows-latest']
         # First is php version, second composer version
-        versions: [['8.1', '2.6'], ['8.3', '2.7'], ['8.4', 'v2'], ['8.5', 'v2']]
+        versions: [['8.2', '2.6'], ['8.3', '2.7'], ['8.4', 'v2'], ['8.5', 'v2']]
     steps:
       - uses: actions/checkout@v3
 

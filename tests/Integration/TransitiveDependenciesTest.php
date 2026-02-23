@@ -15,10 +15,10 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-/**
- * @group ubuntu-latest
- * @group macos-latest
- */
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('ubuntu-latest')]
+#[Group('macos-latest')]
 class TransitiveDependenciesTest extends TestCase
 {
     public function test_link_with_transitive_dependencies(): void

@@ -15,9 +15,9 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-/**
- * @group windows-latest
- */
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('windows-latest')]
 class WindowsBasicTest extends TestCase
 {
     /**
