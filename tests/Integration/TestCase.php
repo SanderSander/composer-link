@@ -21,7 +21,7 @@ use Tests\TestCase as BaseCase;
 
 abstract class TestCase extends BaseCase
 {
-    public const RELATIVE_PATH_MOCK = '..' . DIRECTORY_SEPARATOR . 'composer-link' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'mock';
+    public const RELATIVE_PATH_MOCK = '../composer-link/tests/mock';
 
     protected Application $application;
 

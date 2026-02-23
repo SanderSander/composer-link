@@ -30,6 +30,7 @@ class PathHelperTest extends TestCase
         $testPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
         $root = realpath($testPath);
         if (PHP_OS_FAMILY === 'Windows') {
+            /** @phpstan-ignore-next-line  */
             $root = str_replace('\\', '/', $root);
         }
 

@@ -113,6 +113,7 @@ class LinkCommandTest extends TestCase
         $this->plugin->method('isGlobal')->willReturn(true);
         $realPath = realpath(__DIR__ . '/../..');
         if (PHP_OS_FAMILY === 'Windows') {
+            /** @phpstan-ignore-next-line  */
             $realPath = str_replace('\\', '/', $realPath);
         }
 
