@@ -29,6 +29,10 @@ class PathHelperTest extends TestCase
     {
         $testPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..';
         $root = realpath($testPath);
+        if (PHP_OS_FAMILY === 'Windows') {
+            $root = str_replace('\\', '/', $root);
+        }
+
         $helper = new PathHelper($path);
         static::assertEquals(
             $root . '/' . $path,

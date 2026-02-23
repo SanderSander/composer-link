@@ -81,6 +81,9 @@ class PathHelper
     public function getNormalizedPath(): string
     {
         $path = $this->path;
+
+        // In windows a path like A/b\c\d/E\F is possible and even case-insensitive, so screw that
+        // We will just use / directory separator internally and not mixed random stuff.
         if (PHP_OS_FAMILY === 'Windows') {
             $path = str_replace('\\', '/', $path);
         }
