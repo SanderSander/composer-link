@@ -15,9 +15,9 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-/**
- * @group ubuntu-latest
- */
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('ubuntu-latest')]
 class LinuxExtraTest extends TestCase
 {
     public function test_upgrade_safety_mechanism(): void
