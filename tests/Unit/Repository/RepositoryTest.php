@@ -42,7 +42,8 @@ class RepositoryTest extends TestCase
     {
         return new Repository(
             $this->storage,
-            $this->transformer
+            $this->transformer,
+            []
         );
     }
 
@@ -121,7 +122,7 @@ class RepositoryTest extends TestCase
 
         $this->storage->expects(static::once())
             ->method('write')
-            ->with(['packages' => []]);
+            ->with(['packages' => [], 'unlinkedExtra' => []]);
         $repository->persist();
     }
 

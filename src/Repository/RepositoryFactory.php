@@ -23,7 +23,8 @@ class RepositoryFactory
 {
     public function create(string $storageFile, LinkedPackageFactory $linkedPackageFactory, Composer $composer): Repository
     {
-        $paths = $composer->getPackage()->getExtra()['composer-link']['paths'] ?? [];
+        $extra = $composer->getPackage()->getExtra();
+        $paths = $extra['composer-link']['paths'] ?? [];
         foreach ($paths as $index => $path) {
             $paths[$index] = (new PathHelper($path))->getNormalizedPath();
         }

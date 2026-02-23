@@ -75,19 +75,15 @@ class PathHelper
         return new PathHelper($real);
     }
 
-    /**
-     * @return non-empty-string
-     */
     public function getNormalizedPath(): string
     {
-        /** @var non-empty-string $path */
         $path = $this->path;
         if (PHP_OS_FAMILY === 'Windows') {
             $path = str_replace('\\', '/', $path);
         }
 
         if (str_ends_with($path, '/')) {
-            return substr($path, 0, -1);
+            $path = substr($path, 0, -1);
         }
 
         return $path;

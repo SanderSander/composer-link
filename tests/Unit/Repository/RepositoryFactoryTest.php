@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Repository;
 
+use Composer\Composer;
 use ComposerLink\Package\LinkedPackageFactory;
 use ComposerLink\Repository\RepositoryFactory;
 use Tests\Unit\TestCase;
@@ -24,7 +25,11 @@ class RepositoryFactoryTest extends TestCase
     public function test_creates_repository(): void
     {
         $factory = new RepositoryFactory();
-        $factory->create($this->tmpAbsoluteDir . 'linked-packages.json', $this->createMock(LinkedPackageFactory::class));
+        $factory->create(
+            $this->tmpAbsoluteDir . 'linked-packages.json',
+            $this->createMock(LinkedPackageFactory::class),
+            $this->createMock(Composer::class)
+        );
 
         static::expectNotToPerformAssertions();
     }
