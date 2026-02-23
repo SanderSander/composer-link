@@ -149,6 +149,11 @@ class Repository
 
     private function load(): void
     {
+        // Load extra packages
+        foreach ($this->extra as $extraPackage) {
+            $this->extraPackages[] = $this->transformer->load(['path' => $extraPackage, 'withoutDependencies' => false]);
+        }
+
         if (!$this->storage->hasData()) {
             return;
         }
@@ -157,11 +162,6 @@ class Repository
 
         foreach ($data['packages'] as $package) {
             $this->linkedPackages[] = $this->transformer->load($package);
-        }
-
-        // Load extra packages
-        foreach ($this->extra as $extraPackage) {
-            $this->extraPackages[] = $this->transformer->load(['path' => $extraPackage, 'withoutDependencies' => false]);
         }
 
         $this->unlinkedExtra = $data['unlinkedExtra'] ?? [];
