@@ -192,7 +192,7 @@ class LinkManager
             ->setUpdateAllowList(array_keys($this->requires))
             ->setPlatformRequirementFilter(new IgnoreAllPlatformRequirementFilter())
             ->setDevMode($isDev)
-            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_ONLY_LISTED);
+            ->setUpdateAllowTransitiveDependencies(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS_NO_ROOT_REQUIRE);
 
         $exit = $installer->run();
         $this->io->debug('Installer exited with code ' . $exit);
