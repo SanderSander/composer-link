@@ -139,8 +139,12 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with([])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(false)->willReturnSelf();
-        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
-        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')
+            ->with(new IgnoreAllPlatformRequirementFilter())
+            ->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')
+            ->with(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS_NO_ROOT_REQUIRE)
+            ->willReturnSelf();
         $this->installer->expects(static::once())->method('run');
 
         $this->linkManager->linkPackages(false);
@@ -160,8 +164,12 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with(['test/package'])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
-        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
-        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')
+            ->with(new IgnoreAllPlatformRequirementFilter())
+            ->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')
+            ->with(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS_NO_ROOT_REQUIRE)
+            ->willReturnSelf();
         $this->installer->expects(static::once())->method('run');
 
         $this->linkManager->linkPackages(true);
@@ -181,8 +189,12 @@ class LinkManagerTest extends TestCase
         $this->installer->expects(static::once())->method('setWriteLock')->with(false)->willReturnSelf();
         $this->installer->expects(static::once())->method('setUpdateAllowList')->with(['test/package'])->willReturnSelf();
         $this->installer->expects(static::once())->method('setDevMode')->with(true)->willReturnSelf();
-        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')->with(new IgnoreAllPlatformRequirementFilter())->willReturnSelf();
-        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')->with(Request::UPDATE_ONLY_LISTED)->willReturnSelf();
+        $this->installer->expects(static::once())->method('setPlatformRequirementFilter')
+            ->with(new IgnoreAllPlatformRequirementFilter())
+            ->willReturnSelf();
+        $this->installer->expects(static::once())->method('setUpdateAllowTransitiveDependencies')
+            ->with(Request::UPDATE_LISTED_WITH_TRANSITIVE_DEPS_NO_ROOT_REQUIRE)
+            ->willReturnSelf();
         $this->installer->expects(static::once())->method('run')->willReturn(2);
         $this->repository->expects(static::once())->method('remove')->with($package);
 
