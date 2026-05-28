@@ -19,7 +19,7 @@ jobs:
         operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
         php-versions: [ '8.2', '8.5' ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

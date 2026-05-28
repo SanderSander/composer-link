@@ -14,12 +14,12 @@ jobs:
   phpmd:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
 
       - name: Validate composer.json
         run: composer validate --strict
@@ -28,4 +28,4 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Run phpmd
-        run: ./vendor/bin/phpmd ./src,./tests github ruleset.xml
+        run: ./vendor/bin/phpmd analyze ./src ./tests --format=github --ruleset=ruleset.xml

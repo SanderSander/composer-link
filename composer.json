@@ -30,7 +30,8 @@
         "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^11.5.55",
         "phpstan/phpstan-phpunit": "^2.0",
-        "phpmd/phpmd": "^2.12",
+        "phpmd/phpmd": "^3.x-dev",
+        "pdepend/pdepend": "3.x-dev",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpstan/phpstan-deprecation-rules": "^2.0"
     },
@@ -38,7 +39,7 @@
         "class": "ComposerLink\\Plugin"
     },
     "scripts": {
-        "phpmd": "./vendor/bin/phpmd ./src,./tests ansi ruleset.xml",
+        "phpmd": "./vendor/bin/phpmd analyze ./src ./tests --ansi --ruleset=ruleset.xml",
         "test": "./vendor/bin/phpunit --testsuite=Unit",
         "test-integration": [
             "docker build -t composer-link-test ./support && docker run --rm -v $PWD:/composer-link composer-link-test"
