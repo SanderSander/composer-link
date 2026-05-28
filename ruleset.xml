@@ -27,10 +27,16 @@
     </rule>
     <rule ref="rulesets/naming.xml">
         <exclude name="ShortVariable" />
+        <exclude name="LongMethodName" />
     </rule>
     <rule ref="rulesets/naming.xml/ShortVariable">
         <properties>
             <property name="exceptions" value="io" />
+        </properties>
+    </rule>
+    <rule ref="rulesets/naming.xml/LongMethodName">
+        <properties>
+            <property name="exceptions" value="test_*" />
         </properties>
     </rule>
     <rule ref="rulesets/unusedcode.xml" />
