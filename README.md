@@ -39,6 +39,7 @@ it to the absolute path.
 ```
 composer link ../path/to/package
 composer global link ../path/to/package
+composer link ../path/to/package-one ../path/to/package-two
 ```
 
 It's also possible to use a wildcard in your path, note that this will install all packages found in the directory `../packages`
