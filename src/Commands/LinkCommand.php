@@ -28,7 +28,7 @@ class LinkCommand extends Command
     {
         $this->setName('link');
         $this->setDescription('Link a package to a local directory');
-        $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
+        $this->addArgument('path', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The path(s) of the package(s)');
         $this->addOption(
             'without-dependencies',
             null,
@@ -56,11 +56,15 @@ class LinkCommand extends Command
     {
         /** @var bool $onlyInstalled */
         $onlyInstalled = $input->getOption('only-installed');
-        /** @var non-empty-string $pathArgument */
-        $pathArgument = $input->getArgument('path');
-        $paths = $this->getPaths($pathArgument);
+        /** @var non-empty-string[] $pathArguments */
+        $pathArguments = $input->getArgument('path');
         $manager = $this->plugin->getLinkManager();
         $added = [];
+
+        $paths = [];
+        foreach ($pathArguments as $pathArgument) {
+            $paths = array_merge($paths, $this->getPaths($pathArgument));
+        }
 
         foreach ($paths as $path) {
             $package = $this->getPackage($path, $output);

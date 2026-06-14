@@ -83,6 +83,18 @@ class LinkCommandTest extends TestCase
         static::assertSame(0, $this->application->run($input, $this->output));
     }
 
+    public function test_link_command_multiple_paths(): void
+    {
+        $this->packageFactory->expects(static::exactly(2))
+            ->method('fromPath');
+
+        $this->linkManager->expects(static::exactly(2))->method('add');
+        $this->linkManager->expects(static::once())->method('linkPackages');
+
+        $input = new StringInput('link /test-path-one /test-path-two');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
     public function test_only_installed_when_not_installed(): void
     {
         $this->packageFactory->expects(static::once())
