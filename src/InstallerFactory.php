@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace ComposerLink;
 
 use Composer\Composer;
+use Composer\EventDispatcher\Event;
 use Composer\EventDispatcher\EventDispatcher;
 use Composer\Installer;
 use Composer\IO\IOInterface;
@@ -35,10 +36,23 @@ class InstallerFactory
      */
     public function create(): Installer
     {
-        $eventDispatcher = new EventDispatcher(
-            $this->composer, $this->io
-        );
+        // Use an isolated dispatcher so script events (post-update-cmd etc.) don't
+        // fire and trigger Composer's circular-call detection when composer-link runs
+        // inside a script handler. Plugin events are forwarded to the global dispatcher
+        // so other plugins (e.g. version-constraint plugins) remain active.
+        $eventDispatcher = new EventDispatcher($this->composer, $this->io);
         $eventDispatcher->setRunScripts(false);
+
+        $globalDispatcher = $this->composer->getEventDispatcher();
+        foreach ($this->pluginEvents() as $eventName) {
+            $eventDispatcher->addListener(
+                $eventName,
+                static function (Event $event) use ($globalDispatcher, $eventName): void {
+                    $globalDispatcher->dispatch($eventName, $event);
+                },
+                PHP_INT_MAX
+            );
+        }
 
         /** @var RootPackageInterface&BasePackage $package */
         $package = $this->composer->getPackage();
@@ -54,5 +68,14 @@ class InstallerFactory
             $eventDispatcher,
             $this->composer->getAutoloadGenerator()
         );
+    }
+
+    /** @return string[] */
+    private function pluginEvents(): array
+    {
+        return [
+            'pre-pool-create',
+            'pre-operations-exec',
+        ];
     }
 }
