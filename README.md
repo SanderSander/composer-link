@@ -38,8 +38,8 @@ it to the absolute path.
 
 ```
 composer link ../path/to/package
-composer global link ../path/to/package
 composer link ../path/to/package-one ../path/to/package-two
+composer global link ../path/to/package
 ```
 
 It's also possible to use a wildcard in your path, note that this will install all packages found in the directory `../packages`
@@ -60,6 +60,7 @@ To unlink the package you can use the `unlink` command
 ```
 composer unlink ../path/to/package
 composer unlink ../packages/*
+composer unlink ../path/to/package-one ../path/to/package-two
 composer global unlink ../path/to/package
 ```
 

@@ -73,6 +73,16 @@ class UnlinkCommandTest extends TestCase
         static::assertSame(0, $this->application->run($input, $this->output));
     }
 
+    public function test_unlink_command_multiple_paths(): void
+    {
+        $this->repository->expects(static::exactly(2))->method('findByPath')->willReturn($this->package);
+        $this->linkManager->expects(static::exactly(2))->method('remove')->with($this->package);
+        $this->linkManager->expects(static::once())->method('linkPackages');
+
+        $input = new StringInput('unlink /test-path-one /test-path-two');
+        static::assertSame(0, $this->application->run($input, $this->output));
+    }
+
     public function test_unlink_command_for_existing_package_global(): void
     {
         $this->plugin->method('isGlobal')->willReturn(true);

@@ -26,7 +26,7 @@ class UnlinkCommand extends Command
     {
         $this->setName('unlink');
         $this->setDescription('Unlink a linked package');
-        $this->addArgument('path', InputArgument::REQUIRED, 'The path of the package');
+        $this->addArgument('path', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The path(s) of the package(s)');
         $this->addOption(
             'no-dev',
             null,
@@ -40,10 +40,14 @@ class UnlinkCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var non-empty-string $pathArgument */
-        $pathArgument = $input->getArgument('path');
-        $paths = $this->getPaths($pathArgument);
+        /** @var non-empty-string[] $pathArguments */
+        $pathArguments = $input->getArgument('path');
         $manager = $this->plugin->getLinkManager();
+
+        $paths = [];
+        foreach ($pathArguments as $pathArgument) {
+            $paths = array_merge($paths, $this->getPaths($pathArgument));
+        }
 
         foreach ($paths as $path) {
             $repository = $this->plugin->getRepository();
