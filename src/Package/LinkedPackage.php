@@ -49,11 +49,14 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
      */
     public function createLink(RootPackageInterface $root): Link
     {
+        $prettyVersion = $this->original?->getPrettyVersion() ?? 'dev-linked';
+
         return new Link(
             $root->getName(),
             $this->getName(),
             new Constraint('=', $this->original?->getVersion() ?? 'dev-linked'),
-            Link::TYPE_REQUIRE
+            Link::TYPE_REQUIRE,
+            '== ' . $prettyVersion
         );
     }
 
