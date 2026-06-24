@@ -69,6 +69,7 @@ class LinkedPackageTest extends TestCase
         $originalPackage = static::createStub(PackageInterface::class);
         $originalPackage->method('getRequires')->willReturn(['orig-test' => $link]);
         $originalPackage->method('getDevRequires')->willReturn(['orig-dev-test' => $link]);
+        $originalPackage->method('getPrettyVersion')->willReturn('1.0.1');
         $originalPackage->method('getVersion')->willReturn('1.0.1');
         $linkedPackage = new LinkedPackage(
             $package,
@@ -98,7 +99,7 @@ class LinkedPackageTest extends TestCase
 
         $root = $this->createMock(RootPackageInterface::class);
         $root->method('getName')->willReturn('root/package');
-        $link = new Link('root/package', 'test/package', new Constraint('=', '1.0.1'), Link::TYPE_REQUIRE);
+        $link = new Link('root/package', 'test/package', new Constraint('=', '1.0.1'), Link::TYPE_REQUIRE, '== 1.0.1');
         static::assertEquals($link, $linkedPackage->createLink($root));
     }
 
