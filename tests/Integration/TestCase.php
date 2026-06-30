@@ -56,10 +56,10 @@ abstract class TestCase extends BaseCase
         return $this->thisPackagePath . '/tests/mock';
     }
 
-    protected function runComposerCommand(string $command): string
+    protected function runComposerCommand(string $command, int &$exitCode = 0): string
     {
         $output = [];
-        exec('composer ' . $command . ' 2>&1', $output);
+        exec('composer ' . $command . ' 2>&1', $output, $exitCode);
 
         return implode(PHP_EOL, $output);
     }
@@ -149,6 +149,26 @@ abstract class TestCase extends BaseCase
         }');
 
         shell_exec('composer global require sandersander/composer-link @dev  2>&1');
+    }
+
+    public function test_composer_link_can_run_inside_post_update_command(): void
+    {
+        $this->useComposerLinkLocal();
+
+        $composerJson = $this->getCurrentComposeFile();
+        $composerJson['scripts']['post-update-cmd'] = [
+            '@php -r "file_put_contents(\'post-update-count.txt\', ((int) @file_get_contents(\'post-update-count.txt\')) + 1);"',
+            'composer link',
+        ];
+
+        $this->setCurrentComposeFile($composerJson);
+
+        $exitCode = 0;
+        $output = $this->runComposerCommand('update', $exitCode);
+
+        static::assertSame(0, $exitCode, $output);
+        static::assertStringNotContainsString('Circular call to script handler', $output);
+        static::assertSame('1', trim((string) file_get_contents('post-update-count.txt')));
     }
 
     public function tearDown(): void
