@@ -216,7 +216,7 @@ class LinuxMacosBasicTest extends TestCase
                 'symlink' => false,
             ],
         ];
-        $composerJson['require-dev']['test/plugin-event-listener'] = 'dev-master';
+        $composerJson['require-dev']['test/plugin-event-listener'] = '*@dev';
         $composerJson['config']['allow-plugins']['test/plugin-event-listener'] = true;
         $this->setCurrentComposeFile($composerJson);
 
