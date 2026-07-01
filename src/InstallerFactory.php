@@ -31,9 +31,6 @@ class InstallerFactory
     ) {
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.StaticAccess)
-     */
     public function create(): Installer
     {
         // Use an isolated dispatcher so script events (post-update-cmd etc.) don't
@@ -41,6 +38,8 @@ class InstallerFactory
         // inside a script handler. Plugin events are forwarded to the global dispatcher
         // so other plugins (e.g. version-constraint plugins) remain active.
         $eventDispatcher = new EventDispatcher($this->composer, $this->io);
+
+        // Prevent circular call to script handler 'post-update-cmd' by creating a new composer instance
         $eventDispatcher->setRunScripts(false);
 
         $globalDispatcher = $this->composer->getEventDispatcher();

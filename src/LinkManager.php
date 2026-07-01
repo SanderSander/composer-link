@@ -156,7 +156,6 @@ class LinkManager
     public function linkPackages(bool $isDev, array $recentAddedPackages = []): void
     {
         $repositoryManager = $this->composer->getRepositoryManager();
-        $eventDispatcher = $this->composer->getEventDispatcher();
         $rootPackage = $this->composer->getPackage();
 
         // Use the composer installer to install the linked packages with dependencies
@@ -181,9 +180,6 @@ class LinkManager
         }
         $rootPackage->setDevRequires($devRequires);
 
-        // Prevent circular call to script handler 'post-update-cmd' by creating a new composer instance
-        // We also need to set this on the Installer while it's deprecated
-        $eventDispatcher->setRunScripts(false);
         $installer = $this->installerFactory->create();
 
         $installer->setUpdate(count($this->requires) > 0)
@@ -203,7 +199,6 @@ class LinkManager
             }
         }
 
-        $eventDispatcher->setRunScripts();
         $this->io->warning('<warning>Linking packages finished!</warning>');
     }
 }

@@ -200,4 +200,46 @@ class LinuxMacosBasicTest extends TestCase
             $this->runComposerCommand('global linked')
         );
     }
+
+    /**
+     * Test if we can link a package in a project while using absolute paths.
+     */
+    public function test_composer_linked_forwards_pre_pool_create_to_other_plugins(): void
+    {
+        $this->useComposerLinkLocal();
+        $composerJson = $this->getCurrentComposeFile();
+
+        $composerJson['repositories'][] = [
+            'type' => 'path',
+            'url' => __DIR__ . '/../mock/PluginEventListenerMock',
+            'options' => [
+                'symlink' => false,
+            ],
+        ];
+        $composerJson['require-dev']['test/plugin-event-listener'] = 'dev-master';
+        $composerJson['config']['allow-plugins']['test/plugin-event-listener'] = true;
+        $this->setCurrentComposeFile($composerJson);
+
+        // Install the plugin
+        $exitCode = 0;
+        $output = $this->runComposerCommand('update', $exitCode);
+        static::assertSame(0, $exitCode, $output);
+        $exitCode = 0;
+        $output = $this->runComposerCommand('link ' . self::RELATIVE_PATH_MOCK . '/package-1', $exitCode);
+        static::assertSame(0, $exitCode, $output);
+
+        // Other plugins should have received the event
+        $count = (int) file_get_contents('pre-pool-create-fired.txt');
+        static::assertSame(1, $count, $output);
+
+        // Test events
+        $output = $this->runComposerCommand('install', $exitCode);
+        static::assertSame(0, $exitCode, $output);
+        static::assertFileExists('pre-pool-create-fired.txt', $output);
+
+        // Other plugins should have received the event twice (plus 1 time on the link)
+        // Once for the normal installation, and once for the linking the packages.
+        $count = (int) file_get_contents('pre-pool-create-fired.txt');
+        static::assertSame(3, $count, $output);
+    }
 }

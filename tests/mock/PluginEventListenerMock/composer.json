@@ -1,0 +1,15 @@
+{
+    "name": "test/plugin-event-listener",
+    "type": "composer-plugin",
+    "require": {
+        "composer-plugin-api": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tests\\Mock\\PluginEventListener\\": "/"
+        }
+    },
+    "extra": {
+        "class": "Tests\\Mock\\PluginEventListener\\PluginEventListenerMock"
+    }
+}
