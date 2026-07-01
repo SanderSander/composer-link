@@ -56,30 +56,41 @@ abstract class TestCase extends BaseCase
         return $this->thisPackagePath . '/tests/mock';
     }
 
-    protected function runComposerCommand(string $command): string
+    protected function runComposerCommand(string $command, int &$exitCode = 0): string
     {
         $output = [];
-        exec('composer ' . $command . ' 2>&1', $output);
+        exec('composer ' . $command . ' 2>&1', $output, $exitCode);
 
         return implode(PHP_EOL, $output);
     }
 
     /**
      * @return array{
-     *     require: array<string, string>,
-     *     repositories: array<array{type: string, url: string}>
-     * }
+     *      name?: string,
+     *      require?: array<string, string>,
+     *      require-dev?: array<string, string>,
+     *      repositories?: list<array<string, mixed>>,
+     *      config?: array{
+     *          allow-plugins?: array<string, bool>
+     *      }&array<string, mixed>,
+     *      scripts?: array<string, string|list<string>>
+     *  }
      */
     protected function getCurrentComposeFile(): array
     {
         /** @var string $content */
         $content = file_get_contents('composer.json');
-
         /** @var array{
-         * require: array<string, string>,
-         * repositories: array<array{type: string, url: string}>
+         *   name?: string,
+         *   require?: array<string, string>,
+         *   require-dev?: array<string, string>,
+         *   repositories?: list<array<string, mixed>>,
+         *   config?: array{
+         *     allow-plugins?: array<string, bool>
+         *   }&array<string, mixed>,
+         *   scripts?: array<string, string|list<string>>
          * } $json */
-        $json = json_decode($content, true);
+        $json = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
 
         return $json;
     }
