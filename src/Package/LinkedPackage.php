@@ -22,7 +22,7 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Repository\RepositoryInterface;
 use Composer\Semver\Constraint\Constraint;
-use Composer\Semver\Constraint\MatchAllConstraint;
+use DateTimeImmutable;
 use DateTimeInterface;
 
 /**
@@ -542,5 +542,17 @@ class LinkedPackage extends BasePackage implements CompletePackageInterface
     public function setSourceDistReferences(string $reference): void
     {
         $this->linkedPackage->setSourceDistReferences($reference);
+    }
+
+    public function getPublishedDate(): ?DateTimeImmutable
+    {
+        if (method_exists($this->linkedPackage, 'getPublishedDate')) {
+            $date = $this->linkedPackage->getPublishedDate();
+
+            // needed for composer version below 2.11
+            return $date instanceof DateTimeImmutable ? $date : null;
+        }
+
+        return null;
     }
 }
