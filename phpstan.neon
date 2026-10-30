@@ -5,6 +5,9 @@ parameters:
 		- tests
 	ignoreErrors:
 		- '#PHPDoc tag @SuppressWarnings has invalid value \(\(PHPMD.[a-zA-Z]+#'
+		- identifier: function.alreadyNarrowedType # when composer version below 2.11
+		  path: src/Package/LinkedPackage.php
+		  reportUnmatched: false
 includes:
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-phpunit/rules.neon
